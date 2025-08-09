@@ -282,11 +282,12 @@ Best regards,
 ${params.repName}`
     };
 
+    const emailType = params.type || 'followUp';
     return {
-      type: params.type || 'followUp',
-      draft: templates[params.type || 'followUp'],
-      subject: this.generateEmailSubject(params.type),
-      attachments: this.suggestAttachments(params.type)
+      type: emailType,
+      draft: templates[emailType as keyof typeof templates],
+      subject: this.generateEmailSubject(emailType),
+      attachments: this.suggestAttachments(emailType)
     };
   }
 
@@ -355,7 +356,7 @@ ${params.repName}`
       }
     };
 
-    return scenarios[params.scenario] || scenarios.objectionHandling;
+    return scenarios[params.scenario as keyof typeof scenarios] || scenarios.objectionHandling;
   }
 
   private analyzeCompetition(params: any): any {

@@ -132,7 +132,7 @@ Provide approval recommendation and specific feedback.
     } else if (mlrReview.recommendation === 'revise') {
       recommendations.push('Address identified issues within 48 hours');
       recommendations.push('Schedule expedited re-review after revisions');
-      mlrReview.suggestions.forEach(s => recommendations.push(s));
+      mlrReview.suggestions.forEach((s: string) => recommendations.push(s));
     } else {
       recommendations.push('Requires significant revision before resubmission');
       recommendations.push('Consider consulting medical/legal team');
