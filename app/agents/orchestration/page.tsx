@@ -1,106 +1,173 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Network, Brain, TrendingUp, Target } from 'lucide-react';
-import Link from 'next/link';
+import { Network } from 'lucide-react';
+import { AgentView } from '@/components/agent-verse/AgentView';
+import { colors } from '@/lib/design-system/colors';
+import { OrchestrationVisualization } from '@/components/agents/OrchestrationVisualization';
 
-export default function OrchestrationPage() {
-  const [selectedHCP, setSelectedHCP] = useState('HCP-001');
-  
-  const journeyStages = [
-    { name: 'Awareness', status: 'completed', engagement: 'low' },
-    { name: 'Consideration', status: 'completed', engagement: 'medium' },
-    { name: 'Trial', status: 'active', engagement: 'high' },
-    { name: 'Adoption', status: 'pending', engagement: '-' },
-    { name: 'Advocacy', status: 'pending', engagement: '-' }
-  ];
+export default function OrchestrationAgent() {
+  const agentData = {
+    agentId: 'orchestration',
+    agentName: 'AI-based Orchestration Agent',
+    agentColor: colors.agents.orchestration,
+    agentIcon: Network,
+    overview: `The AI-based Orchestration Agent optimizes customer journeys using advanced machine learning techniques. 
+    It employs BERT-style models to predict customer behavior, genetic algorithms to optimize journey sequences, 
+    and provides explainable Next Best Action recommendations with visual journey mapping.`,
+    
+    businessInputs: [
+      {
+        label: 'Customer Journey Mapping',
+        description: 'Define the stages and touchpoints in your customer journey from awareness to advocacy',
+        type: 'Configuration'
+      },
+      {
+        label: 'Historical Engagement Data',
+        description: 'Past interaction data across all channels including field, digital, and event engagement',
+        type: 'Data Input'
+      },
+      {
+        label: 'Behavior Prediction Models',
+        description: 'BERT model configuration and training parameters for customer behavior prediction',
+        type: 'AI Configuration'
+      },
+      {
+        label: 'Optimization Objectives',
+        description: 'Business goals and constraints for genetic algorithm optimization (ROI, engagement, conversion)',
+        type: 'Strategic Input'
+      }
+    ],
+    
+    outputs: [
+      {
+        label: 'Optimized Journey Paths',
+        description: 'Genetically optimized customer journey sequences with highest predicted success rates',
+        format: 'Interactive Journey Map'
+      },
+      {
+        label: 'Next Best Actions',
+        description: 'Real-time, personalized action recommendations with impact probability and timing',
+        format: 'Action Dashboard'
+      },
+      {
+        label: 'BERT Model Performance',
+        description: 'Continuous model performance monitoring with accuracy, precision, and F1 score metrics',
+        format: 'Performance Dashboard'
+      },
+      {
+        label: 'Journey Analytics',
+        description: 'Customer progression analytics with conversion rates and engagement metrics by stage',
+        format: 'Analytics Report'
+      }
+    ],
+    
+    analytics: [
+      {
+        title: 'Customer Journey Funnel',
+        description: 'Visual progression through journey stages with completion and engagement rates',
+        type: 'chart' as const
+      },
+      {
+        title: 'BERT Model Performance',
+        description: 'Real-time tracking of model accuracy, precision, recall, and F1 scores',
+        type: 'chart' as const
+      },
+      {
+        title: 'Genetic Algorithm Optimization',
+        description: 'Evolution of journey optimization showing fitness scores and diversity metrics',
+        type: 'chart' as const
+      },
+      {
+        title: 'Next Best Actions Matrix',
+        description: 'Scatter plot of action recommendations by success probability and expected impact',
+        type: 'chart' as const
+      }
+    ],
+    
+    downstreamUsage: [
+      {
+        agent: 'Field Copilot Agent',
+        usage: 'Receives next best action recommendations to provide contextual guidance and call planning for field reps'
+      },
+      {
+        agent: 'Content Review Agent',
+        usage: 'Uses journey stage insights to ensure appropriate content is available for each customer touchpoint'
+      },
+      {
+        agent: 'Budget Planning Agent',
+        usage: 'Leverages journey optimization results to allocate budget to highest-impact touchpoints and channels'
+      }
+    ],
+    
+    capabilities: [
+      'BERT-based customer behavior prediction with 94% accuracy',
+      'Genetic algorithm journey optimization across 8+ touchpoints',
+      'Real-time Next Best Action recommendations',
+      'Explainable AI with visual journey mapping',
+      'Cross-channel orchestration and timing optimization',
+      'Continuous model performance monitoring and improvement'
+    ],
+    
+    parameters: [
+      {
+        label: 'BERT Model Learning Rate',
+        key: 'bert_learning_rate',
+        type: 'number',
+        value: 0.001
+      },
+      {
+        label: 'Genetic Algorithm Generations',
+        key: 'ga_generations',
+        type: 'slider',
+        value: 25,
+        min: 10,
+        max: 50,
+        step: 5
+      },
+      {
+        label: 'Population Diversity Threshold',
+        key: 'diversity_threshold',
+        type: 'slider',
+        value: 0.35,
+        min: 0.1,
+        max: 0.8,
+        step: 0.05
+      },
+      {
+        label: 'Journey Optimization Objective',
+        key: 'optimization_objective',
+        type: 'select',
+        value: 'conversion_rate',
+        options: ['conversion_rate', 'engagement_score', 'roi_maximization', 'time_efficiency']
+      },
+      {
+        label: 'NBA Minimum Confidence',
+        key: 'nba_confidence',
+        type: 'slider',
+        value: 0.75,
+        min: 0.5,
+        max: 0.95,
+        step: 0.05
+      },
+      {
+        label: 'Journey Stage Weighting',
+        key: 'stage_weighting',
+        type: 'select',
+        value: 'equal',
+        options: ['equal', 'funnel_weighted', 'conversion_focused', 'engagement_focused']
+      }
+    ],
+    
+    suggestedQueries: [
+      'What is the optimal journey path for high-value HCPs?',
+      'Show me the BERT model performance over time',
+      'Which next best actions have the highest success probability?',
+      'How has genetic algorithm optimization improved journey performance?',
+      'What are the top 3 recommended actions for Dr. Johnson?'
+    ],
+    
+    visualizationComponent: <OrchestrationVisualization />
+  };
 
-  const nextBestActions = [
-    { action: 'Send clinical trial results', channel: 'Email', timing: 'Within 48 hours', impact: 92 },
-    { action: 'Schedule follow-up call', channel: 'Field', timing: 'Next week', impact: 85 },
-    { action: 'Invite to speaker program', channel: 'Event', timing: 'Within 2 weeks', impact: 78 }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-gray-600 hover:text-gray-900">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-              <div className="flex items-center space-x-3">
-                <Network className="h-8 w-8 text-orange-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">AI Orchestration Agent</h1>
-                  <p className="text-sm text-gray-500">Customer Journey & Next Best Actions</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <motion.div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold mb-4">Model Performance</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Accuracy</span>
-                <span className="font-medium">89%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Precision</span>
-                <span className="font-medium">87%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">F1 Score</span>
-                <span className="font-medium">88%</span>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div className="lg:col-span-2 bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold mb-4">Customer Journey - {selectedHCP}</h3>
-            <div className="flex justify-between items-center">
-              {journeyStages.map((stage, idx) => (
-                <div key={idx} className="flex-1 text-center">
-                  <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-2 ${
-                    stage.status === 'completed' ? 'bg-green-100 text-green-600' :
-                    stage.status === 'active' ? 'bg-blue-100 text-blue-600' :
-                    'bg-gray-100 text-gray-400'
-                  }`}>
-                    {idx + 1}
-                  </div>
-                  <p className="text-xs font-medium">{stage.name}</p>
-                  <p className="text-xs text-gray-500">{stage.engagement}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        <motion.div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4">Next Best Actions</h3>
-          <div className="space-y-4">
-            {nextBestActions.map((nba, idx) => (
-              <div key={idx} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex-1">
-                  <p className="font-medium">{nba.action}</p>
-                  <p className="text-sm text-gray-600">{nba.channel} • {nba.timing}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-500">Expected Impact</p>
-                  <p className="text-2xl font-bold text-blue-600">{nba.impact}%</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </main>
-    </div>
-  );
+  return <AgentView {...agentData} />;
 }

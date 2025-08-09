@@ -1,110 +1,184 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Lightbulb, CheckCircle, XCircle, Clock } from 'lucide-react';
-import Link from 'next/link';
-import { fieldSuggestionTriggers } from '@/lib/data/mock-data';
+import { Lightbulb } from 'lucide-react';
+import { AgentView } from '@/components/agent-verse/AgentView';
+import { colors } from '@/lib/design-system/colors';
+import { FieldSuggestionsVisualization } from '@/components/agents/FieldSuggestionsVisualization';
 
-export default function SuggestionsPage() {
-  const [triggers] = useState(fieldSuggestionTriggers);
-  
-  const activeSuggestions = [
-    { id: 1, hcp: 'Dr. Smith', trigger: 'Speaker Program Follow-up', priority: 'High', daysLeft: 7 },
-    { id: 2, hcp: 'Dr. Johnson', trigger: 'Low Fulfillment Rate', priority: 'Medium', daysLeft: 10 },
-    { id: 3, hcp: 'Dr. Williams', trigger: 'Positive Payer Coverage', priority: 'High', daysLeft: 5 },
-    { id: 4, hcp: 'Dr. Brown', trigger: 'Email Engagement', priority: 'Low', daysLeft: 12 },
-    { id: 5, hcp: 'Dr. Davis', trigger: 'Slowed Prescribing', priority: 'Medium', daysLeft: 8 }
-  ];
+export default function FieldSuggestionsAgent() {
+  const agentData = {
+    agentId: 'suggestions',
+    agentName: 'Field Suggestion Design Agent',
+    agentColor: colors.agents.suggestions,
+    agentIcon: Lightbulb,
+    overview: `The Field Suggestion Design Agent creates and monitors intelligent field suggestions aligned with brand objectives. 
+    It features 7 configurable trigger types with sensitivity analysis, implements a 40/40/20 prioritization system 
+    (rep feedback, strategic priority, behavior severity), and includes performance monitoring with proactive adjustments.`,
+    
+    businessInputs: [
+      {
+        label: 'Brand Strategic Priorities',
+        description: 'Current brand objectives and strategic focus areas that should drive suggestion prioritization',
+        type: 'Strategic Input'
+      },
+      {
+        label: 'Trigger Configuration',
+        description: 'Setup and sensitivity settings for the 7 field suggestion trigger types',
+        type: 'Configuration'
+      },
+      {
+        label: 'Rep Feedback Data',
+        description: 'Historical rep feedback on suggestion relevance, timing, and effectiveness',
+        type: 'Field Intelligence'
+      },
+      {
+        label: 'Behavioral Data',
+        description: 'HCP behavioral patterns and change indicators from prescribing and engagement data',
+        type: 'Data Input'
+      }
+    ],
+    
+    outputs: [
+      {
+        label: 'Intelligent Field Suggestions',
+        description: 'Prioritized, time-sensitive suggestions delivered to field reps with 14-day expiration',
+        format: 'Mobile Notifications'
+      },
+      {
+        label: 'Trigger Performance Report',
+        description: 'Analysis of trigger effectiveness, acceptance rates, and ROI by trigger type',
+        format: 'Performance Dashboard'
+      },
+      {
+        label: 'Prioritization Analytics',
+        description: '40/40/20 scoring breakdown showing rep feedback, strategic alignment, and behavior severity',
+        format: 'Scoring Matrix'
+      },
+      {
+        label: 'Feedback Loop Insights',
+        description: 'Rep acceptance patterns and suggestion optimization recommendations',
+        format: 'Insights Report'
+      }
+    ],
+    
+    analytics: [
+      {
+        title: '7 Trigger Types Performance',
+        description: 'Comparative analysis of trigger effectiveness, volume, and conversion rates',
+        type: 'chart' as const
+      },
+      {
+        title: '40/40/20 Prioritization System',
+        description: 'Breakdown of prioritization factors and their contribution to suggestion scoring',
+        type: 'chart' as const
+      },
+      {
+        title: 'Field Feedback Loop',
+        description: 'Rep acceptance rates, completion rates, and effectiveness scores over time',
+        type: 'chart' as const
+      },
+      {
+        title: 'Performance by Trigger',
+        description: 'ROI and conversion metrics for each trigger type with acceptance rates',
+        type: 'chart' as const
+      }
+    ],
+    
+    downstreamUsage: [
+      {
+        agent: 'Field Copilot Agent',
+        usage: 'Receives prioritized suggestions to integrate into rep workflow and provide contextual guidance'
+      },
+      {
+        agent: 'Customer Planning Agent',
+        usage: 'Uses suggestion outcomes to refine HCP prioritization and barrier analysis'
+      },
+      {
+        agent: 'Budget Planning Agent',
+        usage: 'Leverages suggestion ROI data to optimize resource allocation for field activities'
+      }
+    ],
+    
+    capabilities: [
+      '7 configurable trigger types with sensitivity analysis',
+      '40/40/20 prioritization system with feedback integration',
+      'Real-time suggestion monitoring and adjustment',
+      '20 suggestions/week limit with smart throttling',
+      '14-day expiration with suppression rules',
+      'ROI tracking and performance optimization'
+    ],
+    
+    parameters: [
+      {
+        label: 'Rep Feedback Weight',
+        key: 'rep_feedback_weight',
+        type: 'slider',
+        value: 40,
+        min: 20,
+        max: 60,
+        step: 5
+      },
+      {
+        label: 'Strategic Priority Weight',
+        key: 'strategic_weight',
+        type: 'slider',
+        value: 40,
+        min: 20,
+        max: 60,
+        step: 5
+      },
+      {
+        label: 'Behavior Severity Weight',
+        key: 'behavior_weight',
+        type: 'slider',
+        value: 20,
+        min: 10,
+        max: 40,
+        step: 5
+      },
+      {
+        label: 'Weekly Suggestion Limit',
+        key: 'weekly_limit',
+        type: 'slider',
+        value: 20,
+        min: 10,
+        max: 30,
+        step: 2
+      },
+      {
+        label: 'Trigger Sensitivity Threshold',
+        key: 'sensitivity_threshold',
+        type: 'slider',
+        value: 0.75,
+        min: 0.5,
+        max: 0.95,
+        step: 0.05
+      },
+      {
+        label: 'Expiration Period (Days)',
+        key: 'expiration_days',
+        type: 'select',
+        value: '14',
+        options: ['7', '14', '21', '28']
+      },
+      {
+        label: 'Minimum ROI Threshold',
+        key: 'min_roi',
+        type: 'number',
+        value: 1.5
+      }
+    ],
+    
+    suggestedQueries: [
+      'Which trigger types have the highest ROI?',
+      'Show me the 40/40/20 prioritization breakdown',
+      'How has rep feedback influenced suggestion quality?',
+      'What is the current weekly suggestion volume by rep?',
+      'Which triggers need sensitivity adjustments?'
+    ],
+    
+    visualizationComponent: <FieldSuggestionsVisualization />
+  };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-gray-600 hover:text-gray-900">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-              <div className="flex items-center space-x-3">
-                <Lightbulb className="h-8 w-8 text-pink-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Field Suggestions Agent</h1>
-                  <p className="text-sm text-gray-500">Trigger Management & Performance</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          <motion.div className="bg-white rounded-lg shadow-sm p-6">
-            <p className="text-sm text-gray-500">Active Triggers</p>
-            <p className="text-2xl font-bold">7</p>
-          </motion.div>
-          <motion.div className="bg-white rounded-lg shadow-sm p-6">
-            <p className="text-sm text-gray-500">Weekly Suggestions</p>
-            <p className="text-2xl font-bold">140</p>
-          </motion.div>
-          <motion.div className="bg-white rounded-lg shadow-sm p-6">
-            <p className="text-sm text-gray-500">Completion Rate</p>
-            <p className="text-2xl font-bold">68%</p>
-          </motion.div>
-          <motion.div className="bg-white rounded-lg shadow-sm p-6">
-            <p className="text-sm text-gray-500">Rep Feedback</p>
-            <p className="text-2xl font-bold">85%</p>
-          </motion.div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <motion.div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold mb-4">Configured Triggers</h3>
-            <div className="space-y-3">
-              {triggers.map(trigger => (
-                <div key={trigger.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium text-sm">{trigger.name}</p>
-                    <p className="text-xs text-gray-500">Priority: {trigger.priority}</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {trigger.isActive ? (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-gray-400" />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold mb-4">Active Suggestions</h3>
-            <div className="space-y-3">
-              {activeSuggestions.map(suggestion => (
-                <div key={suggestion.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium text-sm">{suggestion.hcp}</p>
-                    <p className="text-xs text-gray-500">{suggestion.trigger}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      suggestion.priority === 'High' ? 'bg-red-100 text-red-800' :
-                      suggestion.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
-                      {suggestion.priority}
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1">{suggestion.daysLeft} days left</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </main>
-    </div>
-  );
+  return <AgentView {...agentData} />;
 }

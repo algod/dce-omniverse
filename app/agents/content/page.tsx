@@ -1,240 +1,181 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  FileText, 
-  CheckCircle,
-  XCircle,
-  Clock,
-  RefreshCw,
-  Brain,
-  Filter
-} from 'lucide-react';
-import Link from 'next/link';
-import { generateMockContent } from '@/lib/data/mock-data';
+import { FileText } from 'lucide-react';
+import { AgentView } from '@/components/agent-verse/AgentView';
+import { colors } from '@/lib/design-system/colors';
+import { ContentReviewVisualization } from '@/components/agents/ContentReviewVisualization';
 
-export default function ContentReviewPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [content, setContent] = useState<any[]>([]);
-  const [filter, setFilter] = useState('all');
-  const [isReviewing, setIsReviewing] = useState(false);
+export default function ContentReviewAgent() {
+  const agentData = {
+    agentId: 'content',
+    agentName: 'Content Review Agent',
+    agentColor: colors.agents.content,
+    agentIcon: FileText,
+    overview: `The Content Review Agent manages the content lifecycle from creation through MLR approval, ensuring all materials align with identified barriers and channel requirements. 
+    It receives barrier analysis from Customer Planning and budget allocations from Budget Planning to prioritize content development and accelerate approval processes.`,
 
-  useEffect(() => {
-    const mockContent = generateMockContent(20);
-    setTimeout(() => {
-      setContent(mockContent);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
-
-  const runMLRReview = async () => {
-    setIsReviewing(true);
     
-    try {
-      const response = await fetch('/api/agents/content-review', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'batchReview',
-          data: { assets: content.slice(0, 5) }
-        })
-      });
+    businessInputs: [
+      {
+        label: 'Barrier Analysis',
+        description: 'Identified barriers and their prevalence from Customer Planning Agent',
+        type: 'Upstream Data'
+      },
+      {
+        label: 'Channel Budgets',
+        description: 'Approved budget allocations per channel from Budget Planning Agent',
+        type: 'Upstream Data'
+      },
+      {
+        label: 'Message Themes',
+        description: 'Brand-approved messaging themes and positioning statements',
+        type: 'Brand Guidelines'
+      },
+      {
+        label: 'MLR Requirements',
+        description: 'Medical, Legal, and Regulatory review criteria and compliance rules',
+        type: 'Compliance Rules'
+      },
+      {
+        label: 'Content Library',
+        description: 'Existing approved content assets and their performance metrics',
+        type: 'Asset Repository'
+      }
+    ],
 
-      const result = await response.json();
-      console.log('MLR Review Result:', result);
-      alert(`Review complete! ${result.approved || 0} approved, ${result.needsRevision || 0} need revision`);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setIsReviewing(false);
-    }
+    
+    outputs: [
+      {
+        label: 'Content-Barrier Mapping',
+        description: 'Matrix showing which content addresses each identified barrier',
+        format: 'Coverage Matrix'
+      },
+      {
+        label: 'MLR Approval Status',
+        description: 'Real-time status of all content in the MLR review process',
+        format: 'Status Dashboard'
+      },
+      {
+        label: 'Gap Analysis Report',
+        description: 'Identified content gaps by barrier and channel with priority scores',
+        format: 'Gap Report'
+      },
+      {
+        label: 'Approved Content Library',
+        description: 'Repository of MLR-approved content ready for distribution',
+        format: 'Asset Library'
+      },
+      {
+        label: 'Content Production Plan',
+        description: 'Timeline and priorities for new content development',
+        format: 'Project Plan'
+      }
+    ],
+
+    
+    analytics: [
+      {
+        title: 'Barrier Coverage Heatmap',
+        description: 'Visual map of content coverage by barrier',
+        type: 'heatmap' as const
+      },
+      {
+        title: 'MLR Approval Pipeline',
+        description: 'Status and timeline of content in review',
+        type: 'chart' as const
+      },
+      {
+        title: 'Content Gap Analysis',
+        description: 'Gaps by channel and barrier priority',
+        type: 'chart' as const
+      },
+      {
+        title: 'Compliance Scorecard',
+        description: 'MLR compliance metrics and trends',
+        type: 'metric' as const
+      }
+    ],
+
+    
+    downstreamUsage: [
+      {
+        agent: 'Orchestration Agent',
+        usage: 'Provides approved content for inclusion in personalized customer journeys'
+      },
+      {
+        agent: 'Field Suggestions Agent',
+        usage: 'Supplies field-ready materials aligned with triggered suggestions'
+      },
+      {
+        agent: 'Field Copilot Agent',
+        usage: 'Delivers approved content for rep use during customer interactions'
+      }
+    ],
+
+    
+    capabilities: [
+      'Maps content themes to identified barriers',
+      'Automates MLR compliance checking',
+      'Identifies content gaps by channel and barrier',
+      'Tracks approval pipeline and timelines',
+      'Manages content library and versioning',
+      'Generates content production priorities',
+      'Monitors content performance metrics'
+    ],
+
+    
+    parameters: [
+      {
+        label: 'MLR Compliance Threshold',
+        key: 'mlr_threshold',
+        type: 'slider',
+        value: 85,
+        min: 70,
+        max: 100,
+        step: 5
+      },
+      {
+        label: 'Content Priority',
+        key: 'priority',
+        type: 'select',
+        value: 'barrier_aligned',
+        options: ['barrier_aligned', 'channel_focused', 'quick_wins', 'strategic']
+      },
+      {
+        label: 'Review Speed',
+        key: 'review_speed',
+        type: 'select',
+        value: 'standard',
+        options: ['expedited', 'standard', 'thorough']
+      },
+      {
+        label: 'Gap Tolerance',
+        key: 'gap_tolerance',
+        type: 'slider',
+        value: 10,
+        min: 0,
+        max: 20,
+        step: 5
+      },
+      {
+        label: 'Auto-Retire Old Content',
+        key: 'auto_retire',
+        type: 'select',
+        value: 'yes',
+        options: ['yes', 'no']
+      }
+    ],
+    
+    suggestedQueries: [
+      'Which content addresses referral pathway barriers?',
+      'Show MLR approval status for pending assets',
+      'What content gaps exist for email channel?',
+      'How many assets are ready for field use?',
+      'Which themes have the highest MLR approval rate?'
+    ],
+    
+    visualizationComponent: <ContentReviewVisualization />
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'pending':
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      case 'rejected':
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      default:
-        return <Clock className="h-5 w-5 text-gray-400" />;
-    }
-  };
-
-  const getFilteredContent = () => {
-    if (filter === 'all') return content;
-    return content.filter(c => c.status === filter);
-  };
-
-  const stats = {
-    total: content.length,
-    approved: content.filter(c => c.status === 'approved').length,
-    pending: content.filter(c => c.status === 'pending').length,
-    rejected: content.filter(c => c.status === 'rejected').length
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-gray-600 hover:text-gray-900">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-              <div className="flex items-center space-x-3">
-                <FileText className="h-8 w-8 text-purple-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Content Review Agent</h1>
-                  <p className="text-sm text-gray-500">MLR Approval & Content Management</p>
-                </div>
-              </div>
-            </div>
-            <button 
-              onClick={runMLRReview}
-              disabled={isReviewing}
-              className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:opacity-50"
-            >
-              {isReviewing ? (
-                <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  <span>Reviewing...</span>
-                </>
-              ) : (
-                <>
-                  <Brain className="h-4 w-4" />
-                  <span>Run MLR Review</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          {(['all', 'approved', 'pending', 'rejected'] as const).map((status) => (
-            <motion.div
-              key={status}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              onClick={() => setFilter(status)}
-              className={`bg-white rounded-lg shadow-sm p-6 cursor-pointer transition-all ${
-                filter === status ? 'ring-2 ring-purple-500' : ''
-              }`}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm text-gray-500 capitalize">{status === 'all' ? 'Total Assets' : status}</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {status === 'all' ? stats.total : stats[status as keyof typeof stats]}
-                  </p>
-                </div>
-                {status !== 'all' && getStatusIcon(status)}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-6 border-b">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-900">Content Library</h3>
-              <div className="flex items-center space-x-2">
-                <Filter className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-gray-600">
-                  Showing {getFilteredContent().length} assets
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Asset
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Theme
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Barrier
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    MLR Score
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                      Loading content library...
-                    </td>
-                  </tr>
-                ) : getFilteredContent().slice(0, 10).map((asset) => (
-                  <tr key={asset.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{asset.title}</div>
-                        <div className="text-xs text-gray-500">{asset.id}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                        {asset.type}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {asset.theme}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {asset.barrier || 'General'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <span className="text-sm font-medium text-gray-900">
-                          {asset.mlrScore?.toFixed(0) || 'N/A'}
-                        </span>
-                        {asset.mlrScore && (
-                          <div className="ml-2 w-16 bg-gray-200 rounded-full h-2">
-                            <div
-                              className={`h-2 rounded-full ${
-                                asset.mlrScore >= 85 ? 'bg-green-600' :
-                                asset.mlrScore >= 70 ? 'bg-yellow-600' :
-                                'bg-red-600'
-                              }`}
-                              style={{ width: `${asset.mlrScore}%` }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        {getStatusIcon(asset.status)}
-                        <span className="text-sm capitalize">{asset.status}</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+  return <AgentView {...agentData} />;
 }

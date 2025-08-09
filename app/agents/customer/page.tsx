@@ -1,297 +1,184 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Users, 
-  BarChart3, 
-  Target,
-  AlertTriangle,
-  TrendingUp,
-  Filter,
-  Download,
-  RefreshCw,
-  Brain
-} from 'lucide-react';
-import Link from 'next/link';
-import { generateMockHCPs } from '@/lib/data/mock-data';
+import { Users } from 'lucide-react';
+import { AgentView } from '@/components/agent-verse/AgentView';
+import { colors } from '@/lib/design-system/colors';
+import { CustomerPlanningVisualization } from '@/components/agents/CustomerPlanningVisualization';
 
-export default function CustomerPlanningPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [hcps, setHcps] = useState<any[]>([]);
-  const [selectedSegment, setSelectedSegment] = useState('all');
-  const [segments, setSegments] = useState<any>({});
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    setIsLoading(true);
-    const mockHCPs = generateMockHCPs(100);
+export default function CustomerPlanningAgent() {
+  const agentData = {
+    agentId: 'customer',
+    agentName: 'Customer Planning Agent',
+    agentColor: colors.agents.customer,
+    agentIcon: Users,
+    overview: `The Customer Planning Agent uses advanced barrier analysis to prioritize high-opportunity Healthcare Professionals (HCPs). 
+    It analyzes secondary data and field feedback to identify the 5 primary barriers preventing HCP adoption, predicts sales opportunities, 
+    and generates targeted engagement strategies through "The Play" framework.`,
     
-    setTimeout(() => {
-      setHcps(mockHCPs);
-      calculateSegments(mockHCPs);
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  const calculateSegments = (hcpList: any[]) => {
-    const segmentData: any = {
-      Champions: [],
-      Growth: [],
-      Maintain: [],
-      Monitor: []
-    };
-
-    hcpList.forEach(hcp => {
-      const score = Math.floor(Math.random() * 100);
-      hcp.opportunityScore = score;
-      
-      if (score >= 80) {
-        hcp.segment = 'Champions';
-        segmentData.Champions.push(hcp);
-      } else if (score >= 60) {
-        hcp.segment = 'Growth';
-        segmentData.Growth.push(hcp);
-      } else if (score >= 40) {
-        hcp.segment = 'Maintain';
-        segmentData.Maintain.push(hcp);
-      } else {
-        hcp.segment = 'Monitor';
-        segmentData.Monitor.push(hcp);
+    businessInputs: [
+      {
+        label: 'Brand Objectives',
+        description: 'Strategic priorities and goals for the brand, including target market share and growth objectives',
+        type: 'Strategic Input'
+      },
+      {
+        label: 'Barrier Confirmation',
+        description: 'Validation of the 5 primary barriers affecting HCP prescribing behavior in your therapeutic area',
+        type: 'Field Intelligence'
+      },
+      {
+        label: 'Importance Weights',
+        description: 'Relative importance scoring for each barrier based on brand strategy and market dynamics',
+        type: 'Configuration'
+      },
+      {
+        label: 'HCP Universe',
+        description: 'Complete list of target HCPs with prescribing history and practice characteristics',
+        type: 'Data Input'
       }
-    });
-
-    setSegments(segmentData);
-  };
-
-  const analyzeWithAI = async () => {
-    setIsAnalyzing(true);
+    ],
     
-    try {
-      const response = await fetch('/api/agents/customer-planning', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'analyzePortfolio',
-          data: { count: 20 }
-        })
-      });
-
-      const result = await response.json();
-      console.log('AI Analysis:', result);
-      
-      setTimeout(() => {
-        setIsAnalyzing(false);
-        alert('AI Analysis Complete! Check console for results.');
-      }, 2000);
-    } catch (error) {
-      console.error('Error:', error);
-      setIsAnalyzing(false);
-    }
+    outputs: [
+      {
+        label: 'Prioritized HCP List',
+        description: 'Ranked list of HCPs with opportunity scores based on barrier analysis and sales potential',
+        format: 'CSV/JSON'
+      },
+      {
+        label: 'Barrier Analysis Report',
+        description: 'Detailed breakdown of barriers by HCP, segment, and territory with severity scores',
+        format: 'Interactive Dashboard'
+      },
+      {
+        label: 'Engagement Recommendations',
+        description: 'Specific engagement strategies tailored to each HCP\'s primary barriers',
+        format: 'Action Plan'
+      },
+      {
+        label: 'The Play Framework',
+        description: '5-question engagement strategy for each barrier type to guide field interactions',
+        format: 'Field Guide'
+      }
+    ],
+    
+    analytics: [
+      {
+        title: 'Barrier Prevalence Heatmap',
+        description: 'Visual representation of barrier distribution across HCP segments',
+        type: 'heatmap' as const
+      },
+      {
+        title: 'Opportunity Scatter Plot',
+        description: 'HCP positioning based on sales depth vs breadth potential',
+        type: 'chart' as const
+      },
+      {
+        title: 'Barrier Distribution',
+        description: 'Breakdown of barrier types by segment and priority',
+        type: 'chart' as const
+      },
+      {
+        title: 'HCP Scoring Matrix',
+        description: 'Comprehensive scoring table with all evaluation criteria',
+        type: 'table' as const
+      }
+    ],
+    
+    downstreamUsage: [
+      {
+        agent: 'Budget Planning Agent',
+        usage: 'Uses prioritized HCP list and opportunity scores to optimize channel budget allocation for maximum impact on high-value targets'
+      },
+      {
+        agent: 'Content Review Agent',
+        usage: 'Maps barrier analysis to content themes, ensuring appropriate messaging exists for each identified barrier'
+      },
+      {
+        agent: 'Orchestration Agent',
+        usage: 'Leverages barrier profiles to design personalized customer journeys and determine next best actions'
+      }
+    ],
+    
+    capabilities: [
+      'Analyzes 5 primary barriers affecting HCP adoption',
+      'Predicts sales depth and breadth opportunities',
+      'Segments HCPs by barrier profile and potential',
+      'Generates barrier-specific engagement strategies',
+      'Creates "The Play" framework for field execution',
+      'Tracks barrier resolution over time'
+    ],
+    
+    parameters: [
+      {
+        label: 'Referral Pathway Weight',
+        key: 'barrier_b001',
+        type: 'slider',
+        value: 30,
+        min: 0,
+        max: 100,
+        step: 5
+      },
+      {
+        label: 'Side Effects Weight',
+        key: 'barrier_b002',
+        type: 'slider',
+        value: 25,
+        min: 0,
+        max: 100,
+        step: 5
+      },
+      {
+        label: 'Insurance Coverage Weight',
+        key: 'barrier_b003',
+        type: 'slider',
+        value: 20,
+        min: 0,
+        max: 100,
+        step: 5
+      },
+      {
+        label: 'Formulary Approval Weight',
+        key: 'barrier_b004',
+        type: 'slider',
+        value: 15,
+        min: 0,
+        max: 100,
+        step: 5
+      },
+      {
+        label: 'Diagnostic Tool Weight',
+        key: 'barrier_b005',
+        type: 'slider',
+        value: 10,
+        min: 0,
+        max: 100,
+        step: 5
+      },
+      {
+        label: 'Analysis Depth',
+        key: 'depth',
+        type: 'select',
+        value: 'comprehensive',
+        options: ['quick', 'standard', 'comprehensive', 'exhaustive']
+      },
+      {
+        label: 'Minimum Opportunity Score',
+        key: 'min_score',
+        type: 'number',
+        value: 50
+      }
+    ],
+    
+    suggestedQueries: [
+      'Which barriers are most prevalent in my territory?',
+      'Show me high-opportunity HCPs with referral pathway barriers',
+      'What is the recommended engagement strategy for Dr. Smith?',
+      'How many HCPs have multiple barriers?',
+      'Generate "The Play" for insurance coverage barriers'
+    ],
+    
+    visualizationComponent: <CustomerPlanningVisualization />
   };
 
-  const getFilteredHCPs = () => {
-    if (selectedSegment === 'all') return hcps;
-    return segments[selectedSegment] || [];
-  };
-
-  const getBarrierColor = (severity: string) => {
-    switch (severity) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-gray-600 hover:text-gray-900">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-              <div className="flex items-center space-x-3">
-                <Users className="h-8 w-8 text-blue-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Customer Planning Agent</h1>
-                  <p className="text-sm text-gray-500">Barrier Analysis & HCP Prioritization</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex space-x-3">
-              <button 
-                onClick={analyzeWithAI}
-                disabled={isAnalyzing}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    <span>Analyzing...</span>
-                  </>
-                ) : (
-                  <>
-                    <Brain className="h-4 w-4" />
-                    <span>Analyze with AI</span>
-                  </>
-                )}
-              </button>
-              <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                <Download className="h-4 w-4" />
-                <span>Export</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-          {Object.entries(segments).map(([segment, hcpList]: [string, any]) => (
-            <motion.div
-              key={segment}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`bg-white rounded-lg shadow-sm p-6 cursor-pointer transition-all ${
-                selectedSegment === segment ? 'ring-2 ring-blue-500' : ''
-              }`}
-              onClick={() => setSelectedSegment(segment)}
-            >
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-gray-900">{segment}</h3>
-                <Target className="h-5 w-5 text-gray-400" />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{hcpList.length}</p>
-              <p className="text-sm text-gray-500">HCPs</p>
-              <div className="mt-3 pt-3 border-t">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Avg Score</span>
-                  <span className="font-medium">
-                    {hcpList.length > 0 
-                      ? Math.round(hcpList.reduce((sum: number, h: any) => sum + (h.opportunityScore || 0), 0) / hcpList.length)
-                      : 0}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-6 border-b">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-gray-900">
-                HCP Portfolio Analysis
-              </h2>
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => setSelectedSegment('all')}
-                  className={`px-3 py-1 rounded-lg text-sm ${
-                    selectedSegment === 'all' 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  All ({hcps.length})
-                </button>
-                <Filter className="h-4 w-4 text-gray-400" />
-              </div>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    HCP Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Specialty
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Prescribing Volume
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Barriers
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Opportunity Score
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Segment
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                      Loading HCP data...
-                    </td>
-                  </tr>
-                ) : getFilteredHCPs().slice(0, 10).map((hcp: any) => (
-                  <tr key={hcp.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{hcp.name}</div>
-                      <div className="text-xs text-gray-500">{hcp.id}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {hcp.specialty}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {hcp.prescribingVolume}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-1">
-                        {hcp.barriers.map((barrier: any, idx: number) => (
-                          <span
-                            key={idx}
-                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getBarrierColor(barrier.severity)}`}
-                          >
-                            {barrier.type.replace('_', ' ')}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <span className="text-sm font-medium text-gray-900">
-                          {hcp.opportunityScore || 0}
-                        </span>
-                        <div className="ml-2 w-16 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-blue-600 h-2 rounded-full"
-                            style={{ width: `${hcp.opportunityScore || 0}%` }}
-                          />
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                        hcp.segment === 'Champions' ? 'bg-green-100 text-green-800' :
-                        hcp.segment === 'Growth' ? 'bg-blue-100 text-blue-800' :
-                        hcp.segment === 'Maintain' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {hcp.segment}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+  return <AgentView {...agentData} />;
 }
