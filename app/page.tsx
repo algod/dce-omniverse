@@ -1,7 +1,7 @@
 'use client';
 
-import { FlowVisualizationLight } from '@/components/agent-verse/FlowVisualizationLight';
+import { FlowVisualizationEnhanced } from '@/components/agent-verse/FlowVisualizationEnhanced';
 
 export default function Home() {
-  return <FlowVisualizationLight />;
+  return <FlowVisualizationEnhanced />;
 }
