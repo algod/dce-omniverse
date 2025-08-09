@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileText, Database, Brain, ArrowRight, ChevronLeft,
@@ -61,6 +60,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState<'overview' | 'inputs' | 'analytics' | 'outputs'>('overview');
   const [parameters, setParameters] = useState(props.businessInputs.parameters);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Info },
@@ -97,14 +97,40 @@ export function StandardAgentViewLight(props: AgentViewProps) {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link 
-                href="/"
-                className="flex items-center gap-2 transition-colors cursor-pointer group hover:text-blue-600"
-                style={{ color: zsColors.neutral.gray }}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log('Navigation clicked - attempting to navigate to home');
+                  setIsNavigating(true);
+                  
+                  // Try multiple navigation methods
+                  try {
+                    // Method 1: Use router.push
+                    router.push('/');
+                    console.log('Router.push executed');
+                    
+                    // Method 2: Fallback to window.location after a short delay
+                    setTimeout(() => {
+                      if (window.location.pathname !== '/') {
+                        console.log('Router.push may have failed, using window.location');
+                        window.location.href = '/';
+                      }
+                    }, 500);
+                  } catch (error) {
+                    console.error('Navigation error:', error);
+                    // Method 3: Direct fallback
+                    window.location.href = '/';
+                  }
+                }}
+                disabled={isNavigating}
+                className="flex items-center gap-2 transition-colors cursor-pointer group hover:text-blue-600 disabled:opacity-50"
+                style={{ color: isNavigating ? zsColors.neutral.lightGray : zsColors.neutral.gray }}
               >
                 <ChevronLeft size={20} className="transition-colors" />
-                <span className="text-sm font-medium">Back to Flow</span>
-              </Link>
+                <span className="text-sm font-medium">
+                  {isNavigating ? 'Navigating...' : 'Back to Flow'}
+                </span>
+              </button>
               <div className="h-6 w-px" style={{ backgroundColor: zsColors.neutral.lightGray }} />
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg p-2" style={{
