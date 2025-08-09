@@ -1,0 +1,19 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "functions": {
+    "app/api/gemini/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/agents/*/route.ts": {
+      "maxDuration": 60
+    }
+  },
+  "env": {
+    "GEMINI_API_KEY": "@gemini-api-key",
+    "POSTGRES_URL": "@postgres-url",
+    "KV_URL": "@kv-url"
+  }
+}

@@ -1,103 +1,242 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Brain, 
+  DollarSign, 
+  FileText, 
+  Network, 
+  Lightbulb, 
+  HeadphonesIcon,
+  ChevronRight,
+  Activity,
+  TrendingUp,
+  Users,
+  BarChart3
+} from 'lucide-react';
+import Link from 'next/link';
+
+const agents = [
+  {
+    id: 'customer',
+    name: 'Customer Planning',
+    description: 'Prioritize high-opportunity HCPs using barrier analysis',
+    icon: Users,
+    color: 'from-blue-500 to-blue-600',
+    stats: { active: 1000, analyzed: 450, opportunities: 89 },
+    href: '/agents/customer'
+  },
+  {
+    id: 'budget',
+    name: 'Budget Planning',
+    description: 'Optimize budget allocation across promotional channels',
+    icon: DollarSign,
+    color: 'from-green-500 to-green-600',
+    stats: { budget: '$5.5M', channels: 6, roi: '3.2x' },
+    href: '/agents/budget'
+  },
+  {
+    id: 'content',
+    name: 'Content Review',
+    description: 'Accelerate MLR approval and content management',
+    icon: FileText,
+    color: 'from-purple-500 to-purple-600',
+    stats: { assets: 120, pending: 15, approved: 95 },
+    href: '/agents/content'
+  },
+  {
+    id: 'orchestration',
+    name: 'AI Orchestration',
+    description: 'Generate optimal customer journeys with NBA',
+    icon: Network,
+    color: 'from-orange-500 to-orange-600',
+    stats: { journeys: 250, nba: 1200, accuracy: '87%' },
+    href: '/agents/orchestration'
+  },
+  {
+    id: 'suggestions',
+    name: 'Field Suggestions',
+    description: 'Design and monitor field suggestions for reps',
+    icon: Lightbulb,
+    color: 'from-pink-500 to-pink-600',
+    stats: { triggers: 7, active: 140, feedback: '85%' },
+    href: '/agents/suggestions'
+  },
+  {
+    id: 'copilot',
+    name: 'Field Copilot',
+    description: 'AI assistant for pre-call planning and execution',
+    icon: HeadphonesIcon,
+    color: 'from-indigo-500 to-indigo-600',
+    stats: { reps: 50, calls: 320, insights: 1500 },
+    href: '/agents/copilot'
+  }
+];
+
+export default function Dashboard() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [metrics, setMetrics] = useState({
+    totalHCPs: 0,
+    activeEngagements: 0,
+    avgROI: 0,
+    completionRate: 0
+  });
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+      setMetrics({
+        totalHCPs: 1000,
+        activeEngagements: 450,
+        avgROI: 3.2,
+        completionRate: 87
+      });
+    }, 1000);
+  }, []);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-3">
+              <Brain className="h-8 w-8 text-blue-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">DCE OmniVerse</h1>
+                <p className="text-sm text-gray-500">Pharmaceutical Omnichannel AI Platform</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-500">Powered by Gemini 2.5 Pro</span>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                Demo Mode
+              </button>
+            </div>
+          </div>
         </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <MetricCard
+              title="Total HCPs"
+              value={metrics.totalHCPs.toLocaleString()}
+              icon={Users}
+              trend="+12%"
+              loading={isLoading}
+            />
+            <MetricCard
+              title="Active Engagements"
+              value={metrics.activeEngagements.toLocaleString()}
+              icon={Activity}
+              trend="+8%"
+              loading={isLoading}
+            />
+            <MetricCard
+              title="Average ROI"
+              value={`${metrics.avgROI}x`}
+              icon={TrendingUp}
+              trend="+15%"
+              loading={isLoading}
+            />
+            <MetricCard
+              title="Completion Rate"
+              value={`${metrics.completionRate}%`}
+              icon={BarChart3}
+              trend="+5%"
+              loading={isLoading}
+            />
+          </div>
+
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">AI Agents</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {agents.map((agent, index) => (
+              <motion.div
+                key={agent.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <Link href={agent.href}>
+                  <div className="group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden">
+                    <div className={`absolute inset-0 bg-gradient-to-r ${agent.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
+                    
+                    <div className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={`p-3 rounded-lg bg-gradient-to-r ${agent.color}`}>
+                          <agent.icon className="h-6 w-6 text-white" />
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
+                      </div>
+                      
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        {agent.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        {agent.description}
+                      </p>
+                      
+                      <div className="grid grid-cols-3 gap-2 pt-4 border-t">
+                        {Object.entries(agent.stats).map(([key, value]) => (
+                          <div key={key} className="text-center">
+                            <p className="text-xs text-gray-500 capitalize">{key}</p>
+                            <p className="text-sm font-semibold text-gray-900">{value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-12 bg-white rounded-xl shadow-sm p-8">
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Ready for Your Presentation
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                This demonstration showcases the power of Gemini 2.5 Pro in transforming pharmaceutical 
+                omnichannel planning and execution. Each agent provides real-time AI-powered insights 
+                and recommendations tailored for senior commercial leaders.
+              </p>
+              <div className="flex justify-center space-x-4">
+                <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                  Start Demo Presentation
+                </button>
+                <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                  View Documentation
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    </div>
+  );
+}
+
+function MetricCard({ title, value, icon: Icon, trend, loading }: any) {
+  return (
+    <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="flex items-center justify-between mb-2">
+        <Icon className="h-5 w-5 text-gray-400" />
+        <span className="text-xs text-green-600 font-medium">{trend}</span>
+      </div>
+      <p className="text-sm text-gray-600 mb-1">{title}</p>
+      {loading ? (
+        <div className="h-8 bg-gray-200 rounded animate-pulse" />
+      ) : (
+        <p className="text-2xl font-bold text-gray-900">{value}</p>
+      )}
     </div>
   );
 }
