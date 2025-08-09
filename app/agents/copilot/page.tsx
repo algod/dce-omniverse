@@ -90,7 +90,7 @@ export default function CopilotPage() {
             </motion.div>
 
             <motion.div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4">Today\'s Calls</h3>
+              <h3 className="text-lg font-semibold mb-4">Today&apos;s Calls</h3>
               <div className="space-y-3">
                 {upcomingCalls.map((call, idx) => (
                   <div key={idx} className="flex items-center justify-between p-4 border rounded-lg">
