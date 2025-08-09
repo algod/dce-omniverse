@@ -1,173 +1,199 @@
 'use client';
 
-import { Network } from 'lucide-react';
-import { AgentView } from '@/components/agent-verse/AgentView';
-import { colors } from '@/lib/design-system/colors';
+import { Brain } from 'lucide-react';
+import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
 import { OrchestrationVisualization } from '@/components/agents/OrchestrationVisualization';
 
 export default function OrchestrationAgent() {
-  const agentData = {
-    agentId: 'orchestration',
-    agentName: 'AI-based Orchestration Agent',
-    agentColor: colors.agents.orchestration,
-    agentIcon: Network,
-    overview: `The AI-based Orchestration Agent optimizes customer journeys using advanced machine learning techniques. 
-    It employs BERT-style models to predict customer behavior, genetic algorithms to optimize journey sequences, 
-    and provides explainable Next Best Action recommendations with visual journey mapping.`,
-    
-    businessInputs: [
-      {
-        label: 'Customer Journey Mapping',
-        description: 'Define the stages and touchpoints in your customer journey from awareness to advocacy',
-        type: 'Configuration'
-      },
-      {
-        label: 'Historical Engagement Data',
-        description: 'Past interaction data across all channels including field, digital, and event engagement',
-        type: 'Data Input'
-      },
-      {
-        label: 'Behavior Prediction Models',
-        description: 'BERT model configuration and training parameters for customer behavior prediction',
-        type: 'AI Configuration'
-      },
-      {
-        label: 'Optimization Objectives',
-        description: 'Business goals and constraints for genetic algorithm optimization (ROI, engagement, conversion)',
-        type: 'Strategic Input'
-      }
-    ],
-    
-    outputs: [
-      {
-        label: 'Optimized Journey Paths',
-        description: 'Genetically optimized customer journey sequences with highest predicted success rates',
-        format: 'Interactive Journey Map'
-      },
-      {
-        label: 'Next Best Actions',
-        description: 'Real-time, personalized action recommendations with impact probability and timing',
-        format: 'Action Dashboard'
-      },
-      {
-        label: 'BERT Model Performance',
-        description: 'Continuous model performance monitoring with accuracy, precision, and F1 score metrics',
-        format: 'Performance Dashboard'
-      },
-      {
-        label: 'Journey Analytics',
-        description: 'Customer progression analytics with conversion rates and engagement metrics by stage',
-        format: 'Analytics Report'
-      }
-    ],
-    
-    analytics: [
-      {
-        title: 'Customer Journey Funnel',
-        description: 'Visual progression through journey stages with completion and engagement rates',
-        type: 'chart' as const
-      },
-      {
-        title: 'BERT Model Performance',
-        description: 'Real-time tracking of model accuracy, precision, recall, and F1 scores',
-        type: 'chart' as const
-      },
-      {
-        title: 'Genetic Algorithm Optimization',
-        description: 'Evolution of journey optimization showing fitness scores and diversity metrics',
-        type: 'chart' as const
-      },
-      {
-        title: 'Next Best Actions Matrix',
-        description: 'Scatter plot of action recommendations by success probability and expected impact',
-        type: 'chart' as const
-      }
-    ],
-    
-    downstreamUsage: [
-      {
-        agent: 'Field Copilot Agent',
-        usage: 'Receives next best action recommendations to provide contextual guidance and call planning for field reps'
-      },
-      {
-        agent: 'Content Review Agent',
-        usage: 'Uses journey stage insights to ensure appropriate content is available for each customer touchpoint'
-      },
-      {
-        agent: 'Budget Planning Agent',
-        usage: 'Leverages journey optimization results to allocate budget to highest-impact touchpoints and channels'
-      }
-    ],
-    
-    capabilities: [
-      'BERT-based customer behavior prediction with 94% accuracy',
-      'Genetic algorithm journey optimization across 8+ touchpoints',
-      'Real-time Next Best Action recommendations',
-      'Explainable AI with visual journey mapping',
-      'Cross-channel orchestration and timing optimization',
-      'Continuous model performance monitoring and improvement'
-    ],
-    
-    parameters: [
-      {
-        label: 'BERT Model Learning Rate',
-        key: 'bert_learning_rate',
-        type: 'number',
-        value: 0.001
-      },
-      {
-        label: 'Genetic Algorithm Generations',
-        key: 'ga_generations',
-        type: 'slider',
-        value: 25,
-        min: 10,
-        max: 50,
-        step: 5
-      },
-      {
-        label: 'Population Diversity Threshold',
-        key: 'diversity_threshold',
-        type: 'slider',
-        value: 0.35,
-        min: 0.1,
-        max: 0.8,
-        step: 0.05
-      },
-      {
-        label: 'Journey Optimization Objective',
-        key: 'optimization_objective',
-        type: 'select',
-        value: 'conversion_rate',
-        options: ['conversion_rate', 'engagement_score', 'roi_maximization', 'time_efficiency']
-      },
-      {
-        label: 'NBA Minimum Confidence',
-        key: 'nba_confidence',
-        type: 'slider',
-        value: 0.75,
-        min: 0.5,
-        max: 0.95,
-        step: 0.05
-      },
-      {
-        label: 'Journey Stage Weighting',
-        key: 'stage_weighting',
-        type: 'select',
-        value: 'equal',
-        options: ['equal', 'funnel_weighted', 'conversion_focused', 'engagement_focused']
-      }
-    ],
-    
-    suggestedQueries: [
-      'What is the optimal journey path for high-value HCPs?',
-      'Show me the BERT model performance over time',
-      'Which next best actions have the highest success probability?',
-      'How has genetic algorithm optimization improved journey performance?',
-      'What are the top 3 recommended actions for Dr. Johnson?'
-    ],
-    
-    visualizationComponent: <OrchestrationVisualization />
-  };
-
-  return <AgentView {...agentData} />;
+  return (
+    <StandardAgentViewLight
+      agentId="orchestration"
+      agentName="AI Orchestration Agent"
+      agentIcon={Brain}
+      agentColor="from-orange-500 to-orange-600"
+      overview={{
+        position: "Fourth in flow - Journey Optimization. Receives approved content from Content Review Agent and generates optimal customer journeys with Next Best Action recommendations.",
+        purpose: "Customer journey optimization and Next Best Action recommendations using BERT model for behavior prediction and genetic algorithms for sequence optimization. Creates explainable AI recommendations for field execution.",
+        reasoning: [
+          "Trains BERT model on customer behavior patterns",
+          "Uses genetic algorithms for journey sequence optimization",
+          "Performs automated feature engineering",
+          "Calculates SHAP values for explainability",
+          "Generates confidence scores for all recommendations"
+        ],
+        tools: [
+          "BERT Model Training Platform",
+          "Journey Optimization Engine",
+          "NBA Recommendation System",
+          "Explainability Framework",
+          "Feature Engineering Pipeline",
+          "Model Performance Monitor"
+        ],
+        actions: [
+          "Training on 125K customer samples",
+          "Optimizing 250 customer journeys",
+          "Generating NBA recommendations",
+          "Calculating feature importance",
+          "Creating explainable insights"
+        ],
+        keyMetrics: [
+          { label: "Model Accuracy", value: "89.2%" },
+          { label: "Active Journeys", value: "250" },
+          { label: "NBA Generated", value: "423" },
+          { label: "Avg Confidence", value: "87%" },
+          { label: "F1 Score", value: "0.89" },
+          { label: "Processing Time", value: "1.2s" }
+        ]
+      }}
+      businessInputs={{
+        upstream: {
+          source: "Content Review Agent",
+          data: [
+            { label: "Approved Content", value: "147 MLR-approved assets" },
+            { label: "Content-Barrier Map", value: "Complete coverage" },
+            { label: "Gap Analysis", value: "12 gaps identified" },
+            { label: "Channel Assets", value: "6 channels mapped" }
+          ]
+        },
+        parameters: [
+          {
+            name: "Model Training Frequency",
+            type: "select",
+            value: "Weekly",
+            options: ["Daily", "Weekly", "Bi-weekly", "Monthly"]
+          },
+          {
+            name: "Journey Complexity",
+            type: "select",
+            value: "Optimized",
+            options: ["Simple", "Standard", "Optimized", "Advanced"]
+          },
+          {
+            name: "Feature Engineering Depth",
+            type: "slider",
+            value: 3,
+            min: 1,
+            max: 5
+          },
+          {
+            name: "Confidence Threshold (%)",
+            type: "slider",
+            value: 75,
+            min: 60,
+            max: 95
+          },
+          {
+            name: "Max Journey Steps",
+            type: "select",
+            value: "7",
+            options: ["5", "7", "10", "15"]
+          },
+          {
+            name: "Include Cross-Channel",
+            type: "toggle",
+            value: true
+          },
+          {
+            name: "Explainability Mode",
+            type: "select",
+            value: "SHAP",
+            options: ["SHAP", "LIME", "Both", "None"]
+          },
+          {
+            name: "Real-time Updates",
+            type: "toggle",
+            value: true
+          }
+        ],
+        constraints: [
+          "Model retraining requires minimum 10K new samples",
+          "Journey steps cannot exceed channel budget limits",
+          "NBA recommendations must have >70% confidence",
+          "Explainability required for all high-impact decisions",
+          "Cross-channel journeys need content availability check"
+        ]
+      }}
+      analytics={{
+        models: [
+          {
+            name: "BERT Behavior Model",
+            description: "Transformer-based model for predicting HCP behavior patterns and engagement likelihood",
+            accuracy: 89.2
+          },
+          {
+            name: "Genetic Algorithm Optimizer",
+            description: "Evolutionary algorithm for finding optimal journey sequences across channels",
+            accuracy: 91.5
+          },
+          {
+            name: "SHAP Explainability Engine",
+            description: "Provides interpretable explanations for all NBA recommendations",
+            accuracy: 94
+          }
+        ],
+        algorithms: [
+          "BERT Architecture",
+          "Genetic Algorithms",
+          "SHAP Values",
+          "Feature Engineering",
+          "Ensemble Methods",
+          "Reinforcement Learning"
+        ],
+        reasoning: {
+          steps: [
+            {
+              step: "Data Preparation",
+              description: "Aggregate content, budget, and customer data from upstream agents"
+            },
+            {
+              step: "Feature Engineering",
+              description: "Create derived features including interaction patterns and temporal signals"
+            },
+            {
+              step: "Model Training",
+              description: "Train BERT model on historical engagement data with transfer learning"
+            },
+            {
+              step: "Journey Optimization",
+              description: "Apply genetic algorithm to find optimal multi-channel sequences"
+            },
+            {
+              step: "NBA Generation",
+              description: "Generate ranked Next Best Actions with confidence scores"
+            },
+            {
+              step: "Explainability Analysis",
+              description: "Calculate SHAP values to explain recommendations"
+            }
+          ]
+        },
+        visualizations: <OrchestrationVisualization />
+      }}
+      outputs={{
+        downstream: {
+          destination: "Field Suggestions Agent",
+          data: [
+            { label: "Optimized Journeys", value: "250 active paths" },
+            { label: "NBA Recommendations", value: "423 actions" },
+            { label: "Model Predictions", value: "89% confidence avg" },
+            { label: "Sequence Rankings", value: "Top 5 per HCP" },
+            { label: "Feature Importance", value: "6 key drivers" }
+          ]
+        },
+        recommendations: [
+          "Deploy Email → Field → Speaker sequence for formulary barriers",
+          "Prioritize digital touchpoints for awareness stage HCPs",
+          "Implement 3-touch journey for high-opportunity targets",
+          "Use peer discussions for referral pathway barriers",
+          "Schedule re-engagement for stalled conversions"
+        ],
+        impact: [
+          { metric: "Conversion Rate", change: "+33%" },
+          { metric: "Journey Efficiency", change: "+45%" },
+          { metric: "Model Accuracy", change: "+12%" },
+          { metric: "Time to Action", change: "-28%" }
+        ]
+      }}
+    />
+  );
 }

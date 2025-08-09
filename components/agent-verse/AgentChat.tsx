@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, User, Sparkles, RotateCw, HelpCircle, Settings } from 'lucide-react';
 import Button from '@/components/design-system/Button';
-import { colors } from '@/lib/design-system/colors';
+import { zsColors } from '@/lib/design-system/zs-colors';
 
 export interface Message {
   id: string;
@@ -131,11 +131,18 @@ export function AgentChat({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="flex flex-col h-full rounded-lg" style={{
+      backgroundColor: zsColors.neutral.white,
+      border: `1px solid ${zsColors.neutral.lightGray}`,
+      boxShadow: zsColors.shadows.sm
+    }}>
       {/* Header */}
       <div 
-        className="px-4 py-3 border-b border-gray-200 flex items-center justify-between"
-        style={{ backgroundColor: `${agentColor}08` }}
+        className="px-4 py-3 flex items-center justify-between"
+        style={{ 
+          backgroundColor: zsColors.neutral.white,
+          borderBottom: `1px solid ${zsColors.neutral.lightGray}`
+        }}
       >
         <div className="flex items-center gap-2">
           <div 
@@ -145,21 +152,21 @@ export function AgentChat({
             <Bot size={16} className="text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">{agentName}</h3>
-            <p className="text-xs text-gray-600">Interactive Q&A</p>
+            <h3 className="font-semibold" style={{ color: zsColors.neutral.charcoal }}>{agentName}</h3>
+            <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Interactive Q&A</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {parameters.length > 0 && (
             <button
               onClick={() => setShowParameters(!showParameters)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 rounded-lg transition-colors hover:bg-gray-100"
             >
-              <Settings size={16} className="text-gray-600" />
+              <Settings size={16} style={{ color: zsColors.neutral.gray }} />
             </button>
           )}
-          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <HelpCircle size={16} className="text-gray-600" />
+          <button className="p-2 rounded-lg transition-colors hover:bg-gray-100">
+            <HelpCircle size={16} style={{ color: zsColors.neutral.gray }} />
           </button>
         </div>
       </div>
@@ -171,11 +178,12 @@ export function AgentChat({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="border-b border-gray-200 overflow-hidden"
+            className="overflow-hidden"
+            style={{ borderBottom: `1px solid ${zsColors.neutral.lightGray}` }}
           >
-            <div className="p-4 bg-gray-50">
+            <div className="p-4" style={{ backgroundColor: zsColors.neutral.offWhite }}>
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-semibold text-gray-700">Analysis Parameters</h4>
+                <h4 className="text-sm font-semibold" style={{ color: zsColors.neutral.darkGray }}>Analysis Parameters</h4>
                 <Button
                   size="sm"
                   variant="secondary"
@@ -188,7 +196,7 @@ export function AgentChat({
               <div className="space-y-3">
                 {parameters.map(param => (
                   <div key={param.key}>
-                    <label className="text-xs text-gray-600 mb-1 block">
+                    <label className="text-xs mb-1 block" style={{ color: zsColors.neutral.gray }}>
                       {param.label}
                     </label>
                     {param.type === 'slider' ? (
@@ -203,7 +211,7 @@ export function AgentChat({
                           className="flex-1"
                           style={{ accentColor: agentColor }}
                         />
-                        <span className="text-sm font-medium text-gray-700 w-12 text-right">
+                        <span className="text-sm font-medium w-12 text-right" style={{ color: zsColors.neutral.darkGray }}>
                           {params[param.key] || param.value}
                         </span>
                       </div>
@@ -211,8 +219,12 @@ export function AgentChat({
                       <select
                         value={params[param.key] || param.value}
                         onChange={(e) => handleParameterChange(param.key, e.target.value)}
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
-                        style={{ borderColor: agentColor }}
+                        className="w-full px-3 py-1.5 text-sm rounded-lg focus:outline-none focus:ring-2"
+                        style={{ 
+                          backgroundColor: zsColors.neutral.white,
+                          border: `1px solid ${zsColors.neutral.lightGray}`,
+                          color: zsColors.neutral.charcoal
+                        }}
                       >
                         {param.options?.map(option => (
                           <option key={option} value={option}>{option}</option>
@@ -223,8 +235,12 @@ export function AgentChat({
                         type={param.type}
                         value={params[param.key] || param.value}
                         onChange={(e) => handleParameterChange(param.key, param.type === 'number' ? Number(e.target.value) : e.target.value)}
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
-                        style={{ borderColor: agentColor }}
+                        className="w-full px-3 py-1.5 text-sm rounded-lg focus:outline-none focus:ring-2"
+                        style={{ 
+                          backgroundColor: zsColors.neutral.white,
+                          border: `1px solid ${zsColors.neutral.lightGray}`,
+                          color: zsColors.neutral.charcoal
+                        }}
                       />
                     )}
                   </div>
@@ -248,19 +264,22 @@ export function AgentChat({
               <div 
                 className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
-                  backgroundColor: message.role === 'agent' ? agentColor : colors.gray[200],
-                  color: message.role === 'agent' ? 'white' : colors.gray[600]
+                  backgroundColor: message.role === 'agent' ? agentColor : zsColors.neutral.lightGray,
+                  color: message.role === 'agent' ? zsColors.neutral.white : zsColors.neutral.darkGray
                 }}
               >
                 {message.role === 'agent' ? <Bot size={16} /> : <User size={16} />}
               </div>
               <div>
                 <div
-                  className={`px-4 py-2 rounded-lg ${
-                    message.role === 'user' 
-                      ? 'bg-gray-100 text-gray-900' 
-                      : 'bg-white border border-gray-200'
-                  }`}
+                  className="px-4 py-2 rounded-lg"
+                  style={{
+                    backgroundColor: message.role === 'user' ? zsColors.neutral.offWhite : zsColors.neutral.white,
+                    color: zsColors.neutral.charcoal,
+                    ...(message.role === 'agent' && {
+                      border: `1px solid ${zsColors.neutral.lightGray}`
+                    })
+                  }}
                 >
                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 </div>
@@ -279,7 +298,7 @@ export function AgentChat({
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>
                   {message.timestamp.toLocaleTimeString()}
                 </p>
               </div>
@@ -299,22 +318,28 @@ export function AgentChat({
               >
                 <Bot size={16} className="text-white" />
               </div>
-              <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg">
+              <div className="px-4 py-2 rounded-lg" style={{
+                backgroundColor: zsColors.neutral.white,
+                border: `1px solid ${zsColors.neutral.lightGray}`
+              }}>
                 <div className="flex gap-1">
                   <motion.div
                     animate={{ y: [0, -5, 0] }}
                     transition={{ repeat: Infinity, duration: 0.6, delay: 0 }}
-                    className="w-2 h-2 bg-gray-400 rounded-full"
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: zsColors.neutral.gray }}
                   />
                   <motion.div
                     animate={{ y: [0, -5, 0] }}
                     transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }}
-                    className="w-2 h-2 bg-gray-400 rounded-full"
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: zsColors.neutral.gray }}
                   />
                   <motion.div
                     animate={{ y: [0, -5, 0] }}
                     transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }}
-                    className="w-2 h-2 bg-gray-400 rounded-full"
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: zsColors.neutral.gray }}
                   />
                 </div>
               </div>
@@ -326,17 +351,25 @@ export function AgentChat({
 
       {/* Suggested Queries */}
       {suggestedQueries.length > 0 && (
-        <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
+        <div className="px-4 py-2" style={{
+          borderTop: `1px solid ${zsColors.neutral.lightGray}`,
+          backgroundColor: zsColors.neutral.offWhite
+        }}>
           <div className="flex items-center gap-2 mb-2">
-            <Sparkles size={14} className="text-gray-500" />
-            <span className="text-xs text-gray-600">Suggested queries</span>
+            <Sparkles size={14} style={{ color: zsColors.neutral.gray }} />
+            <span className="text-xs" style={{ color: zsColors.neutral.gray }}>Suggested queries</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {suggestedQueries.map((query, index) => (
               <button
                 key={index}
                 onClick={() => handleSuggestedQuery(query)}
-                className="px-3 py-1 text-xs bg-white border border-gray-300 rounded-full hover:border-gray-400 transition-colors"
+                className="px-3 py-1 text-xs rounded-full transition-colors"
+                style={{
+                  backgroundColor: zsColors.neutral.white,
+                  border: `1px solid ${zsColors.neutral.lightGray}`,
+                  color: zsColors.neutral.darkGray
+                }}
               >
                 {query}
               </button>
@@ -346,7 +379,7 @@ export function AgentChat({
       )}
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4" style={{ borderTop: `1px solid ${zsColors.neutral.lightGray}` }}>
         <div className="flex gap-2">
           <input
             type="text"
@@ -354,16 +387,22 @@ export function AgentChat({
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Ask a question or request an action..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
-            style={{ borderColor: agentColor }}
+            className="flex-1 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
+            style={{ 
+              backgroundColor: zsColors.neutral.white,
+              border: `1px solid ${zsColors.neutral.lightGray}`,
+              color: zsColors.neutral.charcoal
+            }}
             disabled={isProcessing}
           />
           <Button
             onClick={handleSend}
             disabled={!input.trim() || isProcessing}
             icon={<Send size={16} />}
-            style={{ backgroundColor: agentColor }}
-            className="text-white"
+            style={{ 
+              backgroundColor: agentColor,
+              color: zsColors.neutral.white
+            }}
           >
             Send
           </Button>

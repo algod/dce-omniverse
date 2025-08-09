@@ -2,7 +2,7 @@
 
 ## Overview
 
-DCE OmniVerse is a next-generation omnichannel agentic AI solution for pharmaceutical companies, featuring 6 intelligent AI agents powered by Google Gemini 2.5 Pro. This demonstration application showcases advanced AI capabilities for omnichannel planning and execution.
+DCE OmniVerse is a next-generation omnichannel agentic AI solution for pharmaceutical companies, featuring 6 intelligent AI agents powered by Advanced AI Engine. This demonstration application showcases advanced AI capabilities for omnichannel planning and execution.
 
 ## 🚀 Features
 
@@ -17,7 +17,7 @@ DCE OmniVerse is a next-generation omnichannel agentic AI solution for pharmaceu
 
 ## 🛠️ Tech Stack
 
-- **AI Model**: Google Gemini 2.5 Pro (1M token context)
+- **AI Model**: Advanced AI Engine (extended context window)
 - **Framework**: Next.js 14 with TypeScript
 - **Deployment**: Vercel
 - **Database**: Vercel Postgres + Vercel KV
@@ -86,9 +86,9 @@ vercel
 
 ## 🔑 Getting API Keys
 
-### Gemini 2.5 Pro API Key
-1. Visit [Google AI Studio](https://aistudio.google.com/)
-2. Sign in with your Google account
+### AI Engine API Key
+1. Contact your system administrator
+2. Request API access credentials
 3. Create a new API key
 4. Copy and add to your environment variables
 
@@ -113,7 +113,7 @@ The application includes pre-configured demo scenarios for each agent:
 ## 🎯 Key Features for Presentation
 
 - **< 2 second load times** - Optimized for executive demonstrations
-- **Live AI reasoning** - Real-time Gemini 2.5 Pro explanations
+- **Live AI reasoning** - Real-time AI Engine explanations
 - **Interactive visualizations** - Drag-and-drop budget allocation
 - **Mobile responsive** - Works on all devices
 - **Demo mode** - Pre-loaded with realistic pharma data
@@ -147,4 +147,4 @@ Proprietary - DCE OmniVerse 2025
 
 ---
 
-**Built for pharmaceutical senior commercial leaders** | **Powered by Gemini 2.5 Pro**
+**Built for pharmaceutical senior commercial leaders** | **Powered by Advanced AI Engine**

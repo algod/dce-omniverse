@@ -1,181 +1,197 @@
 'use client';
 
-import { FileText } from 'lucide-react';
-import { AgentView } from '@/components/agent-verse/AgentView';
-import { colors } from '@/lib/design-system/colors';
+import { FileCheck } from 'lucide-react';
+import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
 import { ContentReviewVisualization } from '@/components/agents/ContentReviewVisualization';
 
 export default function ContentReviewAgent() {
-  const agentData = {
-    agentId: 'content',
-    agentName: 'Content Review Agent',
-    agentColor: colors.agents.content,
-    agentIcon: FileText,
-    overview: `The Content Review Agent manages the content lifecycle from creation through MLR approval, ensuring all materials align with identified barriers and channel requirements. 
-    It receives barrier analysis from Customer Planning and budget allocations from Budget Planning to prioritize content development and accelerate approval processes.`,
-
-    
-    businessInputs: [
-      {
-        label: 'Barrier Analysis',
-        description: 'Identified barriers and their prevalence from Customer Planning Agent',
-        type: 'Upstream Data'
-      },
-      {
-        label: 'Channel Budgets',
-        description: 'Approved budget allocations per channel from Budget Planning Agent',
-        type: 'Upstream Data'
-      },
-      {
-        label: 'Message Themes',
-        description: 'Brand-approved messaging themes and positioning statements',
-        type: 'Brand Guidelines'
-      },
-      {
-        label: 'MLR Requirements',
-        description: 'Medical, Legal, and Regulatory review criteria and compliance rules',
-        type: 'Compliance Rules'
-      },
-      {
-        label: 'Content Library',
-        description: 'Existing approved content assets and their performance metrics',
-        type: 'Asset Repository'
-      }
-    ],
-
-    
-    outputs: [
-      {
-        label: 'Content-Barrier Mapping',
-        description: 'Matrix showing which content addresses each identified barrier',
-        format: 'Coverage Matrix'
-      },
-      {
-        label: 'MLR Approval Status',
-        description: 'Real-time status of all content in the MLR review process',
-        format: 'Status Dashboard'
-      },
-      {
-        label: 'Gap Analysis Report',
-        description: 'Identified content gaps by barrier and channel with priority scores',
-        format: 'Gap Report'
-      },
-      {
-        label: 'Approved Content Library',
-        description: 'Repository of MLR-approved content ready for distribution',
-        format: 'Asset Library'
-      },
-      {
-        label: 'Content Production Plan',
-        description: 'Timeline and priorities for new content development',
-        format: 'Project Plan'
-      }
-    ],
-
-    
-    analytics: [
-      {
-        title: 'Barrier Coverage Heatmap',
-        description: 'Visual map of content coverage by barrier',
-        type: 'heatmap' as const
-      },
-      {
-        title: 'MLR Approval Pipeline',
-        description: 'Status and timeline of content in review',
-        type: 'chart' as const
-      },
-      {
-        title: 'Content Gap Analysis',
-        description: 'Gaps by channel and barrier priority',
-        type: 'chart' as const
-      },
-      {
-        title: 'Compliance Scorecard',
-        description: 'MLR compliance metrics and trends',
-        type: 'metric' as const
-      }
-    ],
-
-    
-    downstreamUsage: [
-      {
-        agent: 'Orchestration Agent',
-        usage: 'Provides approved content for inclusion in personalized customer journeys'
-      },
-      {
-        agent: 'Field Suggestions Agent',
-        usage: 'Supplies field-ready materials aligned with triggered suggestions'
-      },
-      {
-        agent: 'Field Copilot Agent',
-        usage: 'Delivers approved content for rep use during customer interactions'
-      }
-    ],
-
-    
-    capabilities: [
-      'Maps content themes to identified barriers',
-      'Automates MLR compliance checking',
-      'Identifies content gaps by channel and barrier',
-      'Tracks approval pipeline and timelines',
-      'Manages content library and versioning',
-      'Generates content production priorities',
-      'Monitors content performance metrics'
-    ],
-
-    
-    parameters: [
-      {
-        label: 'MLR Compliance Threshold',
-        key: 'mlr_threshold',
-        type: 'slider',
-        value: 85,
-        min: 70,
-        max: 100,
-        step: 5
-      },
-      {
-        label: 'Content Priority',
-        key: 'priority',
-        type: 'select',
-        value: 'barrier_aligned',
-        options: ['barrier_aligned', 'channel_focused', 'quick_wins', 'strategic']
-      },
-      {
-        label: 'Review Speed',
-        key: 'review_speed',
-        type: 'select',
-        value: 'standard',
-        options: ['expedited', 'standard', 'thorough']
-      },
-      {
-        label: 'Gap Tolerance',
-        key: 'gap_tolerance',
-        type: 'slider',
-        value: 10,
-        min: 0,
-        max: 20,
-        step: 5
-      },
-      {
-        label: 'Auto-Retire Old Content',
-        key: 'auto_retire',
-        type: 'select',
-        value: 'yes',
-        options: ['yes', 'no']
-      }
-    ],
-    
-    suggestedQueries: [
-      'Which content addresses referral pathway barriers?',
-      'Show MLR approval status for pending assets',
-      'What content gaps exist for email channel?',
-      'How many assets are ready for field use?',
-      'Which themes have the highest MLR approval rate?'
-    ],
-    
-    visualizationComponent: <ContentReviewVisualization />
-  };
-
-  return <AgentView {...agentData} />;
+  return (
+    <StandardAgentViewLight
+      agentId="content"
+      agentName="Content Review Agent"
+      agentIcon={FileCheck}
+      agentColor="from-sky-500 to-blue-500"
+      overview={{
+        position: "Third in flow - Message Preparation. Receives channel budgets from Budget Planning Agent and ensures adequate content exists for each funded channel.",
+        purpose: "Content management and accelerated MLR approval process. Maps message themes to customer barriers, ensures MLR compliance, identifies content gaps, and coordinates new content production.",
+        reasoning: [
+          "Maps content themes to the 5 primary barriers",
+          "Performs automated MLR compliance checking",
+          "Identifies gaps in content coverage by channel",
+          "Predicts approval likelihood based on historical patterns",
+          "Coordinates content production priorities"
+        ],
+        tools: [
+          "MLR Compliance Checker",
+          "Content Library Manager",
+          "Gap Analysis Engine",
+          "Approval Workflow System",
+          "Content-Barrier Mapper",
+          "Production Coordinator"
+        ],
+        actions: [
+          "Reviewing 147 content assets",
+          "Checking MLR compliance",
+          "Mapping content to barriers",
+          "Identifying 12 content gaps",
+          "Processing approval queue"
+        ],
+        keyMetrics: [
+          { label: "Total Assets", value: "147" },
+          { label: "Approval Rate", value: "72%" },
+          { label: "Content Gaps", value: "12" },
+          { label: "Avg Approval Time", value: "3.2 days" },
+          { label: "Coverage Score", value: "83%" },
+          { label: "Compliance Rate", value: "94%" }
+        ]
+      }}
+      businessInputs={{
+        upstream: {
+          source: "Budget Planning Agent",
+          data: [
+            { label: "Field Budget", value: "$6M allocated" },
+            { label: "Digital Budget", value: "$3.75M allocated" },
+            { label: "Email Budget", value: "$2.25M allocated" },
+            { label: "Content Needs", value: "147 assets required" }
+          ]
+        },
+        parameters: [
+          {
+            name: "MLR Strictness Level",
+            type: "select",
+            value: "Standard",
+            options: ["Relaxed", "Standard", "Strict", "Maximum"]
+          },
+          {
+            name: "Auto-Approval Threshold (%)",
+            type: "slider",
+            value: 95,
+            min: 85,
+            max: 100
+          },
+          {
+            name: "Content Refresh Frequency",
+            type: "select",
+            value: "Quarterly",
+            options: ["Monthly", "Quarterly", "Semi-Annual", "Annual"]
+          },
+          {
+            name: "Barrier Coverage Priority",
+            type: "select",
+            value: "Formulary First",
+            options: ["Equal Weight", "Formulary First", "Referral First", "Side Effects First"]
+          },
+          {
+            name: "Channel Content Ratio",
+            type: "select",
+            value: "Budget-Proportional",
+            options: ["Equal Distribution", "Budget-Proportional", "Field-Heavy", "Digital-Heavy"]
+          },
+          {
+            name: "Include Competitive Claims",
+            type: "toggle",
+            value: false
+          },
+          {
+            name: "Fast-Track Priority Content",
+            type: "toggle",
+            value: true
+          },
+          {
+            name: "Gap Analysis Frequency",
+            type: "select",
+            value: "Weekly",
+            options: ["Daily", "Weekly", "Bi-Weekly", "Monthly"]
+          }
+        ],
+        constraints: [
+          "All content must pass MLR compliance check",
+          "Minimum 3 assets per barrier per channel",
+          "Maximum 30-day approval timeline",
+          "Content expiration after 12 months",
+          "Channel-specific formatting requirements"
+        ]
+      }}
+      analytics={{
+        models: [
+          {
+            name: "MLR Compliance Predictor",
+            description: "ML model that predicts likelihood of MLR approval based on content features",
+            accuracy: 92
+          },
+          {
+            name: "Content Effectiveness Model",
+            description: "Predicts content engagement rates based on historical performance",
+            accuracy: 85
+          },
+          {
+            name: "Gap Detection Algorithm",
+            description: "Identifies missing content coverage across barriers and channels",
+            accuracy: 94
+          }
+        ],
+        algorithms: [
+          "Natural Language Processing",
+          "Compliance Rule Engine",
+          "Semantic Similarity",
+          "Gap Analysis Matrix",
+          "Approval Prediction"
+        ],
+        reasoning: {
+          steps: [
+            {
+              step: "Budget Analysis",
+              description: "Review channel budgets to determine content volume requirements"
+            },
+            {
+              step: "Content Inventory",
+              description: "Catalog existing approved content and assess current coverage"
+            },
+            {
+              step: "Barrier Mapping",
+              description: "Map each content piece to relevant barriers and channels"
+            },
+            {
+              step: "Compliance Check",
+              description: "Run automated MLR compliance assessment on all content"
+            },
+            {
+              step: "Gap Identification",
+              description: "Identify missing content by barrier-channel combinations"
+            },
+            {
+              step: "Production Planning",
+              description: "Prioritize new content creation based on gaps and budget"
+            }
+          ]
+        },
+        visualizations: <ContentReviewVisualization />
+      }}
+      outputs={{
+        downstream: {
+          destination: "AI Orchestration Agent",
+          data: [
+            { label: "Approved Content", value: "147 MLR-approved" },
+            { label: "Content-Barrier Map", value: "Complete mapping" },
+            { label: "Gap Analysis", value: "12 gaps identified" },
+            { label: "Channel Assets", value: "All 6 channels" },
+            { label: "Compliance Status", value: "94% compliant" }
+          ]
+        },
+        recommendations: [
+          "Prioritize formulary barrier content creation (4 gaps)",
+          "Fast-track digital assets for email campaign",
+          "Update side effect management materials",
+          "Create peer discussion guides for speaker programs",
+          "Refresh outdated clinical data presentations"
+        ],
+        impact: [
+          { metric: "Content Coverage", change: "+23%" },
+          { metric: "Approval Speed", change: "+45%" },
+          { metric: "Compliance Rate", change: "+8%" },
+          { metric: "Content Utilization", change: "+37%" }
+        ]
+      }}
+    />
+  );
 }

@@ -1,184 +1,216 @@
 'use client';
 
 import { Lightbulb } from 'lucide-react';
-import { AgentView } from '@/components/agent-verse/AgentView';
-import { colors } from '@/lib/design-system/colors';
+import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
 import { FieldSuggestionsVisualization } from '@/components/agents/FieldSuggestionsVisualization';
 
 export default function FieldSuggestionsAgent() {
-  const agentData = {
-    agentId: 'suggestions',
-    agentName: 'Field Suggestion Design Agent',
-    agentColor: colors.agents.suggestions,
-    agentIcon: Lightbulb,
-    overview: `The Field Suggestion Design Agent creates and monitors intelligent field suggestions aligned with brand objectives. 
-    It features 7 configurable trigger types with sensitivity analysis, implements a 40/40/20 prioritization system 
-    (rep feedback, strategic priority, behavior severity), and includes performance monitoring with proactive adjustments.`,
-    
-    businessInputs: [
-      {
-        label: 'Brand Strategic Priorities',
-        description: 'Current brand objectives and strategic focus areas that should drive suggestion prioritization',
-        type: 'Strategic Input'
-      },
-      {
-        label: 'Trigger Configuration',
-        description: 'Setup and sensitivity settings for the 7 field suggestion trigger types',
-        type: 'Configuration'
-      },
-      {
-        label: 'Rep Feedback Data',
-        description: 'Historical rep feedback on suggestion relevance, timing, and effectiveness',
-        type: 'Field Intelligence'
-      },
-      {
-        label: 'Behavioral Data',
-        description: 'HCP behavioral patterns and change indicators from prescribing and engagement data',
-        type: 'Data Input'
-      }
-    ],
-    
-    outputs: [
-      {
-        label: 'Intelligent Field Suggestions',
-        description: 'Prioritized, time-sensitive suggestions delivered to field reps with 14-day expiration',
-        format: 'Mobile Notifications'
-      },
-      {
-        label: 'Trigger Performance Report',
-        description: 'Analysis of trigger effectiveness, acceptance rates, and ROI by trigger type',
-        format: 'Performance Dashboard'
-      },
-      {
-        label: 'Prioritization Analytics',
-        description: '40/40/20 scoring breakdown showing rep feedback, strategic alignment, and behavior severity',
-        format: 'Scoring Matrix'
-      },
-      {
-        label: 'Feedback Loop Insights',
-        description: 'Rep acceptance patterns and suggestion optimization recommendations',
-        format: 'Insights Report'
-      }
-    ],
-    
-    analytics: [
-      {
-        title: '7 Trigger Types Performance',
-        description: 'Comparative analysis of trigger effectiveness, volume, and conversion rates',
-        type: 'chart' as const
-      },
-      {
-        title: '40/40/20 Prioritization System',
-        description: 'Breakdown of prioritization factors and their contribution to suggestion scoring',
-        type: 'chart' as const
-      },
-      {
-        title: 'Field Feedback Loop',
-        description: 'Rep acceptance rates, completion rates, and effectiveness scores over time',
-        type: 'chart' as const
-      },
-      {
-        title: 'Performance by Trigger',
-        description: 'ROI and conversion metrics for each trigger type with acceptance rates',
-        type: 'chart' as const
-      }
-    ],
-    
-    downstreamUsage: [
-      {
-        agent: 'Field Copilot Agent',
-        usage: 'Receives prioritized suggestions to integrate into rep workflow and provide contextual guidance'
-      },
-      {
-        agent: 'Customer Planning Agent',
-        usage: 'Uses suggestion outcomes to refine HCP prioritization and barrier analysis'
-      },
-      {
-        agent: 'Budget Planning Agent',
-        usage: 'Leverages suggestion ROI data to optimize resource allocation for field activities'
-      }
-    ],
-    
-    capabilities: [
-      '7 configurable trigger types with sensitivity analysis',
-      '40/40/20 prioritization system with feedback integration',
-      'Real-time suggestion monitoring and adjustment',
-      '20 suggestions/week limit with smart throttling',
-      '14-day expiration with suppression rules',
-      'ROI tracking and performance optimization'
-    ],
-    
-    parameters: [
-      {
-        label: 'Rep Feedback Weight',
-        key: 'rep_feedback_weight',
-        type: 'slider',
-        value: 40,
-        min: 20,
-        max: 60,
-        step: 5
-      },
-      {
-        label: 'Strategic Priority Weight',
-        key: 'strategic_weight',
-        type: 'slider',
-        value: 40,
-        min: 20,
-        max: 60,
-        step: 5
-      },
-      {
-        label: 'Behavior Severity Weight',
-        key: 'behavior_weight',
-        type: 'slider',
-        value: 20,
-        min: 10,
-        max: 40,
-        step: 5
-      },
-      {
-        label: 'Weekly Suggestion Limit',
-        key: 'weekly_limit',
-        type: 'slider',
-        value: 20,
-        min: 10,
-        max: 30,
-        step: 2
-      },
-      {
-        label: 'Trigger Sensitivity Threshold',
-        key: 'sensitivity_threshold',
-        type: 'slider',
-        value: 0.75,
-        min: 0.5,
-        max: 0.95,
-        step: 0.05
-      },
-      {
-        label: 'Expiration Period (Days)',
-        key: 'expiration_days',
-        type: 'select',
-        value: '14',
-        options: ['7', '14', '21', '28']
-      },
-      {
-        label: 'Minimum ROI Threshold',
-        key: 'min_roi',
-        type: 'number',
-        value: 1.5
-      }
-    ],
-    
-    suggestedQueries: [
-      'Which trigger types have the highest ROI?',
-      'Show me the 40/40/20 prioritization breakdown',
-      'How has rep feedback influenced suggestion quality?',
-      'What is the current weekly suggestion volume by rep?',
-      'Which triggers need sensitivity adjustments?'
-    ],
-    
-    visualizationComponent: <FieldSuggestionsVisualization />
-  };
-
-  return <AgentView {...agentData} />;
+  return (
+    <StandardAgentViewLight
+      agentId="suggestions"
+      agentName="Field Suggestions Agent"
+      agentIcon={Lightbulb}
+      agentColor="from-cyan-500 to-teal-500"
+      overview={{
+        position: "Fifth in flow - Field Enablement. Receives NBA recommendations from the AI Orchestration Agent and generates prioritized field suggestions for representatives.",
+        purpose: "Design and monitor field suggestions aligned with brand objectives. Balances trigger volume, quality, and field capacity while incorporating feedback through the 40/40/20 prioritization system.",
+        reasoning: [
+          "Configures 7 trigger types with dynamic thresholds",
+          "Monitors field feedback and adoption rates",
+          "Adjusts triggers based on performance metrics",
+          "Implements 40/40/20 prioritization (rep feedback/strategic priority/behavior severity)",
+          "Ensures suggestion quality while managing volume"
+        ],
+        tools: [
+          "Trigger Configuration Console",
+          "Feedback Processing Engine",
+          "Performance Analytics Platform",
+          "Volume Management System",
+          "Priority Scoring Engine",
+          "Adoption Tracking System"
+        ],
+        actions: [
+          "Configuring 7 trigger types",
+          "Processing 892 feedback points",
+          "Adjusting sensitivity thresholds",
+          "Generating priority scores",
+          "Monitoring adoption rates"
+        ],
+        keyMetrics: [
+          { label: "Active Triggers", value: "7" },
+          { label: "Weekly Suggestions", value: "127" },
+          { label: "Completion Rate", value: "72%" },
+          { label: "Feedback Score", value: "4.2/5" },
+          { label: "Adoption Rate", value: "68%" },
+          { label: "Avg Response Time", value: "2.4 hrs" }
+        ]
+      }}
+      businessInputs={{
+        upstream: {
+          source: "AI Orchestration Agent",
+          data: [
+            { label: "NBA Recommendations", value: "423 optimized actions" },
+            { label: "Journey Sequences", value: "156 active paths" },
+            { label: "Model Predictions", value: "89% confidence avg" },
+            { label: "Conversion Probabilities", value: "72% expected" }
+          ]
+        },
+        parameters: [
+          {
+            name: "Trigger 1: Speaker Program Follow-up",
+            type: "slider",
+            value: 85,
+            min: 50,
+            max: 100
+          },
+          {
+            name: "Trigger 2: Low Fulfillment Rate",
+            type: "slider",
+            value: 70,
+            min: 50,
+            max: 100
+          },
+          {
+            name: "Trigger 3: Positive Payer Coverage",
+            type: "slider",
+            value: 75,
+            min: 50,
+            max: 100
+          },
+          {
+            name: "Trigger 4: Slowed Prescribing",
+            type: "slider",
+            value: 65,
+            min: 50,
+            max: 100
+          },
+          {
+            name: "Trigger 5: Single Prescription",
+            type: "slider",
+            value: 60,
+            min: 50,
+            max: 100
+          },
+          {
+            name: "Trigger 6: Email Engagement",
+            type: "slider",
+            value: 80,
+            min: 50,
+            max: 100
+          },
+          {
+            name: "Trigger 7: Early Indicators",
+            type: "slider",
+            value: 55,
+            min: 50,
+            max: 100
+          },
+          {
+            name: "Weekly Volume Cap",
+            type: "select",
+            value: "20",
+            options: ["10", "15", "20", "25", "30"]
+          },
+          {
+            name: "Prioritization Method",
+            type: "select",
+            value: "40-40-20",
+            options: ["40-40-20", "Equal Weight", "Rep Priority", "Strategic Only"]
+          },
+          {
+            name: "Suppression Rules",
+            type: "toggle",
+            value: true
+          }
+        ],
+        constraints: [
+          "Maximum 20 suggestions per rep per week",
+          "14-day expiration on all suggestions",
+          "Suppression for recently contacted HCPs",
+          "40/40/20 weighting must be maintained",
+          "Emergency override for critical triggers"
+        ]
+      }}
+      analytics={{
+        models: [
+          {
+            name: "Trigger Optimization Model",
+            description: "Machine learning model to optimize trigger sensitivity based on outcomes",
+            accuracy: 87
+          },
+          {
+            name: "Feedback Analysis Model",
+            description: "NLP model to process and categorize rep feedback",
+            accuracy: 84
+          },
+          {
+            name: "Volume Prediction Model",
+            description: "Forecasts suggestion volume based on trigger settings",
+            accuracy: 90
+          }
+        ],
+        algorithms: [
+          "Sensitivity Analysis",
+          "Feedback Loop Integration",
+          "Priority Scoring",
+          "Volume Optimization",
+          "Performance Tracking"
+        ],
+        reasoning: {
+          steps: [
+            {
+              step: "NBA Integration",
+              description: "Receive and process Next Best Actions from Orchestration Agent"
+            },
+            {
+              step: "Trigger Evaluation",
+              description: "Evaluate all 7 triggers against current HCP data"
+            },
+            {
+              step: "Priority Calculation",
+              description: "Apply 40/40/20 weighting to generate priority scores"
+            },
+            {
+              step: "Volume Management",
+              description: "Apply caps and suppression rules to manage suggestion volume"
+            },
+            {
+              step: "Performance Monitoring",
+              description: "Track completion rates and feedback for continuous improvement"
+            },
+            {
+              step: "Threshold Adjustment",
+              description: "Dynamically adjust trigger sensitivities based on performance"
+            }
+          ]
+        },
+        visualizations: <FieldSuggestionsVisualization />
+      }}
+      outputs={{
+        downstream: {
+          destination: "Field Copilot Agent",
+          data: [
+            { label: "Active Suggestions", value: "127 this week" },
+            { label: "Priority Actions", value: "45 immediate" },
+            { label: "Performance Metrics", value: "72% completion" },
+            { label: "Feedback Required", value: "23 items" },
+            { label: "Trigger Performance", value: "All monitored" }
+          ]
+        },
+        recommendations: [
+          "Increase speaker program follow-up sensitivity to 90%",
+          "Reduce early indicator threshold to capture more opportunities",
+          "Implement weekly review of trigger performance",
+          "Add suppression for HCPs contacted in last 48 hours",
+          "Focus on formulary and referral barrier triggers"
+        ],
+        impact: [
+          { metric: "Suggestion Quality", change: "+28%" },
+          { metric: "Rep Adoption", change: "+42%" },
+          { metric: "Completion Rate", change: "+15%" },
+          { metric: "Time to Action", change: "-35%" }
+        ]
+      }}
+    />
+  );
 }

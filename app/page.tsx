@@ -1,7 +1,7 @@
 'use client';
 
-import { ExecutiveDashboard } from '@/components/ExecutiveDashboard';
+import { FlowVisualizationLight } from '@/components/agent-verse/FlowVisualizationLight';
 
 export default function Home() {
-  return <ExecutiveDashboard />;
+  return <FlowVisualizationLight />;
 }

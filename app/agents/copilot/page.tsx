@@ -1,183 +1,191 @@
 'use client';
 
 import { HeadphonesIcon } from 'lucide-react';
-import { AgentView } from '@/components/agent-verse/AgentView';
-import { colors } from '@/lib/design-system/colors';
+import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
 import { FieldCopilotVisualization } from '@/components/agents/FieldCopilotVisualization';
 
 export default function FieldCopilotAgent() {
-  const agentData = {
-    agentId: 'copilot',
-    agentName: 'Field Copilot Agent',
-    agentColor: colors.agents.copilot,
-    agentIcon: HeadphonesIcon,
-    overview: `The Field Copilot Agent serves as an AI assistant for sales reps, supporting all field activities with intelligent guidance. 
-    It provides comprehensive pre-call planning with HCP insights, territory and region summaries, virtual coaching simulators, 
-    and call scheduling with email drafting assistance through an intuitive chat interface.`,
-    
-    businessInputs: [
-      {
-        label: 'HCP Profile Data',
-        description: 'Comprehensive HCP information including specialty, prescribing patterns, and engagement history',
-        type: 'Data Input'
-      },
-      {
-        label: 'Territory Configuration',
-        description: 'Territory boundaries, targets, and performance metrics for personalized rep guidance',
-        type: 'Configuration'
-      },
-      {
-        label: 'Coaching Scenarios',
-        description: 'Virtual training scenarios covering objection handling, clinical discussions, and closing techniques',
-        type: 'Training Content'
-      },
-      {
-        label: 'Messaging Templates',
-        description: 'Approved email templates and clinical messaging for various rep activities',
-        type: 'Content Library'
-      }
-    ],
-    
-    outputs: [
-      {
-        label: 'Pre-Call Intelligence',
-        description: 'HCP readiness scores, barrier analysis, and recommended talking points for each call',
-        format: 'Call Prep Dashboard'
-      },
-      {
-        label: 'Territory Performance',
-        description: 'Real-time territory metrics with targets and performance against goals',
-        format: 'Performance Dashboard'
-      },
-      {
-        label: 'AI-Generated Emails',
-        description: 'Personalized email drafts with high engagement rates and compliance-approved messaging',
-        format: 'Email Templates'
-      },
-      {
-        label: 'Virtual Coaching Reports',
-        description: 'Coaching session results with skill improvement tracking and confidence scores',
-        format: 'Training Analytics'
-      }
-    ],
-    
-    analytics: [
-      {
-        title: 'Pre-Call Planning Intelligence',
-        description: 'HCP readiness scores and recommended next actions for optimal call preparation',
-        type: 'chart' as const
-      },
-      {
-        title: 'Territory Performance Summary',
-        description: 'Key metrics tracking with current vs target performance across all KPIs',
-        type: 'chart' as const
-      },
-      {
-        title: 'Virtual Coaching Performance',
-        description: 'Training scenario success rates and skill improvement metrics by coaching type',
-        type: 'chart' as const
-      },
-      {
-        title: 'Email Assistance Analytics',
-        description: 'Email drafting volume, engagement rates, and response metrics over time',
-        type: 'chart' as const
-      }
-    ],
-    
-    downstreamUsage: [
-      {
-        agent: 'Customer Planning Agent',
-        usage: 'Receives HCP prioritization and barrier insights to provide targeted pre-call intelligence'
-      },
-      {
-        agent: 'Field Suggestions Agent',
-        usage: 'Integrates field suggestions into workflow guidance and call planning recommendations'
-      },
-      {
-        agent: 'Content Review Agent',
-        usage: 'Accesses approved messaging and content for email drafting and call preparation materials'
-      }
-    ],
-    
-    capabilities: [
-      'AI-powered pre-call planning with HCP insights',
-      'Real-time territory performance monitoring',
-      'Interactive virtual coaching simulator',
-      'Intelligent email drafting with high engagement',
-      'Call scheduling and follow-up automation',
-      'Mobile-optimized PWA for field accessibility'
-    ],
-    
-    parameters: [
-      {
-        label: 'HCP Readiness Threshold',
-        key: 'readiness_threshold',
-        type: 'slider',
-        value: 70,
-        min: 50,
-        max: 90,
-        step: 5
-      },
-      {
-        label: 'Territory Update Frequency',
-        key: 'update_frequency',
-        type: 'select',
-        value: 'daily',
-        options: ['hourly', 'daily', 'weekly']
-      },
-      {
-        label: 'Coaching Difficulty Level',
-        key: 'coaching_level',
-        type: 'select',
-        value: 'adaptive',
-        options: ['beginner', 'intermediate', 'advanced', 'adaptive']
-      },
-      {
-        label: 'Email Personalization Level',
-        key: 'personalization',
-        type: 'slider',
-        value: 80,
-        min: 40,
-        max: 100,
-        step: 10
-      },
-      {
-        label: 'Call Priority Scoring',
-        key: 'priority_scoring',
-        type: 'select',
-        value: 'comprehensive',
-        options: ['simple', 'standard', 'comprehensive', 'advanced']
-      },
-      {
-        label: 'Response Time SLA (Hours)',
-        key: 'response_sla',
-        type: 'slider',
-        value: 4,
-        min: 1,
-        max: 24,
-        step: 1
-      },
-      {
-        label: 'Offline Mode Duration (Days)',
-        key: 'offline_duration',
-        type: 'slider',
-        value: 3,
-        min: 1,
-        max: 7,
-        step: 1
-      }
-    ],
-    
-    suggestedQueries: [
-      'Help me prepare for my call with Dr. Johnson',
-      'Show me my territory performance this month',
-      'Practice objection handling for competitive scenarios',
-      'Draft a follow-up email for my speaker program attendees',
-      'Which HCPs should I prioritize this week?'
-    ],
-    
-    visualizationComponent: <FieldCopilotVisualization />
-  };
-
-  return <AgentView {...agentData} />;
+  return (
+    <StandardAgentViewLight
+      agentId="copilot"
+      agentName="Field Copilot Agent"
+      agentIcon={HeadphonesIcon}
+      agentColor="from-green-500 to-green-600"
+      overview={{
+        position: "End of flow - Execution Support. This is the final agent in the DCE OmniVerse flow, providing AI-powered assistance to field representatives. It synthesizes all upstream intelligence and sends feedback back to Customer Planning to complete the loop.",
+        purpose: "AI assistant for sales reps supporting field activities. Provides pre-call planning, virtual coaching, territory insights, and email assistance. Captures field feedback and insights to continuously improve the system.",
+        reasoning: [
+          "Synthesizes intelligence from all upstream agents",
+          "Generates contextual pre-call planning summaries",
+          "Provides virtual coaching scenarios",
+          "Assists with scheduling and email drafting",
+          "Captures and processes field feedback for system improvement"
+        ],
+        tools: [
+          "Intelligence Aggregator",
+          "Pre-Call Planning Engine",
+          "Coaching Scenario Generator",
+          "Email/Calendar Assistant",
+          "Territory Management System",
+          "Feedback Processing Engine"
+        ],
+        actions: [
+          "Preparing 445 pre-call plans",
+          "Generating coaching scenarios",
+          "Optimizing territory coverage",
+          "Drafting follow-up emails",
+          "Processing field feedback"
+        ],
+        keyMetrics: [
+          { label: "Active Reps", value: "248" },
+          { label: "Calls Planned", value: "445" },
+          { label: "Emails Drafted", value: "380" },
+          { label: "Coaching Sessions", value: "580" },
+          { label: "Success Rate", value: "78%" },
+          { label: "Feedback Score", value: "4.6/5" }
+        ]
+      }}
+      businessInputs={{
+        upstream: {
+          source: "Field Suggestions Agent",
+          data: [
+            { label: "Active Suggestions", value: "127 for this week" },
+            { label: "Priority Actions", value: "45 immediate" },
+            { label: "Trigger Alerts", value: "7 types active" },
+            { label: "Performance Metrics", value: "72% completion rate" }
+          ]
+        },
+        parameters: [
+          {
+            name: "Pre-Call Depth",
+            type: "select",
+            value: "Comprehensive",
+            options: ["Basic", "Standard", "Comprehensive", "Executive"]
+          },
+          {
+            name: "Coaching Intensity",
+            type: "slider",
+            value: 3,
+            min: 1,
+            max: 5
+          },
+          {
+            name: "Territory Coverage Focus",
+            type: "select",
+            value: "High-Opportunity",
+            options: ["High-Opportunity", "Balanced", "Wide Coverage", "Strategic Accounts"]
+          },
+          {
+            name: "Email Tone",
+            type: "select",
+            value: "Professional",
+            options: ["Formal", "Professional", "Conversational", "Technical"]
+          },
+          {
+            name: "Include Competitive Intel",
+            type: "toggle",
+            value: true
+          },
+          {
+            name: "Real-Time Alerts",
+            type: "toggle",
+            value: true
+          },
+          {
+            name: "Feedback Collection Mode",
+            type: "select",
+            value: "Continuous",
+            options: ["Manual", "Daily", "Weekly", "Continuous"]
+          }
+        ],
+        constraints: [
+          "Maximum 20 pre-call plans per rep per week",
+          "Coaching sessions limited to 30 minutes",
+          "Email drafts must comply with MLR guidelines",
+          "Territory optimization runs weekly",
+          "Feedback must be anonymized"
+        ]
+      }}
+      analytics={{
+        models: [
+          {
+            name: "Context Synthesis Model",
+            description: "Aggregates data from all upstream agents to create comprehensive HCP context",
+            accuracy: 91
+          },
+          {
+            name: "Coaching Effectiveness Model",
+            description: "Personalizes coaching scenarios based on rep performance patterns",
+            accuracy: 86
+          },
+          {
+            name: "Territory Optimization Algorithm",
+            description: "Optimizes call routes and timing for maximum efficiency",
+            accuracy: 88
+          }
+        ],
+        algorithms: [
+          "Natural Language Generation",
+          "Context Aggregation",
+          "Route Optimization",
+          "Sentiment Analysis",
+          "Performance Prediction"
+        ],
+        reasoning: {
+          steps: [
+            {
+              step: "Intelligence Gathering",
+              description: "Collect and synthesize data from all upstream agents"
+            },
+            {
+              step: "Context Generation",
+              description: "Create comprehensive HCP profiles with barriers, opportunities, and history"
+            },
+            {
+              step: "Pre-Call Planning",
+              description: "Generate tailored talking points and objection handling strategies"
+            },
+            {
+              step: "Coaching Customization",
+              description: "Create personalized coaching scenarios based on rep needs"
+            },
+            {
+              step: "Territory Optimization",
+              description: "Optimize call schedules and routes for efficiency"
+            },
+            {
+              step: "Feedback Processing",
+              description: "Capture field insights and send back to Customer Planning"
+            }
+          ]
+        },
+        visualizations: <FieldCopilotVisualization />
+      }}
+      outputs={{
+        downstream: {
+          destination: "Customer Planning Agent (Feedback Loop)",
+          data: [
+            { label: "Field Insights", value: "892 new observations" },
+            { label: "Barrier Updates", value: "47 newly identified" },
+            { label: "Engagement Outcomes", value: "78% positive" },
+            { label: "Customer Feedback", value: "4.6/5 average" },
+            { label: "Territory Metrics", value: "87% coverage achieved" }
+          ]
+        },
+        recommendations: [
+          "Focus pre-call planning on formulary barrier discussions",
+          "Increase coaching for objection handling techniques",
+          "Optimize Tuesday/Thursday for high-value HCP calls",
+          "Prepare side effect management materials for next week",
+          "Schedule peer-to-peer discussions for complex cases"
+        ],
+        impact: [
+          { metric: "Call Success Rate", change: "+34%" },
+          { metric: "Rep Confidence", change: "+42%" },
+          { metric: "Territory Coverage", change: "+28%" },
+          { metric: "Email Response Rate", change: "+56%" }
+        ]
+      }}
+    />
+  );
 }

@@ -250,7 +250,7 @@ export function ExecutiveDashboard() {
                 <h1 className="text-2xl font-bold text-gray-900">DCE OmniVerse</h1>
               </div>
               <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                Powered by Gemini 2.5 Pro
+                Powered by Advanced AI Engine
               </span>
             </div>
             <div className="flex items-center space-x-4">
