@@ -1,10 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error('Missing GEMINI_API_KEY environment variable');
-}
+const API_KEY = process.env.GEMINI_API_KEY || 'demo-key-please-add-real-key';
 
-export const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+export const genAI = new GoogleGenerativeAI(API_KEY);
 
 export const geminiPro = genAI.getGenerativeModel({ 
   model: 'gemini-2.5-pro',

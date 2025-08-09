@@ -10,10 +10,5 @@
     "app/api/agents/*/route.ts": {
       "maxDuration": 60
     }
-  },
-  "env": {
-    "GEMINI_API_KEY": "@gemini-api-key",
-    "POSTGRES_URL": "@postgres-url",
-    "KV_URL": "@kv-url"
   }
 }
