@@ -36,9 +36,9 @@ Provide a detailed, actionable response with clear reasoning.
     return response.text();
   }
 
-  abstract async analyze(input: any): Promise<AgentResponse>;
-  abstract async recommend(context: any): Promise<string[]>;
-  abstract async execute(action: string, params: any): Promise<any>;
+  abstract analyze(input: any): Promise<AgentResponse>;
+  abstract recommend(context: any): Promise<string[]>;
+  abstract execute(action: string, params: any): Promise<any>;
 
   getName(): string {
     return this.config.name;

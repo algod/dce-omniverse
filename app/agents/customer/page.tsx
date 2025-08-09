@@ -238,7 +238,7 @@ export default function CustomerPlanningPage() {
                       Loading HCP data...
                     </td>
                   </tr>
-                ) : getFilteredHCPs().slice(0, 10).map((hcp) => (
+                ) : getFilteredHCPs().slice(0, 10).map((hcp: any) => (
                   <tr key={hcp.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{hcp.name}</div>
