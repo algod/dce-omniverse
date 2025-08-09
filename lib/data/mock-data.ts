@@ -1,4 +1,22 @@
-import { HCP, HCPBarrier } from '@/lib/agents/customer-planning';
+// Legacy mock data - use mock-pharma-data.ts instead
+import { HCP as HCPType } from '@/lib/types/pharma';
+
+// Define legacy HCP and HCPBarrier types for backward compatibility
+interface HCP {
+  id: string;
+  name: string;
+  specialty: string;
+  location: string;
+  prescriptionVolume: number;
+  adoptionStage: 'awareness' | 'consideration' | 'trial' | 'adoption' | 'advocacy';
+}
+
+interface HCPBarrier {
+  type: 'insurance_denial' | 'side_effects' | 'referral_pathway' | 'formulary' | 'diagnostic_tool';
+  severity: 'low' | 'medium' | 'high';
+  description: string;
+  impact: number;
+}
 
 const firstNames = ['James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer', 'Michael', 'Linda', 'William', 'Elizabeth'];
 const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
@@ -38,7 +56,8 @@ export function generateMockHCPs(count: number = 100): HCP[] {
       barriers.push({
         type,
         severity: severities[Math.floor(Math.random() * severities.length)],
-        description: barrierDescriptions[type]
+        description: barrierDescriptions[type],
+        impact: Math.random() * 100
       });
     }
 
@@ -46,8 +65,9 @@ export function generateMockHCPs(count: number = 100): HCP[] {
       id: `HCP-${String(i + 1).padStart(4, '0')}`,
       name: `Dr. ${firstName} ${lastName}`,
       specialty,
-      prescribingVolume: Math.floor(Math.random() * 500) + 50,
-      barriers
+      location: `${['New York', 'Los Angeles', 'Chicago', 'Houston'][Math.floor(Math.random() * 4)]}, ${['NY', 'CA', 'IL', 'TX'][Math.floor(Math.random() * 4)]}`,
+      prescriptionVolume: Math.floor(Math.random() * 500) + 50,
+      adoptionStage: ['awareness', 'consideration', 'trial', 'adoption', 'advocacy'][Math.floor(Math.random() * 5)] as any
     });
   }
 
