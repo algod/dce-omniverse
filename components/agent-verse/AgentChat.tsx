@@ -319,7 +319,7 @@ export function AgentChat({
   };
 
   return (
-    <div className="flex flex-col h-full min-h-[75vh] rounded-lg" style={{
+    <div className="flex flex-col h-full max-h-[700px] rounded-lg" style={{
       backgroundColor: zsColors.neutral.white,
       border: `1px solid ${zsColors.neutral.lightGray}`,
       boxShadow: zsColors.shadows.sm
@@ -440,7 +440,11 @@ export function AgentChat({
       </AnimatePresence>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[50vh]" style={{ overflowWrap: 'break-word' }}>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ 
+        overflowWrap: 'break-word',
+        maxHeight: '450px',
+        minHeight: '350px' 
+      }}>
         {messages.map((message) => (
           <motion.div
             key={message.id}

@@ -14,6 +14,8 @@ export const zsColors = {
     green: '#4CAF50',       // Green (Success)
     red: '#F44336',         // Red (Error)
     teal: '#00BCD4',        // Teal (Info)
+    blue: '#0075BE',        // Blue (Secondary)
+    purple: '#9C27B0',      // Purple (Accent)
   },
   
   // Neutral Colors

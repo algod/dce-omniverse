@@ -7,9 +7,11 @@ import {
   FileText, Database, Brain, ArrowRight, ChevronLeft,
   MessageSquare, Settings, Activity, Zap, Info, Home, Target, ChevronRight
 } from 'lucide-react';
+import Link from 'next/link';
 import { AgentChat } from './AgentChat';
 import { zsColors } from '@/lib/design-system/zs-colors';
 import { AGENT_CONTEXTS } from '@/lib/ai/system-prompts';
+import { getNextLogicalAgents, getFlowNavigationMessage } from '@/lib/utils/agent-flow';
 
 interface AgentViewProps {
   agentId: string;
@@ -300,7 +302,8 @@ export function StandardAgentViewLight(props: AgentViewProps) {
               backgroundColor: zsColors.neutral.white,
               border: `1px solid ${zsColors.neutral.lightGray}`,
               boxShadow: zsColors.shadows.md,
-              minHeight: '500px'
+              minHeight: '500px',
+              maxHeight: '700px'
             }}>
             {/* Enhanced Tab Navigation with Workflow Progress */}
             <div className="px-4 py-3" style={{ borderBottom: `1px solid ${zsColors.neutral.lightGray}` }}>
@@ -494,6 +497,29 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                             <p className="text-xl font-bold truncate" style={{ color: agentTheme.primary }}>{metric.value}</p>
                           </div>
                         ))}
+                      </div>
+                    </div>
+                    
+                    {/* Next Step Button for Overview */}
+                    <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: zsColors.neutral.offWhite, border: `1px solid ${zsColors.neutral.lightGray}` }}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-sm font-semibold mb-1" style={{ color: zsColors.neutral.charcoal }}>Ready to Configure?</h4>
+                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Proceed to provide business inputs for this agent.</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setWorkflowState(prev => ({ ...prev, overviewCompleted: true }));
+                            handleTabChange('inputs');
+                          }}
+                          className="px-4 py-2 rounded-lg font-semibold transition-all hover:shadow-md"
+                          style={{
+                            backgroundColor: agentTheme.primary,
+                            color: zsColors.neutral.white
+                          }}
+                        >
+                          Configure Inputs →
+                        </button>
                       </div>
                     </div>
                   </motion.div>
@@ -700,17 +726,20 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                       </div>
                     </div>
 
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Visualizations</h3>
-                      {isProcessing ? (
-                        <div className="text-center py-12">
-                          <div className="animate-spin w-8 h-8 border-2 border-transparent border-t-current mx-auto mb-4" style={{ color: agentTheme.primary }} />
-                          <p className="text-sm" style={{ color: zsColors.neutral.gray }}>AI models are processing your inputs...</p>
-                        </div>
-                      ) : (
-                        <>{props.analytics.visualizations}</>
-                      )}
-                    </div>
+                    {/* Only show visualizations after analytics are complete */}
+                    {workflowState.analyticsCompleted && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Visualizations</h3>
+                        {isProcessing ? (
+                          <div className="text-center py-12">
+                            <div className="animate-spin w-8 h-8 border-2 border-transparent border-t-current mx-auto mb-4" style={{ color: agentTheme.primary }} />
+                            <p className="text-sm" style={{ color: zsColors.neutral.gray }}>AI models are processing your inputs...</p>
+                          </div>
+                        ) : (
+                          <>{props.analytics.visualizations}</>
+                        )}
+                      </div>
+                    )}
                     
                     {/* Analytics Action Button */}
                     {selectedTab === 'analytics' && !workflowState.analyticsCompleted && !isProcessing && (
@@ -859,6 +888,65 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                           <span className="text-xs" style={{ color: zsColors.neutral.gray }}>Ready for downstream processing</span>
                         </div>
                       )}
+                    </div>
+                    
+                    {/* Next Agent Navigation */}
+                    <div className="mt-6 space-y-4">
+                      <div className="p-4 rounded-lg" style={{ 
+                        backgroundColor: zsColors.neutral.offWhite,
+                        border: `1px solid ${zsColors.neutral.lightGray}`
+                      }}>
+                        <h4 className="text-sm font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
+                          Continue to Next Agent
+                        </h4>
+                        <p className="text-xs mb-4" style={{ color: zsColors.neutral.gray }}>
+                          {getFlowNavigationMessage(props.agentId)}
+                        </p>
+                        <div className="space-y-3">
+                          {getNextLogicalAgents(props.agentId).map((nextAgent) => (
+                            <Link
+                              key={nextAgent.id}
+                              href={nextAgent.path}
+                              className="block rounded-lg p-4 transition-all hover:shadow-md"
+                              style={{
+                                backgroundColor: zsColors.neutral.white,
+                                border: `2px solid ${nextAgent.color.primary}30`
+                              }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-lg p-2" style={{
+                                    backgroundColor: nextAgent.color.primary + '15'
+                                  }}>
+                                    <nextAgent.icon className="w-full h-full" style={{ color: nextAgent.color.primary }} />
+                                  </div>
+                                  <div>
+                                    <h5 className="font-medium" style={{ color: zsColors.neutral.charcoal }}>
+                                      {nextAgent.name}
+                                    </h5>
+                                    <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
+                                      {nextAgent.description}
+                                    </p>
+                                  </div>
+                                </div>
+                                <ChevronRight size={20} style={{ color: nextAgent.color.primary }} />
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                        
+                        {/* Alternative: Return to Flow Overview */}
+                        <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${zsColors.neutral.lightGray}` }}>
+                          <Link
+                            href="/"
+                            className="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-80"
+                            style={{ color: zsColors.primary.navy }}
+                          >
+                            <ChevronLeft size={16} />
+                            Return to Agent Flow Overview
+                          </Link>
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
                 )}
