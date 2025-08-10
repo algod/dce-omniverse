@@ -11,6 +11,8 @@ import {
   Channel,
   ContentAsset,
   CustomerJourney,
+  JourneyStage,
+  TouchpointSequence,
   FieldSuggestion,
   NextBestAction,
   PHARMA_BARRIERS
@@ -257,7 +259,7 @@ export class MockDataService {
   }
   
   private generateHCPBarriers(hcp: HCP): any[] {
-    const barriers = [];
+    const barriers: any[] = [];
     const barrierTypes = ['B001', 'B002', 'B003', 'B004', 'B005'];
     
     // Each HCP has 1-3 primary barriers
@@ -361,7 +363,7 @@ export class MockDataService {
   }
   
   private generateLogCurve(maxBudget: number, maxROI: number, saturation: number): any[] {
-    const points = [];
+    const points: any[] = [];
     const steps = 20;
     
     for (let i = 0; i <= steps; i++) {
@@ -377,7 +379,7 @@ export class MockDataService {
   // ==================== Content & MLR Data ====================
   
   private generateContentLibrary(): void {
-    const contentTypes = ['Detail Aid', 'Email Template', 'Website Content', 'Video', 'Brochure', 'Clinical Study'];
+    const contentTypes: Array<'Email' | 'Web' | 'Print' | 'Video' | 'Interactive' | 'IVA'> = ['Email', 'Web', 'Print', 'Video', 'Interactive', 'IVA'];
     const therapeuticAreas = ['Cardiology', 'Oncology', 'Immunology', 'Endocrinology'];
     const barriers = ['B001', 'B002', 'B003', 'B004', 'B005'];
     
@@ -388,19 +390,14 @@ export class MockDataService {
         id: contentId,
         title: this.generateContentTitle(i),
         type: contentTypes[i % contentTypes.length],
-        therapeuticArea: therapeuticAreas[i % therapeuticAreas.length],
-        targetBarriers: barriers.sort(() => Math.random() - 0.5).slice(0, Math.floor(Math.random() * 3) + 1),
-        mlrStatus: this.generateMLRStatus(),
-        approvalDate: new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000),
-        expirationDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000),
-        engagementMetrics: {
-          views: Math.floor(Math.random() * 5000),
-          downloads: Math.floor(Math.random() * 1000),
-          shares: Math.floor(Math.random() * 200),
-          avgEngagementTime: Math.floor(Math.random() * 300) + 30 // 30-330 seconds
-        },
-        effectiveness: Math.random() * 0.5 + 0.5, // 50-100% effectiveness
-        complianceScore: Math.random() * 0.2 + 0.8 // 80-100% compliance
+        theme: `Theme ${i % 5 + 1}`,
+        barrier: barriers[Math.floor(Math.random() * barriers.length)],
+        status: this.generateMLRStatus(),
+        createdDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000),
+        approvedDate: new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000),
+        expiryDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000),
+        mlrScore: Math.random() * 0.2 + 0.8, // 80-100% MLR score
+        tags: [['Product', 'Education', 'Safety'][Math.floor(Math.random() * 3)]]
       };
       
       this.contentLibrary.set(contentId, content);
@@ -415,18 +412,20 @@ export class MockDataService {
     return `${prefixes[index % prefixes.length]} ${topics[Math.floor(index / 6) % topics.length]} ${suffixes[Math.floor(index / 36) % suffixes.length]}`;
   }
   
-  private generateMLRStatus(): 'Approved' | 'Pending' | 'Rejected' | 'Expired' {
+  private generateMLRStatus(): 'Draft' | 'In Review' | 'Approved' | 'Live' | 'Expired' | 'Retired' {
     const random = Math.random();
-    if (random < 0.96) return 'Approved'; // 96% approval rate
-    if (random < 0.98) return 'Pending';
-    if (random < 0.99) return 'Rejected';
-    return 'Expired';
+    if (random < 0.60) return 'Approved'; // 60% approved
+    if (random < 0.75) return 'Live'; // 15% live
+    if (random < 0.85) return 'In Review'; // 10% in review
+    if (random < 0.92) return 'Draft'; // 7% draft
+    if (random < 0.96) return 'Expired'; // 4% expired
+    return 'Retired'; // 4% retired
   }
   
   getContentAnalysis(): ContentAnalysisResult {
     const contentArray = Array.from(this.contentLibrary.values());
-    const approved = contentArray.filter(c => c.mlrStatus === 'Approved');
-    const pending = contentArray.filter(c => c.mlrStatus === 'Pending');
+    const approved = contentArray.filter(c => c.status === 'Approved');
+    const pending = contentArray.filter(c => c.status === 'In Review');
     
     const barrierCoverage = this.analyzeBarrierCoverage(contentArray);
     const channelDistribution = this.analyzeChannelDistribution(contentArray);
@@ -448,7 +447,7 @@ export class MockDataService {
     const coverage: Record<string, number> = {};
     
     ['B001', 'B002', 'B003', 'B004', 'B005'].forEach(barrier => {
-      coverage[barrier] = content.filter(c => c.targetBarriers.includes(barrier)).length;
+      coverage[barrier] = content.filter(c => c.barrier === barrier).length;
     });
     
     return coverage;
@@ -465,7 +464,7 @@ export class MockDataService {
   }
   
   private identifyContentGaps(coverage: Record<string, number>): string[] {
-    const gaps = [];
+    const gaps: any[] = [];
     const avgCoverage = Object.values(coverage).reduce((sum, v) => sum + v, 0) / Object.keys(coverage).length;
     
     Object.entries(coverage).forEach(([barrier, count]) => {
@@ -479,8 +478,7 @@ export class MockDataService {
   
   private getTopPerformingContent(limit: number): ContentAsset[] {
     return Array.from(this.contentLibrary.values())
-      .sort((a, b) => (b.engagementMetrics.views + b.engagementMetrics.downloads) - 
-                      (a.engagementMetrics.views + a.engagementMetrics.downloads))
+      .sort((a, b) => (b.mlrScore || 0.5) - (a.mlrScore || 0.5))
       .slice(0, limit);
   }
   
@@ -488,19 +486,22 @@ export class MockDataService {
   
   private generateJourneyData(): void {
     this.hcpDatabase.forEach((hcp, hcpId) => {
+      const stages: JourneyStage[] = [
+        { name: 'Awareness', status: 'Completed', engagementLevel: 'Low', touchpoints: 3, keyActivities: ['Email', 'Web'] },
+        { name: 'Consideration', status: 'In Progress', engagementLevel: 'Medium', touchpoints: 5, keyActivities: ['Field Visit', 'Conference'] },
+        { name: 'Trial', status: 'Not Started', engagementLevel: 'Low', touchpoints: 0, keyActivities: [] },
+        { name: 'Adoption', status: 'Not Started', engagementLevel: 'Low', touchpoints: 0, keyActivities: [] },
+        { name: 'Advocacy', status: 'Not Started', engagementLevel: 'Low', touchpoints: 0, keyActivities: [] }
+      ];
+      
       const journey: CustomerJourney = {
         hcpId,
-        journeyId: `JOURNEY-${hcpId}`,
-        stage: this.determineJourneyStage(hcp),
-        touchpoints: this.generateTouchpoints(hcp),
-        nextBestAction: this.generateNBA(hcp),
-        predictedOutcome: {
-          conversionProbability: Math.random() * 0.6 + 0.3, // 30-90%
-          timeToConversion: Math.floor(Math.random() * 90) + 30, // 30-120 days
-          expectedValue: Math.floor(Math.random() * 300000) + 50000 // $50K-$350K
-        },
-        engagementScore: Math.random() * 0.5 + 0.5, // 50-100%
-        lastUpdated: new Date()
+        stages,
+        currentStage: 'Consideration',
+        predictedNextStage: 'Trial',
+        completionProbability: Math.random() * 0.6 + 0.3,
+        recommendedSequence: [],
+        barriers: ['B001', 'B002'].slice(0, Math.floor(Math.random() * 2) + 1)
       };
       
       this.journeyData.set(hcpId, journey);
@@ -527,7 +528,7 @@ export class MockDataService {
   private generateTouchpoints(hcp: HCP): any[] {
     const touchpointTypes = ['Email', 'Call', 'Meeting', 'Conference', 'Digital Ad', 'Webinar'];
     const numTouchpoints = Math.floor(Math.random() * 8) + 3; // 3-10 touchpoints
-    const touchpoints = [];
+    const touchpoints: any[] = [];
     
     for (let i = 0; i < numTouchpoints; i++) {
       touchpoints.push({
@@ -553,15 +554,15 @@ export class MockDataService {
     const selected = actions[Math.floor(Math.random() * actions.length)];
     
     return {
+      hcpId: hcp.id,
+      actionId: `NBA-${Date.now()}`,
       action: selected.action,
       channel: ['Field', 'Email', 'Digital', 'Phone'][Math.floor(Math.random() * 4)],
       timing: `Within ${Math.floor(Math.random() * 14) + 1} days`,
-      reason: selected.reason,
+      priority: Math.floor(Math.random() * 5) + 1,
       confidence: Math.random() * 0.3 + 0.7, // 70-100% confidence
-      expectedImpact: {
-        engagement: Math.random() * 0.4 + 0.2, // 20-60% improvement
-        prescription: Math.random() * 0.3 + 0.1 // 10-40% lift
-      }
+      expectedImpact: Math.random() * 0.3 + 0.2, // 20-50% overall impact
+      reasoning: selected.reason
     };
   }
   
@@ -574,8 +575,8 @@ export class MockDataService {
     
     return {
       totalJourneys: journeys.length,
-      avgTouchpoints: journeys.reduce((sum, j) => sum + j.touchpoints.length, 0) / journeys.length,
-      avgEngagementScore: journeys.reduce((sum, j) => sum + j.engagementScore, 0) / journeys.length,
+      avgTouchpoints: journeys.reduce((sum, j) => sum + j.stages.reduce((s, stage) => s + stage.touchpoints, 0), 0) / journeys.length,
+      avgEngagementScore: journeys.reduce((sum, j) => sum + j.completionProbability, 0) / journeys.length,
       stageDistribution,
       channelEffectiveness,
       conversionFunnel,
@@ -592,7 +593,7 @@ export class MockDataService {
     const distribution: Record<string, number> = {};
     
     journeys.forEach(j => {
-      distribution[j.stage] = (distribution[j.stage] || 0) + 1;
+      distribution[j.currentStage] = (distribution[j.currentStage] || 0) + 1;
     });
     
     return distribution;
@@ -603,9 +604,11 @@ export class MockDataService {
     const counts: Record<string, number> = {};
     
     journeys.forEach(j => {
-      j.touchpoints.forEach(t => {
-        effectiveness[t.type] = (effectiveness[t.type] || 0) + (t.engagement === 'Attended' || t.engagement === 'Clicked' ? 1 : 0);
-        counts[t.type] = (counts[t.type] || 0) + 1;
+      j.stages.forEach(stage => {
+        stage.keyActivities.forEach(activity => {
+          effectiveness[activity] = (effectiveness[activity] || 0) + (stage.engagementLevel === 'High' || stage.engagementLevel === 'Medium' ? 1 : 0);
+          counts[activity] = (counts[activity] || 0) + 1;
+        });
       });
     });
     
@@ -622,7 +625,7 @@ export class MockDataService {
     
     stages.forEach((stage, index) => {
       const count = journeys.filter(j => {
-        const stageIndex = stages.indexOf(j.stage);
+        const stageIndex = stages.indexOf(j.currentStage);
         return stageIndex >= index;
       }).length;
       
@@ -664,18 +667,22 @@ export class MockDataService {
     const territories: Territory[] = [];
     
     for (let i = 0; i < 20; i++) {
+      const repId = `REP-${String(i + 1).padStart(4, '0')}`;
+      const targetCalls = Math.floor(Math.random() * 500) + 200;
+      const actualCalls = Math.floor(Math.random() * 400) + 100;
+      
       territories.push({
         id: `T-${String(i + 1).padStart(2, '0')}`,
         name: `Territory ${i + 1}`,
         region: ['Northeast', 'Southeast', 'Midwest', 'Southwest', 'West'][i % 5],
+        repId,
+        repName: `Rep ${i + 1}`,
         hcpCount: Math.floor(this.TOTAL_HCPS / 20) + Math.floor(Math.random() * 50),
-        repCount: Math.floor(this.TOTAL_REPS / 20) + Math.floor(Math.random() * 5),
-        coverage: 0.6 + Math.random() * 0.35,
-        performance: {
-          calls: Math.floor(Math.random() * 500) + 200,
-          conversions: Math.floor(Math.random() * 50) + 10,
-          revenue: Math.floor(Math.random() * 5000000) + 1000000
-        }
+        targetCalls,
+        actualCalls,
+        attainment: (actualCalls / targetCalls) * 100,
+        topOpportunities: [`HCP-${String(i * 10 + 1).padStart(5, '0')}`, `HCP-${String(i * 10 + 2).padStart(5, '0')}`],
+        challenges: ['B001', 'B002'].slice(0, Math.floor(Math.random() * 2) + 1)
       });
     }
     
@@ -683,7 +690,7 @@ export class MockDataService {
   }
   
   private generateRepPerformance(): any[] {
-    const performance = [];
+    const performance: any[] = [];
     
     for (let i = 0; i < this.TOTAL_REPS; i++) {
       performance.push({
@@ -731,17 +738,18 @@ export class MockDataService {
     
     // Generate suggestions for each rep
     for (let i = 0; i < this.TOTAL_REPS * 18; i++) { // ~18 suggestions per rep
+      const triggerName = triggerTypes[i % triggerTypes.length];
       suggestions.push({
         id: `SUGG-${String(i + 1).padStart(6, '0')}`,
-        repId: `REP-${String((i % this.TOTAL_REPS) + 1).padStart(4, '0')}`,
+        triggerId: `TRIGGER-${String((i % triggerTypes.length) + 1).padStart(2, '0')}`,
+        triggerName,
         hcpId: `HCP-${String(Math.floor(Math.random() * this.TOTAL_HCPS) + 1).padStart(5, '0')}`,
-        trigger: triggerTypes[i % triggerTypes.length],
-        priority: ['High', 'Medium', 'Low'][Math.floor(Math.random() * 3)] as any,
-        status: ['Pending', 'Completed', 'Dismissed'][Math.floor(Math.random() * 3)] as any,
+        priority: ['High', 'Medium', 'Low'][Math.floor(Math.random() * 3)] as 'High' | 'Medium' | 'Low',
+        status: ['Active', 'Completed', 'Dismissed'][Math.floor(Math.random() * 3)] as 'Active' | 'Completed' | 'Dismissed',
         createdDate: new Date(Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000),
-        expirationDate: new Date(Date.now() + Math.random() * 14 * 24 * 60 * 60 * 1000),
-        expectedImpact: Math.floor(Math.random() * 50000) + 10000,
-        confidence: Math.random() * 0.3 + 0.7
+        expiryDate: new Date(Date.now() + Math.random() * 14 * 24 * 60 * 60 * 1000),
+        insight: `HCP engagement pattern indicates ${triggerName.toLowerCase()} opportunity`,
+        recommendedAction: `Follow up with personalized outreach based on ${triggerName.toLowerCase()}`
       });
     }
     
@@ -753,7 +761,7 @@ export class MockDataService {
   }
   
   private identifyImprovementAreas(performance: any[]): string[] {
-    const areas = [];
+    const areas: any[] = [];
     
     const avgCalls = performance.reduce((sum, r) => sum + r.metrics.callsCompleted, 0) / performance.length;
     const lowPerformers = performance.filter(r => r.metrics.callsCompleted < avgCalls * 0.7);
@@ -815,10 +823,10 @@ export class MockDataService {
         content = content.filter(c => c.type === filters.type);
       }
       if (filters.therapeuticArea) {
-        content = content.filter(c => c.therapeuticArea === filters.therapeuticArea);
+        content = content.filter(c => c.barrier === filters.therapeuticArea);
       }
       if (filters.mlrStatus) {
-        content = content.filter(c => c.mlrStatus === filters.mlrStatus);
+        content = content.filter(c => c.status === filters.mlrStatus);
       }
     }
     

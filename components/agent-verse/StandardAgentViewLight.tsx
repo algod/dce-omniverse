@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileText, Database, Brain, ArrowRight, ChevronLeft,
-  MessageSquare, Settings, Activity, Zap, Info, Home
+  MessageSquare, Settings, Activity, Zap, Info, Home, Target, ChevronRight
 } from 'lucide-react';
 import { AgentChat } from './AgentChat';
 import { zsColors } from '@/lib/design-system/zs-colors';
@@ -62,18 +62,110 @@ export function StandardAgentViewLight(props: AgentViewProps) {
   const [selectedTab, setSelectedTab] = useState<'overview' | 'inputs' | 'analytics' | 'outputs'>('overview');
   const [parameters, setParameters] = useState(props.businessInputs.parameters);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [workflowState, setWorkflowState] = useState({
+    overviewCompleted: false,
+    inputsCompleted: false,
+    analyticsCompleted: false,
+    outputsApproved: false
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: Info },
-    { id: 'inputs', label: 'Business Inputs', icon: Settings },
-    { id: 'analytics', label: 'Analytics & AI', icon: Brain },
-    { id: 'outputs', label: 'Outputs & Next Steps', icon: ArrowRight }
+    { 
+      id: 'overview', 
+      label: '1. Overview', 
+      icon: Info, 
+      step: 1, 
+      description: 'Agent purpose & position in flow',
+      enabled: true,
+      completed: workflowState.overviewCompleted
+    },
+    { 
+      id: 'inputs', 
+      label: '2. Business Inputs', 
+      icon: Settings, 
+      step: 2, 
+      description: 'User parameters & constraints',
+      enabled: workflowState.overviewCompleted,
+      completed: workflowState.inputsCompleted
+    },
+    { 
+      id: 'analytics', 
+      label: '3. Analytics & AI', 
+      icon: Brain, 
+      step: 3, 
+      description: 'ML models & reasoning steps',
+      enabled: workflowState.inputsCompleted,
+      completed: workflowState.analyticsCompleted
+    },
+    { 
+      id: 'outputs', 
+      label: '4. Outputs & Flow', 
+      icon: ArrowRight, 
+      step: 4, 
+      description: 'Results & downstream connections',
+      enabled: workflowState.analyticsCompleted,
+      completed: workflowState.outputsApproved
+    }
   ];
 
   const handleParameterChange = (index: number, value: any) => {
     const newParams = [...parameters];
     newParams[index].value = value;
     setParameters(newParams);
+    validateInputs(newParams);
+  };
+
+  const validateInputs = (params: typeof parameters) => {
+    const errors: string[] = [];
+    
+    // Check if all required parameters are filled
+    params.forEach((param) => {
+      if (param.type === 'slider' && (param.value < param.min! || param.value > param.max!)) {
+        errors.push(`${param.name} must be between ${param.min} and ${param.max}`);
+      }
+    });
+    
+    // Check if barrier weights sum to 100% (for customer planning)
+    if (props.agentId === 'customer') {
+      const barrierWeights = params.filter(p => p.name.includes('Barrier Weight')).reduce((sum, p) => sum + p.value, 0);
+      if (Math.abs(barrierWeights - 100) > 1) {
+        errors.push('Barrier weights must sum to 100%');
+      }
+    }
+    
+    setValidationErrors(errors);
+    
+    // Update workflow state
+    if (errors.length === 0 && selectedTab === 'inputs') {
+      setWorkflowState(prev => ({ ...prev, inputsCompleted: true }));
+    }
+  };
+
+  const handleTabChange = (tabId: 'overview' | 'inputs' | 'analytics' | 'outputs') => {
+    const tab = tabs.find(t => t.id === tabId);
+    if (tab && tab.enabled) {
+      setSelectedTab(tabId);
+      
+      // Mark current tab as completed when moving away
+      if (selectedTab === 'overview') {
+        setWorkflowState(prev => ({ ...prev, overviewCompleted: true }));
+      }
+    }
+  };
+
+  const runAnalytics = async () => {
+    setIsProcessing(true);
+    // Simulate AI processing
+    setTimeout(() => {
+      setIsProcessing(false);
+      setWorkflowState(prev => ({ ...prev, analyticsCompleted: true }));
+    }, 3000);
+  };
+
+  const approveOutputs = () => {
+    setWorkflowState(prev => ({ ...prev, outputsApproved: true }));
   };
 
   // Get agent color from zsColors
@@ -87,8 +179,14 @@ export function StandardAgentViewLight(props: AgentViewProps) {
   };
   const agentTheme = agentColorMap[props.agentId] || zsColors.agents.customer;
 
+  // Initialize validation on component mount
+  useEffect(() => {
+    validateInputs(parameters);
+  }, []);
+
   const getAgentSuggestedQueries = (agentId: string): string[] => {
-    return AGENT_CONTEXTS[agentId as keyof typeof AGENT_CONTEXTS]?.sampleQuestions || [];
+    const questions = AGENT_CONTEXTS[agentId as keyof typeof AGENT_CONTEXTS]?.sampleQuestions;
+    return questions ? [...questions] : [];
   };
 
   return (
@@ -156,13 +254,14 @@ export function StandardAgentViewLight(props: AgentViewProps) {
 
       {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-        <div className="flex gap-6 h-[calc(100vh-180px)]">
-          {/* Left Panel - Q&A Chat (40%) */}
-          <div className="w-2/5 rounded-xl overflow-hidden" 
+        <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-140px)]">
+          {/* Left Panel - Q&A Chat (45% desktop, full width mobile) */}
+          <div className="w-full lg:w-[45%] rounded-xl overflow-hidden flex flex-col" 
             style={{ 
               backgroundColor: zsColors.neutral.white,
               border: `1px solid ${zsColors.neutral.lightGray}`,
-              boxShadow: zsColors.shadows.md
+              boxShadow: zsColors.shadows.md,
+              minHeight: '500px'
             }}>
             <div className="p-4" style={{ 
               borderBottom: `1px solid ${zsColors.neutral.lightGray}`,
@@ -183,7 +282,9 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                 parameters: parameters,
                 agentOverview: props.overview,
                 businessInputs: props.businessInputs,
-                analytics: props.analytics
+                analytics: props.analytics,
+                workflowState: workflowState,
+                validationErrors: validationErrors
               }}
               suggestedQueries={getAgentSuggestedQueries(props.agentId)}
               onRerun={(params) => {
@@ -193,44 +294,79 @@ export function StandardAgentViewLight(props: AgentViewProps) {
             />
           </div>
 
-          {/* Right Panel - Visualizations (60%) */}
-          <div className="flex-1 rounded-xl overflow-hidden"
+          {/* Right Panel - Visualizations (55% desktop, full width mobile) */}
+          <div className="w-full lg:w-[55%] rounded-xl overflow-hidden flex flex-col"
             style={{ 
               backgroundColor: zsColors.neutral.white,
               border: `1px solid ${zsColors.neutral.lightGray}`,
-              boxShadow: zsColors.shadows.md
+              boxShadow: zsColors.shadows.md,
+              minHeight: '500px'
             }}>
-            {/* Tab Navigation */}
-            <div className="flex" style={{ borderBottom: `1px solid ${zsColors.neutral.lightGray}` }}>
-              {tabs.map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setSelectedTab(tab.id as any)}
-                  className="flex-1 px-4 py-3 flex items-center justify-center gap-2 transition-all cursor-pointer hover:bg-opacity-10"
-                  style={{
-                    backgroundColor: selectedTab === tab.id ? zsColors.neutral.white : 'transparent',
-                    color: selectedTab === tab.id ? zsColors.neutral.charcoal : zsColors.neutral.gray,
-                    borderBottom: selectedTab === tab.id ? `2px solid ${agentTheme.primary}` : '2px solid transparent'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (selectedTab !== tab.id) {
-                      e.currentTarget.style.backgroundColor = `${agentTheme.primary}10`;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (selectedTab !== tab.id) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }
-                  }}
-                >
-                  <tab.icon size={16} />
-                  <span className="text-sm font-medium">{tab.label}</span>
-                </button>
-              ))}
+            {/* Enhanced Tab Navigation with Workflow Progress */}
+            <div className="px-4 py-3" style={{ borderBottom: `1px solid ${zsColors.neutral.lightGray}` }}>
+              {/* Progress Indicator */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-semibold" style={{ color: zsColors.neutral.charcoal }}>
+                  Sequential Workflow
+                </h2>
+                <div className="flex items-center gap-2">
+                  {tabs.map((tab, index) => (
+                    <div key={tab.id} className="flex items-center">
+                      <motion.div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                          selectedTab === tab.id ? 'scale-110' : 'scale-100'
+                        }`}
+                        style={{
+                          backgroundColor: selectedTab === tab.id 
+                            ? agentTheme.primary 
+                            : tab.completed 
+                              ? zsColors.semantic.success 
+                              : tab.enabled 
+                                ? zsColors.neutral.lightGray 
+                                : zsColors.neutral.lightGray + '60',
+                          color: selectedTab === tab.id || tab.completed
+                            ? zsColors.neutral.white 
+                            : tab.enabled 
+                              ? zsColors.neutral.gray 
+                              : zsColors.neutral.gray + '80',
+                          cursor: tab.enabled ? 'pointer' : 'not-allowed',
+                          opacity: tab.enabled ? 1 : 0.6,
+                          pointerEvents: tab.enabled ? 'auto' : 'none'
+                        }}
+                        onClick={() => tab.enabled && handleTabChange(tab.id as any)}
+                        whileHover={tab.enabled ? { scale: 1.1 } : {}}
+                        whileTap={tab.enabled ? { scale: 0.95 } : {}}
+                      >
+                        {tab.step}
+                      </motion.div>
+                      {index < tabs.length - 1 && (
+                        <div 
+                          className="w-8 h-0.5 mx-2"
+                          style={{ 
+                            backgroundColor: tabs.findIndex(t => t.id === selectedTab) > index 
+                              ? agentTheme.primary + '60' 
+                              : zsColors.neutral.lightGray
+                          }}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Current Step Description */}
+              <div className="text-center">
+                <h3 className="text-lg font-semibold mb-1" style={{ color: agentTheme.primary }}>
+                  {tabs.find(t => t.id === selectedTab)?.label}
+                </h3>
+                <p className="text-sm" style={{ color: zsColors.neutral.gray }}>
+                  {tabs.find(t => t.id === selectedTab)?.description}
+                </p>
+              </div>
             </div>
 
             {/* Tab Content */}
-            <div className="p-6 overflow-y-auto h-[calc(100%-48px)]">
+            <div className="p-6 overflow-y-auto flex-1" style={{ minHeight: '400px' }}>
               <AnimatePresence mode="wait">
                 {/* Overview Tab */}
                 {selectedTab === 'overview' && (
@@ -241,67 +377,121 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     exit={{ opacity: 0, y: -10 }}
                     className="space-y-6"
                   >
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Position in Flow</h3>
-                      <p style={{ color: zsColors.neutral.darkGray }}>{props.overview.position}</p>
+                    {/* Flow Position Visual */}
+                    <div className="rounded-lg p-5" style={{ 
+                      backgroundColor: agentTheme.primary + '10',
+                      border: `1px solid ${agentTheme.primary}30`
+                    }}>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: agentTheme.primary }}>
+                        <Target size={20} />
+                        Position in DCE OmniVerse Flow
+                      </h3>
+                      <p className="mb-4 leading-relaxed" style={{ color: zsColors.neutral.darkGray }}>{props.overview.position}</p>
+                      
+                      {/* Mini Flow Indicator */}
+                      <div className="flex items-center justify-center gap-2 mt-4">
+                        {['Customer', 'Budget', 'Content', 'Orchestration', 'Suggestions', 'Copilot'].map((name, idx) => (
+                          <div key={name} className="flex items-center">
+                            <div
+                              className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                name.toLowerCase() === props.agentId ? 'ring-2 ring-offset-2' : ''
+                              }`}
+                              style={{
+                                backgroundColor: name.toLowerCase() === props.agentId ? agentTheme.primary : zsColors.neutral.lightGray,
+                                color: name.toLowerCase() === props.agentId ? zsColors.neutral.white : zsColors.neutral.gray,
+                                ...(name.toLowerCase() === props.agentId && { ringColor: agentTheme.primary })
+                              }}
+                            >
+                              {idx + 1}
+                            </div>
+                            {idx < 5 && <ChevronRight size={14} style={{ color: zsColors.neutral.gray }} />}
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Purpose</h3>
-                      <p style={{ color: zsColors.neutral.darkGray }}>{props.overview.purpose}</p>
+                    <div className="rounded-lg p-5" style={{ 
+                      backgroundColor: zsColors.neutral.white,
+                      border: `1px solid ${zsColors.neutral.lightGray}`
+                    }}>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: zsColors.neutral.charcoal }}>
+                        <Brain size={20} />
+                        Agent Purpose & Capabilities
+                      </h3>
+                      <p className="mb-5 leading-relaxed" style={{ color: zsColors.neutral.darkGray }}>{props.overview.purpose}</p>
+                      
+                      {/* Key Tools */}
+                      <div className="mb-5">
+                        <h4 className="text-sm font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Available Tools:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {props.overview.tools.map((tool, idx) => (
+                            <span 
+                              key={idx}
+                              className="px-3 py-1.5 text-xs rounded-full font-medium"
+                              style={{
+                                backgroundColor: zsColors.neutral.offWhite,
+                                color: zsColors.neutral.darkGray,
+                                border: `1px solid ${zsColors.neutral.lightGray}`
+                              }}
+                            >
+                              {tool}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
 
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Agent Reasoning</h3>
-                      <ul className="space-y-2">
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-4" style={{ color: zsColors.neutral.charcoal }}>Agent Reasoning</h3>
+                      <ul className="space-y-3">
                         {props.overview.reasoning.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <Brain size={16} style={{ color: agentTheme.primary }} className="mt-1" />
-                            <span className="text-sm" style={{ color: zsColors.neutral.darkGray }}>{item}</span>
+                          <li key={idx} className="flex items-start gap-3">
+                            <Brain size={16} style={{ color: agentTheme.primary }} className="mt-1 flex-shrink-0" />
+                            <span className="text-sm leading-relaxed" style={{ color: zsColors.neutral.darkGray }}>{item}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Tools & Systems</h3>
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-4" style={{ color: zsColors.neutral.charcoal }}>Tools & Systems</h3>
                       <div className="grid grid-cols-2 gap-3">
                         {props.overview.tools.map((tool, idx) => (
-                          <div key={idx} className="rounded-lg p-3 flex items-center gap-2"
+                          <div key={idx} className="rounded-lg p-4 flex items-center gap-3"
                             style={{ 
                               backgroundColor: zsColors.neutral.offWhite,
                               border: `1px solid ${zsColors.neutral.lightGray}`
                             }}>
-                            <Database size={16} style={{ color: zsColors.secondary.teal }} />
-                            <span className="text-sm" style={{ color: zsColors.neutral.darkGray }}>{tool}</span>
+                            <Database size={16} style={{ color: zsColors.secondary.teal }} className="flex-shrink-0" />
+                            <span className="text-sm font-medium truncate" style={{ color: zsColors.neutral.darkGray }}>{tool}</span>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Current Actions</h3>
-                      <div className="space-y-2">
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-4" style={{ color: zsColors.neutral.charcoal }}>Current Actions</h3>
+                      <div className="space-y-3">
                         {props.overview.actions.map((action, idx) => (
-                          <div key={idx} className="flex items-center gap-2">
-                            <Activity size={16} style={{ color: zsColors.secondary.orange }} />
-                            <span className="text-sm" style={{ color: zsColors.neutral.darkGray }}>{action}</span>
+                          <div key={idx} className="flex items-start gap-3">
+                            <Activity size={16} style={{ color: zsColors.secondary.orange }} className="mt-0.5 flex-shrink-0" />
+                            <span className="text-sm leading-relaxed" style={{ color: zsColors.neutral.darkGray }}>{action}</span>
                           </div>
                         ))}
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Key Metrics</h3>
-                      <div className="grid grid-cols-3 gap-4">
+                      <h3 className="text-lg font-semibold mb-4" style={{ color: zsColors.neutral.charcoal }}>Key Metrics</h3>
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                         {props.overview.keyMetrics.map((metric, idx) => (
-                          <div key={idx} className="rounded-lg p-4"
+                          <div key={idx} className="rounded-lg p-4 text-center"
                             style={{ 
                               backgroundColor: zsColors.neutral.white,
                               border: `1px solid ${zsColors.neutral.lightGray}`
                             }}>
-                            <p className="text-xs mb-1" style={{ color: zsColors.neutral.gray }}>{metric.label}</p>
-                            <p className="text-xl font-bold" style={{ color: agentTheme.primary }}>{metric.value}</p>
+                            <p className="text-xs mb-2 font-medium" style={{ color: zsColors.neutral.gray }}>{metric.label}</p>
+                            <p className="text-xl font-bold truncate" style={{ color: agentTheme.primary }}>{metric.value}</p>
                           </div>
                         ))}
                       </div>
@@ -340,6 +530,19 @@ export function StandardAgentViewLight(props: AgentViewProps) {
 
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Adjustable Parameters</h3>
+                      
+                      {/* Validation Errors */}
+                      {validationErrors.length > 0 && (
+                        <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: zsColors.semantic.error + '10', border: `1px solid ${zsColors.semantic.error}30` }}>
+                          <h4 className="text-sm font-semibold mb-2" style={{ color: zsColors.semantic.error }}>Validation Errors:</h4>
+                          <ul className="text-xs space-y-1">
+                            {validationErrors.map((error, idx) => (
+                              <li key={idx} style={{ color: zsColors.semantic.error }}>• {error}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
                       <div className="space-y-4">
                         {parameters.map((param, idx) => (
                           <div key={idx} className="rounded-lg p-4"
@@ -409,6 +612,29 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                         ))}
                       </ul>
                     </div>
+                    
+                    {/* Next Step Button */}
+                    {selectedTab === 'inputs' && (
+                      <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: zsColors.neutral.offWhite, border: `1px solid ${zsColors.neutral.lightGray}` }}>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="text-sm font-semibold mb-1" style={{ color: zsColors.neutral.charcoal }}>Ready to Proceed?</h4>
+                            <p className="text-xs" style={{ color: zsColors.neutral.gray }}>All inputs are validated and ready for analysis.</p>
+                          </div>
+                          <button
+                            onClick={() => handleTabChange('analytics')}
+                            disabled={!workflowState.inputsCompleted || validationErrors.length > 0}
+                            className="px-4 py-2 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md"
+                            style={{
+                              backgroundColor: workflowState.inputsCompleted && validationErrors.length === 0 ? agentTheme.primary : zsColors.neutral.gray,
+                              color: zsColors.neutral.white
+                            }}
+                          >
+                            Run Analytics →
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 )}
 
@@ -476,8 +702,55 @@ export function StandardAgentViewLight(props: AgentViewProps) {
 
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Visualizations</h3>
-                      {props.analytics.visualizations}
+                      {isProcessing ? (
+                        <div className="text-center py-12">
+                          <div className="animate-spin w-8 h-8 border-2 border-transparent border-t-current mx-auto mb-4" style={{ color: agentTheme.primary }} />
+                          <p className="text-sm" style={{ color: zsColors.neutral.gray }}>AI models are processing your inputs...</p>
+                        </div>
+                      ) : (
+                        <>{props.analytics.visualizations}</>
+                      )}
                     </div>
+                    
+                    {/* Analytics Action Button */}
+                    {selectedTab === 'analytics' && !workflowState.analyticsCompleted && !isProcessing && (
+                      <div className="mt-6 p-4 rounded-lg text-center" style={{ backgroundColor: agentTheme.primary + '10', border: `2px solid ${agentTheme.primary}30` }}>
+                        <h4 className="text-lg font-semibold mb-2" style={{ color: agentTheme.primary }}>Ready to Run AI Analysis</h4>
+                        <p className="text-sm mb-4" style={{ color: zsColors.neutral.darkGray }}>Execute machine learning models and generate insights</p>
+                        <button
+                          onClick={runAnalytics}
+                          className="px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-lg"
+                          style={{
+                            backgroundColor: agentTheme.primary,
+                            color: zsColors.neutral.white
+                          }}
+                        >
+                          ▶ Run Analytics & AI Models
+                        </button>
+                      </div>
+                    )}
+                    
+                    {/* Analytics Completed */}
+                    {selectedTab === 'analytics' && workflowState.analyticsCompleted && (
+                      <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: zsColors.semantic.success + '10', border: `1px solid ${zsColors.semantic.success}30` }}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: zsColors.semantic.success }} />
+                            <span className="text-sm font-semibold" style={{ color: zsColors.semantic.success }}>Analysis Complete</span>
+                          </div>
+                          <button
+                            onClick={() => handleTabChange('outputs')}
+                            className="px-4 py-2 rounded-lg font-semibold transition-all hover:shadow-md"
+                            style={{
+                              backgroundColor: zsColors.semantic.success,
+                              color: zsColors.neutral.white
+                            }}
+                          >
+                            View Results →
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 )}
 
@@ -543,19 +816,49 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                       }}>
                       <div className="flex items-center gap-2 mb-2">
                         <Zap size={20} style={{ color: agentTheme.primary }} />
-                        <h4 className="font-semibold" style={{ color: zsColors.neutral.charcoal }}>Preview Downstream Impact</h4>
+                        <h4 className="font-semibold" style={{ color: zsColors.neutral.charcoal }}>Downstream Impact & Approval</h4>
                       </div>
-                      <p className="text-sm mb-3" style={{ color: zsColors.neutral.darkGray }}>
-                        These outputs will be sent to the next agent in the flow for processing.
+                      <p className="text-sm mb-4" style={{ color: zsColors.neutral.darkGray }}>
+                        Review the results and approve sending these outputs to the next agent in the flow.
                       </p>
-                      <button className="px-4 py-2 rounded-lg hover:opacity-90 transition-all duration-200 font-medium hover:shadow-md"
-                        style={{ 
-                          backgroundColor: agentTheme.primary,
-                          color: zsColors.neutral.white,
-                          boxShadow: zsColors.shadows.sm
-                        }}>
-                        Confirm & Send to Next Agent
-                      </button>
+                      
+                      {!workflowState.outputsApproved ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <input type="checkbox" id="review-checkbox" className="rounded" />
+                            <label htmlFor="review-checkbox" className="text-xs" style={{ color: zsColors.neutral.darkGray }}>
+                              I have reviewed the results and recommendations
+                            </label>
+                          </div>
+                          <div className="flex gap-3">
+                            <button 
+                              onClick={approveOutputs}
+                              className="flex-1 px-4 py-2 rounded-lg hover:opacity-90 transition-all duration-200 font-semibold hover:shadow-md"
+                              style={{ 
+                                backgroundColor: zsColors.semantic.success,
+                                color: zsColors.neutral.white
+                              }}>
+                              ✓ Approve & Send to Next Agent
+                            </button>
+                            <button className="px-4 py-2 rounded-lg hover:opacity-90 transition-all duration-200 font-medium border"
+                              style={{ 
+                                color: agentTheme.primary,
+                                border: `1px solid ${agentTheme.primary}`,
+                                backgroundColor: 'transparent'
+                              }}>
+                              Request Changes
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-3 rounded-lg flex items-center justify-between" style={{ backgroundColor: zsColors.semantic.success + '20' }}>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: zsColors.semantic.success }} />
+                            <span className="text-sm font-semibold" style={{ color: zsColors.semantic.success }}>Outputs Approved & Sent</span>
+                          </div>
+                          <span className="text-xs" style={{ color: zsColors.neutral.gray }}>Ready for downstream processing</span>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}

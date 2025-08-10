@@ -195,7 +195,7 @@ export class OrchestrationIntelligence {
     
     return {
       hcpId,
-      currentStage: journey.stage,
+      currentStage: journey.currentStage,
       optimizedSequence,
       predictedOutcome,
       modelConfidence,
@@ -205,7 +205,7 @@ export class OrchestrationIntelligence {
   
   private predictOptimalSequence(hcp: HCP, journey: CustomerJourney): TouchpointSequence[] {
     const sequence: TouchpointSequence[] = [];
-    const stages = this.determineRemainingStages(journey.stage);
+    const stages = this.determineRemainingStages(journey.currentStage);
     
     stages.forEach((stage, index) => {
       const optimalChannel = this.selectOptimalChannel(stage, hcp, journey);
@@ -253,10 +253,10 @@ export class OrchestrationIntelligence {
       if (hcp.specialty === 'Oncology' && channel === 'Conference') score *= 1.15;
       if (hcp.specialty === 'Primary Care' && channel === 'Email') score *= 1.1;
       
-      // Adjust based on past engagement
-      const pastEngagement = journey.touchpoints.filter(t => t.type === channel);
-      if (pastEngagement.length > 0) {
-        const avgEngagement = pastEngagement.filter(t => t.engagement === 'Attended' || t.engagement === 'Clicked').length / pastEngagement.length;
+      // Adjust based on past engagement from stages
+      const relevantStages = journey.stages.filter(stage => stage.keyActivities.includes(channel));
+      if (relevantStages.length > 0) {
+        const avgEngagement = relevantStages.filter(stage => stage.engagementLevel === 'High' || stage.engagementLevel === 'Medium').length / relevantStages.length;
         score *= (1 + avgEngagement * 0.3);
       }
       
@@ -309,15 +309,15 @@ export class OrchestrationIntelligence {
     // Base timing based on step
     const baseDays = step * 7; // Weekly cadence
     
-    // Adjust based on HCP engagement level
-    const engagementScore = journey.engagementScore;
+    // Adjust based on HCP engagement level (calculated from completion probability)
+    const engagementScore = journey.completionProbability;
     let timingMultiplier = 1.0;
     
     if (engagementScore > 0.8) timingMultiplier = 0.7; // Accelerate for engaged HCPs
     else if (engagementScore < 0.4) timingMultiplier = 1.5; // Slow down for low engagement
     
     // Adjust based on stage urgency
-    if (journey.stage === 'Trial') timingMultiplier *= 0.8; // Faster follow-up during trial
+    if (journey.currentStage === 'Trial') timingMultiplier *= 0.8; // Faster follow-up during trial
     
     const days = Math.floor(baseDays * timingMultiplier);
     
@@ -329,7 +329,8 @@ export class OrchestrationIntelligence {
   }
   
   private predictEngagement(channel: string, stage: string, hcp: HCP): number {
-    const baseEngagement = this.CHANNEL_STAGE_EFFECTIVENESS[stage as keyof typeof this.CHANNEL_STAGE_EFFECTIVENESS]?.[channel] || 0.5;
+    const stageEffectiveness = this.CHANNEL_STAGE_EFFECTIVENESS[stage as keyof typeof this.CHANNEL_STAGE_EFFECTIVENESS] as Record<string, number> | undefined;
+    const baseEngagement = stageEffectiveness?.[channel] || 0.5;
     
     // Adjust based on HCP characteristics
     let adjustment = 1.0;
@@ -476,14 +477,14 @@ export class OrchestrationIntelligence {
       {
         feature: 'Current Stage',
         importance: 0.20,
-        impact: ['Trial', 'Adoption'].includes(journey.stage) ? 'Positive' : 'Neutral',
-        description: `${journey.stage} stage indicates ${journey.stage === 'Trial' ? 'high' : 'moderate'} conversion readiness`
+        impact: ['Trial', 'Adoption'].includes(journey.currentStage) ? 'Positive' : 'Neutral',
+        description: `${journey.currentStage} stage indicates ${journey.currentStage === 'Trial' ? 'high' : 'moderate'} conversion readiness`
       },
       {
         feature: 'Past Engagement',
         importance: 0.18,
-        impact: journey.engagementScore > 0.6 ? 'Positive' : 'Negative',
-        description: `${Math.round(journey.engagementScore * 100)}% engagement score ${journey.engagementScore > 0.6 ? 'supports' : 'challenges'} progression`
+        impact: journey.completionProbability > 0.6 ? 'Positive' : 'Negative',
+        description: `${Math.round(journey.completionProbability * 100)}% completion probability ${journey.completionProbability > 0.6 ? 'supports' : 'challenges'} progression`
       },
       {
         feature: 'Specialty',
@@ -511,7 +512,7 @@ export class OrchestrationIntelligence {
   private buildDecisionPath(journey: CustomerJourney, sequence: TouchpointSequence[]): DecisionNode[] {
     const path: DecisionNode[] = [];
     const stages = ['Awareness', 'Consideration', 'Trial', 'Adoption', 'Advocacy'];
-    const currentIndex = stages.indexOf(journey.stage);
+    const currentIndex = stages.indexOf(journey.currentStage);
     
     for (let i = currentIndex; i < Math.min(currentIndex + 3, stages.length); i++) {
       const stage = stages[i];
@@ -609,7 +610,7 @@ export class OrchestrationIntelligence {
   }
   
   private calculateConfidenceBreakdown(hcp: HCP, journey: CustomerJourney): ConfidenceFactors {
-    const dataQuality = journey.touchpoints.length > 5 ? 0.85 : 0.65;
+    const dataQuality = journey.stages.reduce((sum, stage) => sum + stage.touchpoints, 0) > 5 ? 0.85 : 0.65;
     const modelAccuracy = this.MODEL_CONFIG.bertStyle.accuracy;
     const historicalPerformance = 0.82; // Based on past predictions
     
@@ -660,11 +661,10 @@ export class OrchestrationIntelligence {
   
   private determineNBA(hcp: HCP, journey: CustomerJourney, context?: any): string {
     // NBA decision tree based on stage and engagement
-    const stage = journey.stage;
-    const engagement = journey.engagementScore;
-    const lastTouchpoint = journey.touchpoints[journey.touchpoints.length - 1];
-    const daysSinceLastContact = lastTouchpoint ? 
-      Math.floor((Date.now() - lastTouchpoint.date.getTime()) / (1000 * 60 * 60 * 24)) : 999;
+    const stage = journey.currentStage;
+    const engagement = journey.completionProbability;
+    const lastStage = journey.stages[journey.stages.length - 1];
+    const daysSinceLastContact = 30; // Simulated days since last contact
     
     // Stage-specific NBA logic
     if (stage === 'Awareness' && engagement < 0.3) {
@@ -706,8 +706,8 @@ export class OrchestrationIntelligence {
   }
   
   private determineNBATiming(hcp: HCP, journey: CustomerJourney): string {
-    const engagement = journey.engagementScore;
-    const stage = journey.stage;
+    const engagement = journey.completionProbability;
+    const stage = journey.currentStage;
     
     // High engagement = faster follow-up
     if (engagement > 0.7 && ['Trial', 'Adoption'].includes(stage)) {
@@ -724,14 +724,14 @@ export class OrchestrationIntelligence {
   private calculateNBAConfidence(hcp: HCP, journey: CustomerJourney, action: string): number {
     let confidence = 0.7; // Base confidence
     
-    // Adjust based on data quality
-    if (journey.touchpoints.length > 5) confidence += 0.1;
+    // Adjust based on data quality (using stages data)
+    if (journey.stages.reduce((sum, stage) => sum + stage.touchpoints, 0) > 5) confidence += 0.1;
     
     // Adjust based on HCP tier
     if (hcp.tier === 'A' || hcp.tier === 'B') confidence += 0.05;
     
     // Adjust based on engagement
-    if (journey.engagementScore > 0.6) confidence += 0.1;
+    if (journey.completionProbability > 0.6) confidence += 0.1;
     
     // Action-specific adjustments
     if (action.includes('speaker') && hcp.tier === 'A') confidence += 0.05;
@@ -763,7 +763,7 @@ export class OrchestrationIntelligence {
     }
     
     // Adjust based on stage
-    if (journey.stage === 'Trial' || journey.stage === 'Adoption') {
+    if (journey.currentStage === 'Trial' || journey.currentStage === 'Adoption') {
       baseImpact.timeToImpact *= 0.6;
       baseImpact.prescriptionLift *= 1.2;
     }
@@ -780,11 +780,11 @@ export class OrchestrationIntelligence {
     const reasoning: string[] = [];
     
     // Stage-based reasoning
-    reasoning.push(`HCP currently in ${journey.stage} stage requiring ${this.getStageRequirement(journey.stage)}`);
+    reasoning.push(`HCP currently in ${journey.currentStage} stage requiring ${this.getStageRequirement(journey.currentStage)}`);
     
     // Engagement-based reasoning
-    if (journey.engagementScore > 0.6) {
-      reasoning.push(`High engagement score (${Math.round(journey.engagementScore * 100)}%) indicates receptivity`);
+    if (journey.completionProbability > 0.6) {
+      reasoning.push(`High engagement score (${Math.round(journey.completionProbability * 100)}%) indicates receptivity`);
     } else {
       reasoning.push(`Moderate engagement requires nurturing approach`);
     }
@@ -826,7 +826,7 @@ export class OrchestrationIntelligence {
       'Advocacy': ['Research collaboration', 'Publication support', 'Expert panel participation']
     };
     
-    const options = stageAlternatives[journey.stage] || ['Standard follow-up', 'Educational materials'];
+    const options = stageAlternatives[journey.currentStage] || ['Standard follow-up', 'Educational materials'];
     
     options.slice(0, 2).forEach(option => {
       if (option !== primary) {
@@ -948,7 +948,7 @@ export class OrchestrationIntelligence {
     fitness += (goodPacing / sequence.length) * 0.2;
     
     // Stage alignment component
-    const stageAlignment = this.calculateStageAlignment(sequence, journey.stage);
+    const stageAlignment = this.calculateStageAlignment(sequence, journey.currentStage);
     fitness += stageAlignment * 0.3;
     
     // Apply constraints penalty

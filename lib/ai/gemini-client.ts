@@ -1,36 +1,49 @@
-import { GoogleGenerativeAI, GenerativeModel, ChatSession } from '@google/generative-ai';
+import { 
+  GoogleGenerativeAI, 
+  GenerativeModel, 
+  ChatSession,
+  HarmCategory,
+  HarmBlockThreshold 
+} from '@google/generative-ai';
+import { generateAgentPrompt, getAgentConfig } from './agent-prompts';
+import { customerIntelligence } from '@/lib/services/customer-intelligence';
+import { budgetIntelligence } from '@/lib/services/budget-intelligence';
+import { contentIntelligence } from '@/lib/services/content-intelligence';
+import { orchestrationIntelligence } from '@/lib/services/orchestration-intelligence';
+import { suggestionsIntelligence } from '@/lib/services/suggestions-intelligence';
+import { copilotIntelligence } from '@/lib/services/copilot-intelligence';
 
 const API_KEY = process.env.GEMINI_API_KEY || 'demo-key-please-add-real-key';
 
 export const genAI = new GoogleGenerativeAI(API_KEY);
 
-// Enhanced Gemini client configuration with streaming support
+// Enhanced Gemini 2.5 Pro client configuration optimized for pharmaceutical intelligence
 export const geminiProModel = genAI.getGenerativeModel({ 
-  model: 'gemini-2.0-flash-exp',
+  model: 'gemini-2.5-pro', // Gemini 2.5 Pro with 1M+ token context window and thinking capabilities
   generationConfig: {
-    temperature: 0.7,
+    temperature: 0.3, // More deterministic for pharmaceutical analysis
     topK: 40,
-    topP: 0.95,
-    maxOutputTokens: 8192,
+    topP: 0.9,
+    maxOutputTokens: 65536, // Leverage Gemini 2.5 Pro's higher output limit
     candidateCount: 1,
     stopSequences: [],
   },
   safetySettings: [
     {
-      category: 'HARM_CATEGORY_HARASSMENT',
-      threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     },
     {
-      category: 'HARM_CATEGORY_HATE_SPEECH',
-      threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     },
     {
-      category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-      threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     },
     {
-      category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-      threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     },
   ],
 });
@@ -41,10 +54,13 @@ export interface AgentChatMessage {
 }
 
 export interface ChatConfig {
-  systemPrompt: string;
+  systemPrompt?: string; // Optional - will use agent-specific prompt if not provided
   agentId: string;
   conversationHistory?: AgentChatMessage[];
   temperature?: number;
+  includeContext?: boolean; // Whether to include intelligence service data
+  hcpId?: string; // For HCP-specific context
+  territoryId?: string; // For territory-specific context
 }
 
 export class AgentChatSession {
@@ -53,23 +69,94 @@ export class AgentChatSession {
   private systemPrompt: string;
   private agentId: string;
   private conversationHistory: AgentChatMessage[] = [];
+  private config: ChatConfig;
 
   constructor(config: ChatConfig) {
-    this.systemPrompt = config.systemPrompt;
+    this.config = config;
     this.agentId = config.agentId;
     this.conversationHistory = config.conversationHistory || [];
     
-    // Create model instance with custom temperature if provided
+    // Generate enhanced system prompt with agent-specific configuration
+    this.systemPrompt = this.generateEnhancedPrompt(config);
+    
+    // Get agent-specific temperature or use default
+    const agentConfig = getAgentConfig(config.agentId);
+    const temperature = config.temperature || agentConfig.temperature;
+    
+    // Create model instance optimized for pharmaceutical intelligence
     this.model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-pro',
       generationConfig: {
-        temperature: config.temperature || 0.7,
+        temperature,
         topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 8192,
+        topP: 0.9,
+        maxOutputTokens: 65536, // Leverage Gemini 2.5 Pro's higher output limit
+        candidateCount: 1,
       },
       systemInstruction: this.systemPrompt,
     });
+  }
+
+  private generateEnhancedPrompt(config: ChatConfig): string {
+    // Use provided prompt or generate agent-specific prompt
+    if (config.systemPrompt) {
+      return config.systemPrompt;
+    }
+
+    // Gather contextual data from intelligence services if requested
+    let contextData: any = {};
+    
+    if (config.includeContext) {
+      try {
+        contextData = this.gatherContextualData(config);
+      } catch (error) {
+        console.warn(`Failed to gather context for agent ${config.agentId}:`, error);
+      }
+    }
+
+    return generateAgentPrompt(config.agentId, contextData);
+  }
+
+  private gatherContextualData(config: ChatConfig): any {
+    const context: any = {};
+
+    // Gather basic agent-specific data (non-async for build simplicity)
+    try {
+      switch (this.agentId) {
+        case 'customer':
+          if (config.hcpId) {
+            const barriers = customerIntelligence.analyzeBarriers(config.hcpId);
+            context.hcpData = { barriers };
+          }
+          break;
+        case 'budget':
+          const budgetAnalysis = budgetIntelligence.optimizeBudget(47000000);
+          context.budgetData = budgetAnalysis;
+          break;
+        case 'content':
+          const contentAnalysis = contentIntelligence.analyzeContentLibrary();
+          context.contentData = { analysis: contentAnalysis };
+          break;
+        case 'orchestration':
+          if (config.hcpId) {
+            const journey = orchestrationIntelligence.optimizeJourney(config.hcpId);
+            context.journeyData = journey;
+          }
+          break;
+        case 'suggestions':
+          if (config.territoryId) {
+            const analysis = suggestionsIntelligence.analyzeTerritoryTriggers(config.territoryId);
+            context.territoryData = analysis;
+          }
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      console.warn(`Failed to gather context for agent ${this.agentId}:`, error);
+    }
+
+    return context;
   }
 
   async initializeChat(): Promise<void> {
@@ -89,11 +176,14 @@ export class AgentChatSession {
     }
 
     try {
-      const result = await this.chatSession!.sendMessage(message);
+      // Enhance message with agent-specific context if needed
+      const enhancedMessage = this.enhanceMessage(message);
+      
+      const result = await this.chatSession!.sendMessage(enhancedMessage);
       const response = await result.response;
       const text = response.text();
       
-      // Update conversation history
+      // Update conversation history with original message (not enhanced)
       this.conversationHistory.push(
         { role: 'user', parts: [{ text: message }] },
         { role: 'model', parts: [{ text }] }
@@ -106,13 +196,35 @@ export class AgentChatSession {
     }
   }
 
+  private enhanceMessage(message: string): string {
+    // Add agent-specific context hints for better responses
+    const agentConfig = getAgentConfig(this.agentId);
+    
+    let enhancedMessage = message;
+    
+    // Add capability context for better understanding
+    if (message.toLowerCase().includes('help') || message.toLowerCase().includes('what can you')) {
+      enhancedMessage += `\n\nNote: I specialize in: ${agentConfig.capabilities.join(', ')}`;
+    }
+
+    // Add business rules context for decision-making questions
+    if (message.toLowerCase().includes('should') || message.toLowerCase().includes('recommend')) {
+      enhancedMessage += `\n\nConsider these business rules: ${agentConfig.businessRules.join('; ')}`;
+    }
+
+    return enhancedMessage;
+  }
+
   async *sendMessageStream(message: string): AsyncIterable<string> {
     if (!this.chatSession) {
       await this.initializeChat();
     }
 
     try {
-      const result = await this.chatSession!.sendMessageStream(message);
+      // Enhance message with agent-specific context
+      const enhancedMessage = this.enhanceMessage(message);
+      
+      const result = await this.chatSession!.sendMessageStream(enhancedMessage);
       let fullResponse = '';
 
       for await (const chunk of result.stream) {
@@ -121,7 +233,7 @@ export class AgentChatSession {
         yield chunkText;
       }
 
-      // Update conversation history with complete response
+      // Update conversation history with original message (not enhanced)
       this.conversationHistory.push(
         { role: 'user', parts: [{ text: message }] },
         { role: 'model', parts: [{ text: fullResponse }] }
@@ -211,7 +323,100 @@ export async function withRetry<T>(
   throw lastError!;
 }
 
-// Legacy compatibility export
+// Agent chat session factory with intelligence integration
+export function createAgentChatSession(agentId: string, options?: {
+  includeContext?: boolean;
+  hcpId?: string;
+  territoryId?: string;
+  temperature?: number;
+}): AgentChatSession {
+  const config: ChatConfig = {
+    agentId,
+    includeContext: options?.includeContext || false,
+    hcpId: options?.hcpId,
+    territoryId: options?.territoryId,
+    temperature: options?.temperature,
+  };
+
+  return new AgentChatSession(config);
+}
+
+// Enhanced streaming response with agent context
+export async function streamAgentResponse(
+  agentId: string, 
+  message: string,
+  options?: {
+    includeContext?: boolean;
+    hcpId?: string;
+    territoryId?: string;
+  }
+): Promise<AsyncIterable<string>> {
+  const session = createAgentChatSession(agentId, options);
+  return session.sendMessageStream(message);
+}
+
+// Get agent capabilities and configuration
+export function getAgentInfo(agentId: string) {
+  try {
+    const config = getAgentConfig(agentId);
+    return {
+      agentId,
+      capabilities: config.capabilities,
+      dataContext: config.dataContext,
+      temperature: config.temperature,
+      businessRules: config.businessRules
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
+// Validate agent message for business context
+export function validateAgentMessage(agentId: string, message: string): {
+  isValid: boolean;
+  suggestions?: string[];
+  warnings?: string[];
+} {
+  const validation: { isValid: boolean; suggestions?: string[]; warnings?: string[] } = { 
+    isValid: true, 
+    suggestions: [], 
+    warnings: [] 
+  };
+  
+  try {
+    const config = getAgentConfig(agentId);
+    
+    // Check if message aligns with agent capabilities
+    const hasRelevantCapability = config.capabilities.some(cap => 
+      message.toLowerCase().includes(cap.toLowerCase().split(' ')[0])
+    );
+    
+    if (!hasRelevantCapability && message.length > 20) {
+      validation.suggestions!.push(
+        `This question might be better suited for: ${config.capabilities.slice(0, 2).join(', ')}`
+      );
+    }
+    
+    // Check for pharmaceutical compliance
+    const riskyTerms = ['guarantee', 'cure', 'best drug', 'always works'];
+    const hasRiskyTerms = riskyTerms.some(term => 
+      message.toLowerCase().includes(term)
+    );
+    
+    if (hasRiskyTerms) {
+      validation.warnings!.push(
+        'Question contains terms that may require regulatory compliance review'
+      );
+    }
+    
+  } catch (error) {
+    validation.warnings!.push('Unable to validate message for this agent');
+  }
+  
+  return validation;
+}
+
+// Legacy compatibility exports
 export const geminiPro = geminiProModel;
 export const geminiProWithTools = geminiProModel;
 

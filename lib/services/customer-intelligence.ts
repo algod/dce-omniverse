@@ -573,7 +573,7 @@ export class CustomerIntelligence {
     
     // Barrier-specific recommendations
     const barrierDist = this.analyzeBarrierDistribution(opportunities);
-    const topBarrier = Object.entries(barrierDist).sort((a, b) => b[1] - a[1])[0];
+    const topBarrier = Object.entries(barrierDist).sort((a, b) => (b[1] as number) - (a[1] as number))[0];
     if (topBarrier) {
       const barrierName = this.BARRIER_DEFINITIONS[topBarrier[0] as keyof typeof this.BARRIER_DEFINITIONS].name;
       recommendations.push(`Address ${barrierName} affecting ${topBarrier[1]} HCPs in territory`);

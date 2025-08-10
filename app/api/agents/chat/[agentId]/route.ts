@@ -5,9 +5,9 @@ import { getAgentSystemPrompt, AGENT_CONTEXTS } from '@/lib/ai/system-prompts';
 // Agent endpoint for intelligent Q&A with streaming support
 export async function POST(
   request: NextRequest,
-  { params }: { params: { agentId: string } }
+  { params }: { params: Promise<{ agentId: string }> }
 ) {
-  const agentId = params.agentId;
+  const { agentId } = await params;
   
   try {
     // Validate agent ID
@@ -135,9 +135,9 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { agentId: string } }
+  { params }: { params: Promise<{ agentId: string }> }
 ) {
-  const agentId = params.agentId;
+  const { agentId } = await params;
   
   if (!AGENT_CONTEXTS[agentId as keyof typeof AGENT_CONTEXTS]) {
     return NextResponse.json(

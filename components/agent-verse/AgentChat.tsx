@@ -57,6 +57,8 @@ export function AgentChat({
   const [params, setParams] = useState<any>({});
   const [conversationHistory, setConversationHistory] = useState<any[]>([]);
   const [quickActions, setQuickActions] = useState<string[]>([]);
+  const [clarifyingQuestions, setClarifyingQuestions] = useState<string[]>([]);
+  const [awaitingUserInput, setAwaitingUserInput] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -131,7 +133,7 @@ export function AgentChat({
       if (response.ok) {
         // Handle streaming response
         const agentMessageId = (Date.now() + 1).toString();
-        let streamingMessage: Message = {
+        const streamingMessage: Message = {
           id: agentMessageId,
           role: 'agent',
           content: '',
@@ -191,6 +193,9 @@ export function AgentChat({
           { role: 'user', parts: [{ text: messageToSend }] },
           { role: 'model', parts: [{ text: accumulatedContent }] }
         ]);
+        
+        // Generate context-aware clarifying questions
+        generateClarifyingQuestions(messageToSend, accumulatedContent);
       } else {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -227,27 +232,94 @@ export function AgentChat({
     setParams((prev: any) => ({ ...prev, [key]: value }));
   };
 
-  // Get personalized welcome message for each agent
-  const getWelcomeMessage = (agentId: string, agentName: string): string => {
-    const welcomeMessages: Record<string, string> = {
-      'customer': `Hello! I'm Dr. Sarah Chen, your Customer Planning Agent. I'm here to help you with HCP barrier analysis, opportunity scoring, and strategic customer prioritization. I have deep insights into our 2,847 HCPs across therapeutic areas. What would you like to explore?`,
-      
-      'budget': `Hi there! I'm Michael Rodriguez, your Budget Planning Agent. I specialize in ROI optimization across our $47M promotional budget and multi-channel attribution modeling. I can help you maximize returns and allocate spend strategically. What budget questions can I assist with?`,
-      
-      'content': `Greetings! I'm Jennifer Park, your Content Review Agent. I manage our 1,247 promotional materials with 96% MLR first-pass approval rates. I can help with compliance reviews, content-barrier mapping, and regulatory guidance. How can I support your content needs?`,
-      
-      'orchestration': `Welcome! I'm Dr. Alex Kim, your AI Orchestration Agent. I optimize customer journeys for 2,847 HCPs using advanced ML models and provide Next Best Action recommendations with 87% accuracy. What customer journey challenges shall we tackle?`,
-      
-      'suggestions': `Hello! I'm Maria Gonzalez, your Field Suggestion Design Agent. I create intelligent field guidance for 245 reps with 73% suggestion effectiveness rates. I can help optimize triggers, analyze feedback, and improve field performance. What field challenges can I help solve?`,
-      
-      'copilot': `Hey there! I'm David Thompson, your Field Copilot Agent. With 15 years of pharma sales experience, I provide call preparation, territory insights, and coaching support to 245 reps. Ready to enhance your field performance? What can I help you with?`
+  // Get professional welcome message for each agent
+  const generateClarifyingQuestions = async (userMessage: string, agentResponse: string) => {
+    const currentTab = contextData?.currentTab || 'overview';
+    const questions = getContextualQuestions(agentId, userMessage, currentTab);
+    setClarifyingQuestions(questions.slice(0, 3)); // Show max 3 questions
+    
+    // Randomly ask a clarifying question (30% chance)
+    if (Math.random() < 0.3 && questions.length > 0) {
+      setTimeout(() => {
+        askClarifyingQuestion(questions[Math.floor(Math.random() * questions.length)]);
+      }, 2000);
+    }
+  };
+  
+  const getContextualQuestions = (agentId: string, userMessage: string, currentTab: string): string[] => {
+    const baseQuestions: Record<string, Record<string, string[]>> = {
+      customer: {
+        overview: [
+          "Would you like to focus on a specific therapeutic area?",
+          "Are there particular barriers you're most concerned about?",
+          "What's your current HCP engagement strategy?"
+        ],
+        inputs: [
+          "Should we adjust barrier weights based on recent market changes?",
+          "Do you want to include digital-only HCP engagement?",
+          "What's your preferred opportunity threshold for this analysis?"
+        ],
+        analytics: [
+          "Would you like to see the model's confidence intervals?",
+          "Should we run sensitivity analysis on these parameters?",
+          "Do you want to compare against previous quarters?"
+        ]
+      },
+      budget: {
+        inputs: [
+          "Are there seasonal factors we should consider?",
+          "Do you have preferred channels based on past performance?",
+          "What's your risk tolerance for budget reallocation?"
+        ]
+      },
+      // Add more agent-specific questions
     };
     
-    return welcomeMessages[agentId] || `Hello! I'm the ${agentName}. I'm here to help you with pharmaceutical insights and analysis. What would you like to explore?`;
+    return baseQuestions[agentId]?.[currentTab] || [];
+  };
+  
+  const askClarifyingQuestion = (question: string) => {
+    const clarifyingMessage: Message = {
+      id: Date.now().toString(),
+      role: 'agent',
+      content: `I have a follow-up question to help optimize the analysis: ${question}`,
+      timestamp: new Date(),
+      actions: [
+        {
+          label: 'Answer this',
+          action: () => setInput(question)
+        },
+        {
+          label: 'Skip for now',
+          action: () => setClarifyingQuestions([])
+        }
+      ]
+    };
+    
+    setMessages(prev => [...prev, clarifyingMessage]);
+    setAwaitingUserInput(true);
+  };
+
+  const getWelcomeMessage = (agentId: string, agentName: string): string => {
+    const welcomeMessages: Record<string, string> = {
+      'customer': `Welcome to the Customer Planning Agent. I specialize in HCP barrier analysis, opportunity scoring, and strategic customer prioritization across our 2,847 HCPs. I can help you identify high-value opportunities and develop barrier-specific engagement strategies. What would you like to explore?`,
+      
+      'budget': `Welcome to the Budget Planning Agent. I focus on ROI optimization across our $47M promotional budget using advanced attribution modeling. I can help you maximize returns through strategic multi-channel allocation and spend efficiency analysis. What budget optimization questions can I assist with?`,
+      
+      'content': `Welcome to the Content Review Agent. I manage our 1,247 promotional materials with expertise in MLR compliance and 96% first-pass approval rates. I can assist with compliance reviews, content-barrier mapping, and regulatory guidance for pharmaceutical marketing materials. How can I support your content strategy?`,
+      
+      'orchestration': `Welcome to the AI Orchestration Agent. I specialize in customer journey optimization for 2,847 HCPs using advanced ML models and provide Next Best Action recommendations with 87% prediction accuracy. I can help design personalized engagement sequences that maximize conversion potential. What customer journey challenges shall we address?`,
+      
+      'suggestions': `Welcome to the Field Suggestion Design Agent. I create intelligent field guidance systems for 245 sales representatives with 73% suggestion adoption rates. I can help optimize trigger configurations, analyze field feedback patterns, and improve suggestion effectiveness across territories. What field optimization challenges can I help solve?`,
+      
+      'copilot': `Welcome to the Field Copilot Agent. I provide comprehensive field support including call preparation, territory insights, and coaching guidance for pharmaceutical sales teams. I specialize in HCP interaction optimization and performance enhancement across all therapeutic areas. How can I support your field activities today?`
+    };
+    
+    return welcomeMessages[agentId] || `Welcome to the ${agentName}. I'm here to provide professional pharmaceutical insights and analysis. What would you like to explore?`;
   };
 
   return (
-    <div className="flex flex-col h-full rounded-lg" style={{
+    <div className="flex flex-col h-full min-h-[75vh] rounded-lg" style={{
       backgroundColor: zsColors.neutral.white,
       border: `1px solid ${zsColors.neutral.lightGray}`,
       boxShadow: zsColors.shadows.sm
@@ -368,7 +440,7 @@ export function AgentChat({
       </AnimatePresence>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[50vh]" style={{ overflowWrap: 'break-word' }}>
         {messages.map((message) => (
           <motion.div
             key={message.id}
@@ -376,7 +448,7 @@ export function AgentChat({
             animate={{ opacity: 1, y: 0 }}
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <div className={`flex gap-2 max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex gap-3 max-w-[85%] ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
               <div 
                 className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
@@ -388,21 +460,22 @@ export function AgentChat({
               </div>
               <div>
                 <div
-                  className="px-4 py-2 rounded-lg"
+                  className="px-4 py-3 rounded-lg"
                   style={{
                     backgroundColor: message.role === 'user' ? zsColors.neutral.offWhite : zsColors.neutral.white,
                     color: zsColors.neutral.charcoal,
                     ...(message.role === 'agent' && {
                       border: `1px solid ${zsColors.neutral.lightGray}`,
+                      boxShadow: zsColors.shadows.sm,
                       ...(message.isFallback && {
-                        borderColor: zsColors.accent.orange,
+                        borderColor: zsColors.secondary.orange,
                         backgroundColor: '#FFF7ED'
                       })
                     })
                   }}
                 >
                   <div className="flex items-start gap-2">
-                    <p className="text-sm whitespace-pre-wrap flex-1">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap flex-1" style={{ wordBreak: 'break-word', lineHeight: '1.5' }}>{message.content}</p>
                     {message.isStreaming && (
                       <motion.div
                         animate={{ rotate: 360 }}
@@ -429,7 +502,7 @@ export function AgentChat({
                     ))}
                   </div>
                 )}
-                <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>
+                <p className="text-xs mt-2" style={{ color: zsColors.neutral.gray }}>
                   {message.timestamp.toLocaleTimeString()}
                 </p>
               </div>
@@ -550,7 +623,7 @@ export function AgentChat({
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Ask a question or request an action..."
-            className="flex-1 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
+            className="flex-1 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all"
             style={{ 
               backgroundColor: zsColors.neutral.white,
               border: `1px solid ${zsColors.neutral.lightGray}`,
@@ -559,7 +632,7 @@ export function AgentChat({
             disabled={isProcessing}
           />
           <Button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={!input.trim() || isProcessing}
             icon={<Send size={16} />}
             style={{ 

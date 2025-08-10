@@ -191,7 +191,7 @@ export class BudgetIntelligence {
     
     for (let i = 0; i < iterations; i++) {
       // Find channel with highest marginal ROI
-      let bestChannel: BudgetAllocation | null = null;
+      let bestChannel: BudgetAllocation | undefined;
       let bestMarginalROI = 0;
       
       optimized.forEach(channel => {

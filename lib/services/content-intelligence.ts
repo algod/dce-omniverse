@@ -166,7 +166,8 @@ export class ContentIntelligence {
     const violations: ComplianceViolation[] = [];
     
     // Simulate violation detection based on content type and random factors
-    const violationProbability = content.complianceScore < 0.9 ? 0.3 : 0.1;
+    const mlrScore = content.mlrScore || 0.85;
+    const violationProbability = mlrScore < 0.9 ? 0.3 : 0.1;
     
     // Check for claim violations
     if (Math.random() < violationProbability) {
@@ -193,7 +194,7 @@ export class ContentIntelligence {
     }
     
     // Check for fair balance
-    if (content.type === 'Email Template' && Math.random() < violationProbability * 1.2) {
+    if (content.type === 'Email' && Math.random() < violationProbability * 1.2) {
       violations.push({
         type: 'Fair Balance',
         severity: 'Major',
@@ -217,7 +218,7 @@ export class ContentIntelligence {
     }
     
     // Check for comparative claims
-    if (content.type === 'Detail Aid' && Math.random() < violationProbability * 0.7) {
+    if (content.type === 'Interactive' && Math.random() < violationProbability * 0.7) {
       violations.push({
         type: 'Comparative Claim',
         severity: 'Major',
@@ -264,11 +265,11 @@ export class ContentIntelligence {
     }
     
     // Content type specific
-    if (content.type === 'Email Template') {
+    if (content.type === 'Email') {
       recommendations.push('Ensure subject line is not misleading and includes product name');
     }
     
-    if (content.type === 'Detail Aid') {
+    if (content.type === 'Interactive') {
       recommendations.push('Include complete prescribing information or clear reference to it');
     }
     
@@ -317,7 +318,7 @@ export class ContentIntelligence {
     return {
       contentId,
       contentTitle: content.title,
-      targetBarriers: content.targetBarriers,
+      targetBarriers: content.barrier ? [content.barrier] : [],
       effectivenessScores,
       recommendedUsage,
       gaps
@@ -327,12 +328,26 @@ export class ContentIntelligence {
   private calculateBarrierEffectiveness(content: ContentAsset): Record<string, number> {
     const scores: Record<string, number> = {};
     
-    content.targetBarriers.forEach(barrier => {
-      const baseEffectiveness = this.BARRIER_CONTENT_EFFECTIVENESS[barrier as keyof typeof this.BARRIER_CONTENT_EFFECTIVENESS]?.[content.type] || 0.5;
+    // Map actual content types to effectiveness types
+    const typeMapping: Record<string, string> = {
+      'Email': 'Email Template',
+      'Web': 'Website Content',
+      'Print': 'Brochure',
+      'Video': 'Video',
+      'Interactive': 'Detail Aid',
+      'IVA': 'Detail Aid'
+    };
+    
+    const mappedType = typeMapping[content.type] || 'Brochure';
+    const targetBarriers = content.barrier ? [content.barrier] : [];
+    targetBarriers.forEach(barrier => {
+      const barrierEffectiveness = this.BARRIER_CONTENT_EFFECTIVENESS[barrier as keyof typeof this.BARRIER_CONTENT_EFFECTIVENESS];
+      const baseEffectiveness = barrierEffectiveness?.[mappedType as keyof typeof barrierEffectiveness] || 0.5;
       
       // Adjust based on content quality and engagement
-      const qualityMultiplier = content.complianceScore;
-      const engagementMultiplier = Math.min(content.engagementMetrics.views / 1000, 1.2);
+      const qualityMultiplier = content.mlrScore || 0.85;
+      // Simulate engagement multiplier
+      const engagementMultiplier = 0.8 + Math.random() * 0.4;
       
       scores[barrier] = Math.min(baseEffectiveness * qualityMultiplier * engagementMultiplier, 1.0);
     });
@@ -427,14 +442,15 @@ export class ContentIntelligence {
     
     // Check for missing barrier coverage
     const allBarriers = ['B001', 'B002', 'B003', 'B004', 'B005'];
-    const missingBarriers = allBarriers.filter(b => !content.targetBarriers.includes(b));
+    const targetBarriers = content.barrier ? [content.barrier] : [];
+    const missingBarriers = allBarriers.filter(b => !targetBarriers.includes(b));
     
-    if (missingBarriers.length > 0 && content.type === 'Detail Aid') {
+    if (missingBarriers.length > 0 && content.type === 'Interactive') {
       gaps.push(`No coverage for ${missingBarriers.length} barriers in primary sales material`);
     }
     
     // Content type specific gaps
-    if (content.type === 'Email Template' && !content.targetBarriers.includes('B003')) {
+    if (content.type === 'Email' && !targetBarriers.includes('B003')) {
       gaps.push('Email campaigns should address access/insurance barriers');
     }
     
@@ -486,16 +502,28 @@ export class ContentIntelligence {
   
   private calculateEngagementRate(content: ContentAsset): number {
     const totalReach = Math.floor(Math.random() * 10000) + 1000;
-    const engagements = content.engagementMetrics.views + 
-                       content.engagementMetrics.downloads + 
-                       content.engagementMetrics.shares;
+    // Simulate engagement metrics
+    const engagements = Math.floor(Math.random() * 10000) + 1000;
     
     return Math.min(engagements / totalReach, 1.0);
   }
   
   private calculateConversionRate(content: ContentAsset): number {
     // Simulate conversion based on content effectiveness
-    const baseConversion = content.effectiveness * 0.15;
+    const effectiveness = content.mlrScore || 0.8;
+    const baseConversion = effectiveness * 0.15;
+    
+    // Map actual content types to effectiveness types
+    const typeMapping: Record<string, string> = {
+      'Email': 'Email Template',
+      'Web': 'Website Content',
+      'Print': 'Brochure',
+      'Video': 'Video',
+      'Interactive': 'Detail Aid',
+      'IVA': 'Detail Aid'
+    };
+    
+    const mappedType = typeMapping[content.type] || 'Brochure';
     const typeMultiplier = {
       'Detail Aid': 1.2,
       'Clinical Study': 1.3,
@@ -503,7 +531,7 @@ export class ContentIntelligence {
       'Email Template': 0.8,
       'Website Content': 0.9,
       'Brochure': 1.0
-    }[content.type] || 1.0;
+    }[mappedType] || 1.0;
     
     return Math.min(baseConversion * typeMultiplier, 0.25);
   }
@@ -511,8 +539,10 @@ export class ContentIntelligence {
   private calculateFeedbackScore(content: ContentAsset): number {
     // Simulate HCP feedback score
     const base = 0.7;
-    const qualityBonus = content.complianceScore * 0.2;
-    const engagementBonus = Math.min(content.engagementMetrics.avgEngagementTime / 300, 0.1);
+    const qualityBonus = (content.mlrScore || 0.85) * 0.2;
+    // Simulate engagement bonus based on type
+    const avgEngagementTime = content.type === 'Video' ? 240 : content.type === 'Interactive' ? 180 : 120;
+    const engagementBonus = Math.min(avgEngagementTime / 300, 0.1);
     
     return Math.min(base + qualityBonus + engagementBonus, 1.0);
   }
@@ -584,7 +614,8 @@ export class ContentIntelligence {
     const periods = ['2024-Q1', '2024-Q2', '2024-Q3', '2024-Q4'];
     
     // Engagement trend
-    let previousEngagement = content.engagementMetrics.views * 0.7;
+    // Simulate previous engagement
+    let previousEngagement = Math.floor(Math.random() * 5000) + 500;
     periods.forEach(period => {
       const currentEngagement = previousEngagement * (1 + (Math.random() - 0.5) * 0.3);
       const change = ((currentEngagement - previousEngagement) / previousEngagement) * 100;
@@ -651,13 +682,14 @@ export class ContentIntelligence {
     }
     
     // Content age recommendations
-    const ageInDays = Math.floor((Date.now() - content.approvalDate.getTime()) / (1000 * 60 * 60 * 24));
+    const approvedDate = content.approvedDate || new Date();
+    const ageInDays = Math.floor((Date.now() - approvedDate.getTime()) / (1000 * 60 * 60 * 24));
     if (ageInDays > 180) {
       recommendations.push('Content over 6 months old - review for accuracy and relevance');
     }
     
     // Channel optimization
-    if (content.type === 'Email Template' && engagementRate < 0.15) {
+    if (content.type === 'Email' && engagementRate < 0.15) {
       recommendations.push('Optimize subject lines and preview text for better open rates');
     }
     
@@ -670,9 +702,9 @@ export class ContentIntelligence {
     const allContent = this.mockData.getContentList(filters);
     
     const totalAssets = allContent.length;
-    const approvedAssets = allContent.filter(c => c.mlrStatus === 'Approved').length;
-    const pendingAssets = allContent.filter(c => c.mlrStatus === 'Pending').length;
-    const expiredAssets = allContent.filter(c => c.mlrStatus === 'Expired').length;
+    const approvedAssets = allContent.filter(c => c.status === 'Approved').length;
+    const pendingAssets = allContent.filter(c => c.status === 'In Review').length;
+    const expiredAssets = allContent.filter(c => c.status === 'Expired').length;
     
     const barrierCoverage = this.analyzeBarrierCoverage(allContent);
     const channelDistribution = this.analyzeChannelDistribution(allContent);
@@ -705,17 +737,18 @@ export class ContentIntelligence {
     const barriers = ['B001', 'B002', 'B003', 'B004', 'B005'];
     
     barriers.forEach(barrier => {
-      const relevantContent = content.filter(c => c.targetBarriers.includes(barrier));
-      const avgEffectiveness = relevantContent.reduce((sum, c) => sum + c.effectiveness, 0) / 
+      const relevantContent = content.filter(c => c.barrier === barrier);
+      // Calculate average effectiveness from MLR scores
+      const avgEffectiveness = relevantContent.reduce((sum, c) => sum + (c.mlrScore || 0.8), 0) / 
                                (relevantContent.length || 1);
       
       coverage[barrier] = {
         assetCount: relevantContent.length,
         avgEffectiveness,
         topPerformingAssets: relevantContent
-          .sort((a, b) => b.effectiveness - a.effectiveness)
+          .sort((a, b) => (b.mlrScore || 0.8) - (a.mlrScore || 0.8))
           .slice(0, 3)
-          .map(c => ({ id: c.id, title: c.title, effectiveness: c.effectiveness })),
+          .map(c => ({ id: c.id, title: c.title, effectiveness: c.mlrScore || 0.8 })),
         gaps: this.identifyBarrierGaps(barrier, relevantContent)
       };
     });
@@ -737,19 +770,24 @@ export class ContentIntelligence {
   private analyzeTherapeuticCoverage(content: ContentAsset[]): Record<string, number> {
     const coverage: Record<string, number> = {};
     
+    // Simulate therapeutic areas
+    const therapeuticAreas = ['Oncology', 'Immunology', 'Neurology', 'Cardiology', 'Rare Disease'];
+    
     content.forEach(c => {
-      coverage[c.therapeuticArea] = (coverage[c.therapeuticArea] || 0) + 1;
+      // Assign random therapeutic area for simulation
+      const area = therapeuticAreas[Math.floor(Math.random() * therapeuticAreas.length)];
+      coverage[area] = (coverage[area] || 0) + 1;
     });
     
     return coverage;
   }
   
   private calculateLibraryPerformance(content: ContentAsset[]): LibraryPerformanceMetrics {
-    const totalViews = content.reduce((sum, c) => sum + c.engagementMetrics.views, 0);
-    const totalDownloads = content.reduce((sum, c) => sum + c.engagementMetrics.downloads, 0);
-    const avgEngagementTime = content.reduce((sum, c) => sum + c.engagementMetrics.avgEngagementTime, 0) / 
-                              content.length;
-    const avgEffectiveness = content.reduce((sum, c) => sum + c.effectiveness, 0) / content.length;
+    // Simulate aggregate engagement metrics
+    const totalViews = content.length * (Math.floor(Math.random() * 2000) + 1000);
+    const totalDownloads = content.length * (Math.floor(Math.random() * 500) + 100);
+    const avgEngagementTime = 150 + Math.random() * 100;
+    const avgEffectiveness = 0.7 + Math.random() * 0.2;
     
     return {
       totalViews,
@@ -757,10 +795,9 @@ export class ContentIntelligence {
       avgEngagementTime,
       avgEffectiveness,
       topPerformers: content
-        .sort((a, b) => (b.engagementMetrics.views + b.engagementMetrics.downloads) - 
-                       (a.engagementMetrics.views + a.engagementMetrics.downloads))
+        .sort(() => Math.random() - 0.5) // Random sort for simulation
         .slice(0, 5)
-        .map(c => ({ id: c.id, title: c.title, engagement: c.engagementMetrics.views + c.engagementMetrics.downloads }))
+        .map(c => ({ id: c.id, title: c.title, engagement: Math.floor(Math.random() * 5000) + 1000 }))
     };
   }
   
@@ -799,7 +836,8 @@ export class ContentIntelligence {
     
     // Check for outdated content
     const outdated = content.filter(c => {
-      const ageInDays = Math.floor((Date.now() - c.approvalDate.getTime()) / (1000 * 60 * 60 * 24));
+      const approvedDate = c.approvedDate || new Date();
+      const ageInDays = Math.floor((Date.now() - approvedDate.getTime()) / (1000 * 60 * 60 * 24));
       return ageInDays > 365;
     });
     
@@ -831,8 +869,9 @@ export class ContentIntelligence {
     
     // Content refresh recommendations
     const refreshCandidates = content.filter(c => {
-      const ageInDays = Math.floor((Date.now() - c.approvalDate.getTime()) / (1000 * 60 * 60 * 24));
-      return ageInDays > 180 && c.effectiveness < 0.7;
+      const approvalDate = c.approvedDate || new Date();
+      const ageInDays = Math.floor((Date.now() - approvalDate.getTime()) / (1000 * 60 * 60 * 24));
+      return ageInDays > 180 && (c.mlrScore || 0.8) < 0.7;
     });
     
     if (refreshCandidates.length > 0) {
@@ -840,7 +879,7 @@ export class ContentIntelligence {
     }
     
     // MLR process improvements
-    const pendingCount = content.filter(c => c.mlrStatus === 'Pending').length;
+    const pendingCount = content.filter(c => c.status === 'In Review').length;
     if (pendingCount > 10) {
       recommendations.push(`Expedite MLR review for ${pendingCount} pending assets to improve content availability`);
     }
@@ -873,15 +912,27 @@ export class ContentIntelligence {
       let priorityScore = 0;
       
       // Business impact factor
-      const businessImpact = content.targetBarriers.length * 20;
+      const targetBarriers = content.barrier ? [content.barrier] : [];
+      const businessImpact = targetBarriers.length * 20;
       priorityScore += businessImpact;
       
       // Urgency factor
-      const daysUntilExpiration = Math.floor((content.expirationDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      const expiryDate = content.expiryDate || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // Default 90 days
+      const daysUntilExpiration = Math.floor((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
       if (daysUntilExpiration < 30) priorityScore += 50;
       else if (daysUntilExpiration < 60) priorityScore += 30;
       
       // Content type factor
+      const typeMapping: Record<string, string> = {
+        'Email': 'Email Template',
+        'Web': 'Website Content',
+        'Print': 'Brochure',
+        'Video': 'Video',
+        'Interactive': 'Detail Aid',
+        'IVA': 'Detail Aid'
+      };
+      
+      const mappedType = typeMapping[content.type] || 'Brochure';
       const typePriority = {
         'Detail Aid': 40,
         'Clinical Study': 35,
@@ -889,7 +940,7 @@ export class ContentIntelligence {
         'Video': 30,
         'Website Content': 20,
         'Brochure': 15
-      }[content.type] || 10;
+      }[mappedType] || 10;
       priorityScore += typePriority;
       
       return {
@@ -934,9 +985,10 @@ export class ContentIntelligence {
     return contents
       .filter(content => {
         // Check for expedited eligibility
-        const isLowRisk = content.complianceScore > 0.9;
+        const isLowRisk = (content.mlrScore || 0.85) > 0.9;
         const isUpdateOnly = Math.random() > 0.7; // Simulate update vs new content
-        const isHighPriority = content.targetBarriers.length >= 2;
+        const targetBarriers = content.barrier ? [content.barrier] : [];
+        const isHighPriority = targetBarriers.length >= 2;
         
         return isLowRisk && (isUpdateOnly || isHighPriority);
       })
@@ -962,13 +1014,13 @@ export class ContentIntelligence {
     }
     
     // Type-based recommendations
-    const emailCount = contents.filter(c => c.type === 'Email Template').length;
+    const emailCount = contents.filter(c => c.type === 'Email').length;
     if (emailCount > 5) {
       recommendations.push('Use template-based review for email campaigns to reduce review time');
     }
     
     // Risk-based recommendations
-    const lowRiskCount = contents.filter(c => c.complianceScore > 0.9).length;
+    const lowRiskCount = contents.filter(c => (c.mlrScore || 0.85) > 0.9).length;
     if (lowRiskCount > contents.length * 0.6) {
       recommendations.push('Implement auto-approval for low-risk content meeting predefined criteria');
     }
@@ -981,6 +1033,17 @@ export class ContentIntelligence {
   }
   
   private estimateReviewTime(content: ContentAsset): number {
+    // Map actual content types to effectiveness types
+    const typeMapping: Record<string, string> = {
+      'Email': 'Email Template',
+      'Web': 'Website Content',
+      'Print': 'Brochure',
+      'Video': 'Video',
+      'Interactive': 'Detail Aid',
+      'IVA': 'Detail Aid'
+    };
+    
+    const mappedType = typeMapping[content.type] || 'Brochure';
     const baseTime = {
       'Detail Aid': 5,
       'Clinical Study': 7,
@@ -988,10 +1051,10 @@ export class ContentIntelligence {
       'Video': 4,
       'Website Content': 3,
       'Brochure': 3
-    }[content.type] || 4;
+    }[mappedType] || 4;
     
     // Adjust for compliance score
-    const complianceAdjustment = content.complianceScore > 0.9 ? 0.7 : 1.2;
+    const complianceAdjustment = (content.mlrScore || 0.85) > 0.9 ? 0.7 : 1.2;
     
     return Math.ceil(baseTime * complianceAdjustment);
   }
