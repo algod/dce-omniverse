@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { AgentChat } from './AgentChat';
 import { zsColors } from '@/lib/design-system/zs-colors';
+import { AGENT_CONTEXTS } from '@/lib/ai/system-prompts';
 
 interface AgentViewProps {
   agentId: string;
@@ -85,6 +86,10 @@ export function StandardAgentViewLight(props: AgentViewProps) {
     copilot: zsColors.agents.copilot
   };
   const agentTheme = agentColorMap[props.agentId] || zsColors.agents.customer;
+
+  const getAgentSuggestedQueries = (agentId: string): string[] => {
+    return AGENT_CONTEXTS[agentId as keyof typeof AGENT_CONTEXTS]?.sampleQuestions || [];
+  };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: zsColors.neutral.offWhite }}>
@@ -172,10 +177,18 @@ export function StandardAgentViewLight(props: AgentViewProps) {
             <AgentChat 
               agentId={props.agentId} 
               agentName={props.agentName}
-              agentColor={props.agentColor}
-              onSendMessage={async (message) => {
-                console.log('Message sent:', message);
-                return `Processing: ${message}`;
+              agentColor={agentTheme.primary}
+              contextData={{
+                currentTab: selectedTab,
+                parameters: parameters,
+                agentOverview: props.overview,
+                businessInputs: props.businessInputs,
+                analytics: props.analytics
+              }}
+              suggestedQueries={getAgentSuggestedQueries(props.agentId)}
+              onRerun={(params) => {
+                setParameters(params);
+                console.log('Re-running analysis with params:', params);
               }}
             />
           </div>
