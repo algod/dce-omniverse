@@ -73,7 +73,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
   const [isNavigating, setIsNavigating] = useState(false);
   const [workflowState, setWorkflowState] = useState({
     overviewCompleted: false,
-    inputsCompleted: false,
+    inputsCompleted: true, // Allow proceeding with default inputs
     analyticsCompleted: false,
     outputsApproved: false
   });
