@@ -9,7 +9,9 @@ import {
 import Link from 'next/link';
 import { zsColors } from '@/lib/design-system/zs-colors';
 import { useUserMode } from '@/lib/contexts/UserModeContext';
+import { useAgentData } from '@/lib/contexts/AgentDataContext';
 import { UserModeToggle } from '@/components/ui/UserModeToggle';
+import { DataFlowIndicator } from './DataFlowIndicator';
 
 // Master Orchestrator
 const omniAgent = {
@@ -139,21 +141,41 @@ export function FlowVisualizationClean() {
   const [flowStep, setFlowStep] = useState(0);
   const [showOmniConnections, setShowOmniConnections] = useState(true);
   const { isAgentEnabled } = useUserMode();
+  const { addDataFlowEvent } = useAgentData();
 
-  // Sequential flow animation
+  // Sequential flow animation with data flow events
   useEffect(() => {
     const flowInterval = setInterval(() => {
-      setFlowStep(prev => (prev + 1) % agents.length);
-      setActiveAgent(agents[flowStep]?.id || null);
+      const currentAgent = agents[flowStep];
+      const nextStep = (flowStep + 1) % agents.length;
+      const nextAgent = agents[nextStep];
+      
+      setFlowStep(nextStep);
+      setActiveAgent(nextAgent?.id || null);
+      
+      // Simulate data flow between agents
+      if (currentAgent && nextAgent && flowStep < agents.length - 1) {
+        addDataFlowEvent({
+          from: currentAgent.id,
+          to: nextAgent.id,
+          data: {
+            message: `Data from ${currentAgent.name}`,
+            value: Math.round(Math.random() * 1000)
+          }
+        });
+      }
     }, 3000);
 
     return () => {
       clearInterval(flowInterval);
     };
-  }, [flowStep]);
+  }, [flowStep, addDataFlowEvent]);
 
   return (
     <div className="relative min-h-screen p-8" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+      {/* Data Flow Indicator */}
+      <DataFlowIndicator />
+      
       {/* Elegant gradient background */}
       <div className="absolute inset-0 opacity-[0.02] pointer-events-none">
         <div className="absolute inset-0" style={{

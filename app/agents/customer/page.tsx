@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Users } from 'lucide-react';
 import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
 import { CustomerPlanningInteractive } from '@/components/agents/CustomerPlanningInteractive';
 import { CustomerPlanningWorkflow } from '@/components/agents/CustomerPlanningWorkflow';
 import { customerPriorityWorkflow, executeWorkflowStep } from '@/lib/workflows/customer-priority-workflow';
+import { useAgentDataFlow } from '@/lib/contexts/AgentDataContext';
+import { DownstreamImpactPreview } from '@/components/agent-verse/DownstreamImpactPreview';
+import { motion } from 'framer-motion';
 
 export default function CustomerPlanningAgent() {
   const [workflowMode, setWorkflowMode] = useState(false);
@@ -15,12 +18,39 @@ export default function CustomerPlanningAgent() {
     brand_name: 'BrandX',
     objectives: ['Increase market share', 'Improve HCP engagement', 'Optimize resource allocation']
   });
+  
+  // Data flow integration
+  const { currentData, upstreamData, updateData, dataAvailable, previewDownstreamImpact } = useAgentDataFlow('customer');
+  const [pendingChanges, setPendingChanges] = useState<any>(null);
 
   const handleStartWorkflow = () => {
     setWorkflowMode(true);
     // Start the workflow from the first customer planning module
     const updated = executeWorkflowStep(activeWorkflow, 1);
     setActiveWorkflow(updated);
+    
+    // Prepare changes for preview
+    const changes = {
+      prioritizedHCPs: 423,
+      microsegments: ['Champions', 'Growers', 'Converters', 'Maintainers', 'Defenders'],
+      totalOpportunity: '$45M',
+      barriers: {
+        'Formulary': 38,
+        'Referral Pathways': 27,
+        'Side Effects': 20,
+        'Insurance': 10,
+        'Diagnostic': 5
+      },
+      channelPreferences: {
+        'Field': 62,
+        'Digital': 38
+      }
+    };
+    
+    setPendingChanges(changes);
+    
+    // Update data flow when workflow completes
+    updateData(changes);
   };
 
   if (workflowMode) {
@@ -31,6 +61,18 @@ export default function CustomerPlanningAgent() {
           onWorkflowUpdate={setActiveWorkflow}
           brandContext={brandContext}
         />
+        {pendingChanges && (
+          <DownstreamImpactPreview
+            sourceAgent="Customer Planning"
+            changes={pendingChanges}
+            impacts={previewDownstreamImpact(pendingChanges)}
+            onConfirm={() => {
+              updateData(pendingChanges);
+              setPendingChanges(null);
+            }}
+            onCancel={() => setPendingChanges(null)}
+          />
+        )}
       </div>
     );
   }
