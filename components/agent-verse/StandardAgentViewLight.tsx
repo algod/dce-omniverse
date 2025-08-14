@@ -348,69 +348,185 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     exit={{ opacity: 0, y: -10 }}
                     className="space-y-6"
                   >
-                    {/* Flow Position Visual */}
-                    <div className="rounded-lg p-5" style={{ 
-                      backgroundColor: agentTheme.primary + '10',
-                      border: `1px solid ${agentTheme.primary}30`
-                    }}>
-                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: agentTheme.primary }}>
-                        <Target size={20} />
-                        Position in DCE OmniVerse Flow
-                      </h3>
-                      <p className="mb-4 leading-relaxed" style={{ color: zsColors.neutral.darkGray }}>{props.overview.position}</p>
-                      
-                      {/* Mini Flow Indicator */}
-                      <div className="flex items-center justify-center gap-2 mt-4">
-                        {['Customer', 'Budget', 'Content', 'Orchestration', 'Suggestions', 'Copilot'].map((name, idx) => (
-                          <div key={name} className="flex items-center">
-                            <div
-                              className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                name.toLowerCase() === props.agentId ? 'ring-2 ring-offset-2' : ''
-                              }`}
-                              style={{
-                                backgroundColor: name.toLowerCase() === props.agentId ? agentTheme.primary : zsColors.neutral.lightGray,
-                                color: name.toLowerCase() === props.agentId ? zsColors.neutral.white : zsColors.neutral.gray,
-                                ...(name.toLowerCase() === props.agentId && { ringColor: agentTheme.primary })
-                              }}
-                            >
-                              {idx + 1}
+                    {/* For Customer Planning Agent - Show 5 Module Workflow */}
+                    {props.agentId === 'customer' ? (
+                      <>
+                        <div className="rounded-lg p-5" style={{ 
+                          backgroundColor: zsColors.neutral.white,
+                          border: `1px solid ${zsColors.neutral.lightGray}`
+                        }}>
+                          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: zsColors.neutral.charcoal }}>
+                            <Brain size={20} />
+                            Customer Planning 5-Module Workflow
+                          </h3>
+                          <p className="mb-5 leading-relaxed" style={{ color: zsColors.neutral.darkGray }}>
+                            Classifies and prioritizes high-opportunity customers based on microsegments through a comprehensive 5-module analysis process.
+                          </p>
+                          
+                          {/* 5 Modules */}
+                          <div className="space-y-4">
+                            {/* Module 1: Persona Analysis */}
+                            <div className="rounded-lg p-4" style={{ 
+                              backgroundColor: agentTheme.primary + '10',
+                              border: `1px solid ${agentTheme.primary}30`
+                            }}>
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                                  style={{ backgroundColor: agentTheme.primary }}>
+                                  1
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold mb-2" style={{ color: agentTheme.primary }}>Persona Analysis</h4>
+                                  <p className="text-sm mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                    Barrier inferencing and HCP classification
+                                  </p>
+                                  <ul className="text-xs space-y-1" style={{ color: zsColors.neutral.gray }}>
+                                    <li>• Analyzes 2,847 HCPs for barrier patterns</li>
+                                    <li>• Runs probabilistic barrier detection</li>
+                                    <li>• Maps HCPs to 5 primary barriers</li>
+                                    <li>• Calculates barrier prevalence and severity</li>
+                                  </ul>
+                                </div>
+                              </div>
                             </div>
-                            {idx < 5 && <ChevronRight size={14} style={{ color: zsColors.neutral.gray }} />}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
 
-                    <div className="rounded-lg p-5" style={{ 
-                      backgroundColor: zsColors.neutral.white,
-                      border: `1px solid ${zsColors.neutral.lightGray}`
-                    }}>
-                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: zsColors.neutral.charcoal }}>
-                        <Brain size={20} />
-                        Agent Purpose & Capabilities
-                      </h3>
-                      <p className="mb-5 leading-relaxed" style={{ color: zsColors.neutral.darkGray }}>{props.overview.purpose}</p>
-                      
-                      {/* Key Tools */}
-                      <div className="mb-5">
-                        <h4 className="text-sm font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Available Tools:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {props.overview.tools.map((tool, idx) => (
-                            <span 
-                              key={idx}
-                              className="px-3 py-1.5 text-xs rounded-full font-medium"
-                              style={{
-                                backgroundColor: zsColors.neutral.offWhite,
-                                color: zsColors.neutral.darkGray,
-                                border: `1px solid ${zsColors.neutral.lightGray}`
-                              }}
-                            >
-                              {tool}
-                            </span>
-                          ))}
+                            {/* Module 2: Performance Metrics */}
+                            <div className="rounded-lg p-4" style={{ 
+                              backgroundColor: zsColors.neutral.offWhite,
+                              border: `1px solid ${zsColors.neutral.lightGray}`
+                            }}>
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                                  style={{ backgroundColor: agentTheme.primary }}>
+                                  2
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold mb-2" style={{ color: zsColors.neutral.charcoal }}>Performance Metrics</h4>
+                                  <p className="text-sm mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                    KPI selection and historical analysis
+                                  </p>
+                                  <ul className="text-xs space-y-1" style={{ color: zsColors.neutral.gray }}>
+                                    <li>• Selects KPIs based on brand objectives</li>
+                                    <li>• Processes 24 months of historical data</li>
+                                    <li>• Segments HCPs into performance quintiles</li>
+                                    <li>• Identifies trends and patterns</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Module 3: Potential Prediction */}
+                            <div className="rounded-lg p-4" style={{ 
+                              backgroundColor: zsColors.neutral.offWhite,
+                              border: `1px solid ${zsColors.neutral.lightGray}`
+                            }}>
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                                  style={{ backgroundColor: agentTheme.primary }}>
+                                  3
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold mb-2" style={{ color: zsColors.neutral.charcoal }}>Potential Prediction</h4>
+                                  <p className="text-sm mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                    ML-based opportunity forecasting
+                                  </p>
+                                  <ul className="text-xs space-y-1" style={{ color: zsColors.neutral.gray }}>
+                                    <li>• Configures breadth and depth prediction models</li>
+                                    <li>• Trains ensemble models (Random Forest + XGBoost)</li>
+                                    <li>• Generates opportunity predictions per HCP</li>
+                                    <li>• Validates against holdout dataset</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Module 4: Preference Mapping */}
+                            <div className="rounded-lg p-4" style={{ 
+                              backgroundColor: zsColors.neutral.offWhite,
+                              border: `1px solid ${zsColors.neutral.lightGray}`
+                            }}>
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                                  style={{ backgroundColor: agentTheme.primary }}>
+                                  4
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold mb-2" style={{ color: zsColors.neutral.charcoal }}>Preference Mapping</h4>
+                                  <p className="text-sm mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                    Channel and content affinity analysis
+                                  </p>
+                                  <ul className="text-xs space-y-1" style={{ color: zsColors.neutral.gray }}>
+                                    <li>• Analyzes historical engagement data</li>
+                                    <li>• Runs collaborative filtering algorithms</li>
+                                    <li>• Scores channel preferences (Field, Email, Virtual, Web)</li>
+                                    <li>• Maps content type affinity</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Module 5: Microsegmentation */}
+                            <div className="rounded-lg p-4" style={{ 
+                              backgroundColor: agentTheme.primary + '10',
+                              border: `1px solid ${agentTheme.primary}30`
+                            }}>
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                                  style={{ backgroundColor: agentTheme.primary }}>
+                                  5
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold mb-2" style={{ color: agentTheme.primary }}>Microsegmentation</h4>
+                                  <p className="text-sm mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                    Strategic prioritization using 4P framework
+                                  </p>
+                                  <ul className="text-xs space-y-1" style={{ color: zsColors.neutral.gray }}>
+                                    <li>• Combines all 4P factors (Persona, Performance, Potential, Preference)</li>
+                                    <li>• Creates 5 distinct microsegments</li>
+                                    <li>• Generates 3 prioritization options:</li>
+                                    <li className="ml-3">- Growth Focus: Champions, Growers, Converters (+45% growth)</li>
+                                    <li className="ml-3">- Efficiency Focus: Champions, Maintainers, Defenders (+32% ROI)</li>
+                                    <li className="ml-3">- Balanced: All segments weighted (+28% performance)</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      /* For other agents - Show standard overview */
+                      <div className="rounded-lg p-5" style={{ 
+                        backgroundColor: zsColors.neutral.white,
+                        border: `1px solid ${zsColors.neutral.lightGray}`
+                      }}>
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: zsColors.neutral.charcoal }}>
+                          <Brain size={20} />
+                          Agent Purpose & Capabilities
+                        </h3>
+                        <p className="mb-5 leading-relaxed" style={{ color: zsColors.neutral.darkGray }}>{props.overview.purpose}</p>
+                        
+                        {/* Key Tools */}
+                        <div className="mb-5">
+                          <h4 className="text-sm font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Available Tools:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {props.overview.tools.map((tool, idx) => (
+                              <span 
+                                key={idx}
+                                className="px-3 py-1.5 text-xs rounded-full font-medium"
+                                style={{
+                                  backgroundColor: zsColors.neutral.offWhite,
+                                  color: zsColors.neutral.darkGray,
+                                  border: `1px solid ${zsColors.neutral.lightGray}`
+                                }}
+                              >
+                                {tool}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold mb-4" style={{ color: zsColors.neutral.charcoal }}>Agent Reasoning</h3>
@@ -502,6 +618,39 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     exit={{ opacity: 0, y: -10 }}
                     className="space-y-6"
                   >
+                    {/* Customer Planning Specific Inputs */}
+                    {props.agentId === 'customer' && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
+                          Brand Objectives & Priorities
+                        </h3>
+                        <div className="rounded-lg p-4 space-y-3"
+                          style={{ 
+                            backgroundColor: zsColors.neutral.offWhite,
+                            border: `1px solid ${zsColors.neutral.lightGray}`
+                          }}>
+                          <div className="flex items-center gap-2">
+                            <input type="checkbox" id="obj1" defaultChecked />
+                            <label htmlFor="obj1" className="text-sm" style={{ color: zsColors.neutral.darkGray }}>
+                              Increase market share in high-value HCP segments
+                            </label>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input type="checkbox" id="obj2" defaultChecked />
+                            <label htmlFor="obj2" className="text-sm" style={{ color: zsColors.neutral.darkGray }}>
+                              Improve HCP engagement through barrier resolution
+                            </label>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input type="checkbox" id="obj3" defaultChecked />
+                            <label htmlFor="obj3" className="text-sm" style={{ color: zsColors.neutral.darkGray }}>
+                              Optimize resource allocation across channels
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {props.businessInputs?.upstream && (
                       <div>
                         <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
@@ -523,7 +672,9 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     )}
 
                     <div>
-                      <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Adjustable Parameters</h3>
+                      <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
+                        {props.agentId === 'customer' ? 'Barrier Importance Weights' : 'Adjustable Parameters'}
+                      </h3>
                       
                       {/* Validation Errors */}
                       {validationErrors.length > 0 && (
@@ -641,12 +792,155 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     exit={{ opacity: 0, y: -10 }}
                     className="space-y-6"
                   >
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>AI Models</h3>
-                      <div className="space-y-3">
-                        {props.analytics?.models?.map((model, idx) => (
-                          <div key={idx} className="rounded-lg p-4"
-                            style={{ 
+                    {/* Customer Planning Workflow Execution */}
+                    {props.agentId === 'customer' ? (
+                      <>
+                        <div>
+                          <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
+                            Customer Planning Workflow Progress
+                          </h3>
+                          
+                          {/* Module Progress Bar */}
+                          <div className="mb-6">
+                            <div className="flex items-center justify-between mb-2">
+                              {['Persona', 'Performance', 'Potential', 'Preference', 'Microsegmentation'].map((module, idx) => (
+                                <div key={module} className="flex items-center">
+                                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
+                                    idx <= 2 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
+                                  }`}>
+                                    {idx + 1}
+                                  </div>
+                                  {idx < 4 && (
+                                    <div className={`w-full h-1 mx-2 ${idx < 2 ? 'bg-green-500' : 'bg-gray-200'}`} 
+                                      style={{ width: '40px' }} />
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                            <div className="text-center">
+                              <p className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>
+                                Module 3 of 5: Potential Prediction
+                              </p>
+                              <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
+                                Running ML models to forecast opportunities...
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Current Module Execution */}
+                        <div className="rounded-lg p-4" style={{ 
+                          backgroundColor: agentTheme.primary + '10',
+                          border: `1px solid ${agentTheme.primary}30`
+                        }}>
+                          <h4 className="font-semibold mb-3" style={{ color: agentTheme.primary }}>
+                            Module 3: Potential Prediction - Active
+                          </h4>
+                          
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="text-sm" style={{ color: zsColors.neutral.darkGray }}>
+                                Feature engineering from historical data
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-3">
+                              <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="text-sm" style={{ color: zsColors.neutral.darkGray }}>
+                                Training ensemble models (Random Forest + XGBoost)
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-3">
+                              <div className="animate-spin w-5 h-5 border-2 border-transparent border-t-current" 
+                                style={{ color: agentTheme.primary }} />
+                              <span className="text-sm font-medium" style={{ color: agentTheme.primary }}>
+                                Calculating opportunity scores per HCP...
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-3">
+                              <div className="w-5 h-5 rounded-full bg-gray-300" />
+                              <span className="text-sm text-gray-500">
+                                Validating predictions against holdout set
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Previous Module Results */}
+                        <div>
+                          <h4 className="font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
+                            Completed Modules
+                          </h4>
+                          
+                          <div className="space-y-3">
+                            {/* Module 1 Results */}
+                            <div className="rounded-lg p-3" style={{ 
+                              backgroundColor: zsColors.neutral.offWhite,
+                              border: `1px solid ${zsColors.neutral.lightGray}`
+                            }}>
+                              <div className="flex items-center justify-between mb-2">
+                                <h5 className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>
+                                  Module 1: Persona Analysis ✓
+                                </h5>
+                                <span className="text-xs" style={{ color: zsColors.semantic.success }}>Completed</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                  <span style={{ color: zsColors.neutral.gray }}>HCPs Analyzed:</span>
+                                  <span className="ml-1 font-medium" style={{ color: zsColors.neutral.charcoal }}>2,847</span>
+                                </div>
+                                <div>
+                                  <span style={{ color: zsColors.neutral.gray }}>Barriers Identified:</span>
+                                  <span className="ml-1 font-medium" style={{ color: zsColors.neutral.charcoal }}>5</span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Module 2 Results */}
+                            <div className="rounded-lg p-3" style={{ 
+                              backgroundColor: zsColors.neutral.offWhite,
+                              border: `1px solid ${zsColors.neutral.lightGray}`
+                            }}>
+                              <div className="flex items-center justify-between mb-2">
+                                <h5 className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>
+                                  Module 2: Performance Metrics ✓
+                                </h5>
+                                <span className="text-xs" style={{ color: zsColors.semantic.success }}>Completed</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                  <span style={{ color: zsColors.neutral.gray }}>KPIs Selected:</span>
+                                  <span className="ml-1 font-medium" style={{ color: zsColors.neutral.charcoal }}>12</span>
+                                </div>
+                                <div>
+                                  <span style={{ color: zsColors.neutral.gray }}>Data Processed:</span>
+                                  <span className="ml-1 font-medium" style={{ color: zsColors.neutral.charcoal }}>24 months</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      /* Standard Analytics for other agents */
+                      <>
+                        <div>
+                          <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>AI Models</h3>
+                          <div className="space-y-3">
+                            {props.analytics?.models?.map((model, idx) => (
+                              <div key={idx} className="rounded-lg p-4"
+                                style={{ 
                               backgroundColor: zsColors.neutral.offWhite,
                               border: `1px solid ${zsColors.neutral.lightGray}`
                             }}>
@@ -709,6 +1003,9 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                       </div>
                     )}
                     
+                      </>
+                    )}
+                    
                     {/* Analytics Action Button */}
                     {selectedTab === 'analytics' && !workflowState.analyticsCompleted && !isProcessing && (
                       <div className="mt-6 p-4 rounded-lg text-center" style={{ backgroundColor: agentTheme.primary + '10', border: `2px solid ${agentTheme.primary}30` }}>
@@ -760,6 +1057,97 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     exit={{ opacity: 0, y: -10 }}
                     className="space-y-6"
                   >
+                    {/* Customer Planning 5-Module Results */}
+                    {props.agentId === 'customer' && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
+                          5-Module Workflow Results
+                        </h3>
+                        
+                        {/* Microsegmentation Strategies */}
+                        <div className="mb-6 rounded-lg p-4" style={{ 
+                          backgroundColor: agentTheme.primary + '10',
+                          border: `1px solid ${agentTheme.primary}30`
+                        }}>
+                          <h4 className="font-semibold mb-3" style={{ color: agentTheme.primary }}>
+                            Microsegmentation Strategies
+                          </h4>
+                          <div className="space-y-3">
+                            <div className="p-3 rounded" style={{ backgroundColor: zsColors.neutral.white }}>
+                              <div className="flex items-center justify-between mb-2">
+                                <h5 className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>
+                                  Growth Focus Strategy
+                                </h5>
+                                <span className="text-xs px-2 py-1 rounded" style={{ 
+                                  backgroundColor: zsColors.semantic.success + '20',
+                                  color: zsColors.semantic.success
+                                }}>
+                                  +45% expected growth
+                                </span>
+                              </div>
+                              <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
+                                Champions, Growers, Converters - Focus on high-growth potential segments
+                              </p>
+                            </div>
+                            
+                            <div className="p-3 rounded" style={{ backgroundColor: zsColors.neutral.white }}>
+                              <div className="flex items-center justify-between mb-2">
+                                <h5 className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>
+                                  Efficiency Focus Strategy
+                                </h5>
+                                <span className="text-xs px-2 py-1 rounded" style={{ 
+                                  backgroundColor: zsColors.secondary.teal + '20',
+                                  color: zsColors.secondary.teal
+                                }}>
+                                  +32% ROI improvement
+                                </span>
+                              </div>
+                              <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
+                                Champions, Maintainers, Defenders - Maximize ROI with stable segments
+                              </p>
+                            </div>
+                            
+                            <div className="p-3 rounded" style={{ backgroundColor: zsColors.neutral.white }}>
+                              <div className="flex items-center justify-between mb-2">
+                                <h5 className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>
+                                  Balanced Approach
+                                </h5>
+                                <span className="text-xs px-2 py-1 rounded" style={{ 
+                                  backgroundColor: agentTheme.primary + '20',
+                                  color: agentTheme.primary
+                                }}>
+                                  +28% overall performance
+                                </span>
+                              </div>
+                              <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
+                                All segments with weighted priority - Balanced growth and stability
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Key Outputs */}
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                          <div className="rounded-lg p-4" style={{ 
+                            backgroundColor: zsColors.neutral.offWhite,
+                            border: `1px solid ${zsColors.neutral.lightGray}`
+                          }}>
+                            <p className="text-xs mb-1" style={{ color: zsColors.neutral.gray }}>Prioritized HCPs</p>
+                            <p className="text-2xl font-bold" style={{ color: agentTheme.primary }}>423</p>
+                            <p className="text-xs" style={{ color: zsColors.neutral.darkGray }}>High-opportunity</p>
+                          </div>
+                          <div className="rounded-lg p-4" style={{ 
+                            backgroundColor: zsColors.neutral.offWhite,
+                            border: `1px solid ${zsColors.neutral.lightGray}`
+                          }}>
+                            <p className="text-xs mb-1" style={{ color: zsColors.neutral.gray }}>Total Opportunity</p>
+                            <p className="text-2xl font-bold" style={{ color: zsColors.semantic.success }}>$45M</p>
+                            <p className="text-xs" style={{ color: zsColors.neutral.darkGray }}>Potential revenue</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
                         Data Package to {props.outputs?.downstream?.destination || 'Next Agent'}
