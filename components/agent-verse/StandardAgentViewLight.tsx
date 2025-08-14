@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileText, Database, Brain, ArrowRight, ChevronLeft,
-  MessageSquare, Settings, Activity, Zap, Info, Home, Target, ChevronRight
+  MessageSquare, Settings, Activity, Zap, Info, Home, Target, ChevronRight,
+  ChevronDown, Heart, Layers, Users, TrendingUp
 } from 'lucide-react';
 import Link from 'next/link';
 import { AgentChat } from './AgentChat';
@@ -79,6 +80,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [expandedModule, setExpandedModule] = useState<number | null>(null);
 
   const tabs = [
     { 
@@ -796,138 +798,441 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     {props.agentId === 'customer' ? (
                       <>
                         <div>
-                          <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
-                            Customer Planning Workflow Progress
+                          <h3 className="text-lg font-semibold mb-4" style={{ color: zsColors.neutral.charcoal }}>
+                            Customer Planning 5-Module Workflow: Analytics & AI
                           </h3>
                           
-                          {/* Module Progress Bar */}
-                          <div className="mb-6">
-                            <div className="flex items-center justify-between mb-2">
-                              {['Persona', 'Performance', 'Potential', 'Preference', 'Microsegmentation'].map((module, idx) => (
-                                <div key={module} className="flex items-center">
-                                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
-                                    idx <= 2 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
-                                  }`}>
-                                    {idx + 1}
+                          {/* All 5 Modules with Dropdown */}
+                          <div className="space-y-4">
+                            {/* Module 1: Persona Analysis */}
+                            <div className="rounded-lg overflow-hidden" style={{ 
+                              backgroundColor: zsColors.neutral.white,
+                              border: `1px solid ${zsColors.neutral.lightGray}`
+                            }}>
+                              <button
+                                onClick={() => setExpandedModule(expandedModule === 1 ? null : 1)}
+                                className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+                                    style={{ 
+                                      backgroundColor: agentTheme.primary + '20',
+                                      color: agentTheme.primary
+                                    }}>
+                                    <Users size={20} />
                                   </div>
-                                  {idx < 4 && (
-                                    <div className={`w-full h-1 mx-2 ${idx < 2 ? 'bg-green-500' : 'bg-gray-200'}`} 
-                                      style={{ width: '40px' }} />
-                                  )}
+                                  <div className="text-left">
+                                    <h4 className="font-semibold" style={{ color: zsColors.neutral.charcoal }}>
+                                      Module 1: Persona Analysis
+                                    </h4>
+                                    <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
+                                      Barrier inferencing and HCP classification
+                                    </p>
+                                  </div>
                                 </div>
-                              ))}
+                                <ChevronDown 
+                                  size={20} 
+                                  className={`transition-transform ${expandedModule === 1 ? 'rotate-180' : ''}`}
+                                  style={{ color: zsColors.neutral.gray }}
+                                />
+                              </button>
+                              
+                              {expandedModule === 1 && (
+                                <div className="px-4 pb-4 border-t" style={{ borderColor: zsColors.neutral.lightGray }}>
+                                  <div className="mt-3 space-y-3">
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        AI Models & Analytics
+                                      </h5>
+                                      <ul className="space-y-2 text-xs" style={{ color: zsColors.neutral.gray }}>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Barrier Detection ML Model (Random Forest, 89% accuracy)</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Pattern Recognition Engine for behavioral analysis</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>HCP Behavioral Analytics processing 24 months of data</span>
+                                        </li>
+                                      </ul>
+                                    </div>
+                                    
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        Outputs
+                                      </h5>
+                                      <div className="grid grid-cols-2 gap-3">
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>HCPs Analyzed</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>2,847</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Barriers Identified</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>5</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Barrier Prevalence</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>73%</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Confidence</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>92%</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                            <div className="text-center">
-                              <p className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>
-                                Module 3 of 5: Potential Prediction
-                              </p>
-                              <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
-                                Running ML models to forecast opportunities...
-                              </p>
-                            </div>
-                          </div>
-                        </div>
 
-                        {/* Current Module Execution */}
-                        <div className="rounded-lg p-4" style={{ 
-                          backgroundColor: agentTheme.primary + '10',
-                          border: `1px solid ${agentTheme.primary}30`
-                        }}>
-                          <h4 className="font-semibold mb-3" style={{ color: agentTheme.primary }}>
-                            Module 3: Potential Prediction - Active
-                          </h4>
-                          
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                              <span className="text-sm" style={{ color: zsColors.neutral.darkGray }}>
-                                Feature engineering from historical data
-                              </span>
-                            </div>
-                            
-                            <div className="flex items-center gap-3">
-                              <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                              <span className="text-sm" style={{ color: zsColors.neutral.darkGray }}>
-                                Training ensemble models (Random Forest + XGBoost)
-                              </span>
-                            </div>
-                            
-                            <div className="flex items-center gap-3">
-                              <div className="animate-spin w-5 h-5 border-2 border-transparent border-t-current" 
-                                style={{ color: agentTheme.primary }} />
-                              <span className="text-sm font-medium" style={{ color: agentTheme.primary }}>
-                                Calculating opportunity scores per HCP...
-                              </span>
-                            </div>
-                            
-                            <div className="flex items-center gap-3">
-                              <div className="w-5 h-5 rounded-full bg-gray-300" />
-                              <span className="text-sm text-gray-500">
-                                Validating predictions against holdout set
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Previous Module Results */}
-                        <div>
-                          <h4 className="font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
-                            Completed Modules
-                          </h4>
-                          
-                          <div className="space-y-3">
-                            {/* Module 1 Results */}
-                            <div className="rounded-lg p-3" style={{ 
-                              backgroundColor: zsColors.neutral.offWhite,
+                            {/* Module 2: Performance Metrics */}
+                            <div className="rounded-lg overflow-hidden" style={{ 
+                              backgroundColor: zsColors.neutral.white,
                               border: `1px solid ${zsColors.neutral.lightGray}`
                             }}>
-                              <div className="flex items-center justify-between mb-2">
-                                <h5 className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>
-                                  Module 1: Persona Analysis ✓
-                                </h5>
-                                <span className="text-xs" style={{ color: zsColors.semantic.success }}>Completed</span>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2 text-xs">
-                                <div>
-                                  <span style={{ color: zsColors.neutral.gray }}>HCPs Analyzed:</span>
-                                  <span className="ml-1 font-medium" style={{ color: zsColors.neutral.charcoal }}>2,847</span>
+                              <button
+                                onClick={() => setExpandedModule(expandedModule === 2 ? null : 2)}
+                                className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+                                    style={{ 
+                                      backgroundColor: agentTheme.primary + '20',
+                                      color: agentTheme.primary
+                                    }}>
+                                    <TrendingUp size={20} />
+                                  </div>
+                                  <div className="text-left">
+                                    <h4 className="font-semibold" style={{ color: zsColors.neutral.charcoal }}>
+                                      Module 2: Performance Metrics
+                                    </h4>
+                                    <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
+                                      KPI selection and historical analysis
+                                    </p>
+                                  </div>
                                 </div>
-                                <div>
-                                  <span style={{ color: zsColors.neutral.gray }}>Barriers Identified:</span>
-                                  <span className="ml-1 font-medium" style={{ color: zsColors.neutral.charcoal }}>5</span>
+                                <ChevronDown 
+                                  size={20} 
+                                  className={`transition-transform ${expandedModule === 2 ? 'rotate-180' : ''}`}
+                                  style={{ color: zsColors.neutral.gray }}
+                                />
+                              </button>
+                              
+                              {expandedModule === 2 && (
+                                <div className="px-4 pb-4 border-t" style={{ borderColor: zsColors.neutral.lightGray }}>
+                                  <div className="mt-3 space-y-3">
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        AI Models & Analytics
+                                      </h5>
+                                      <ul className="space-y-2 text-xs" style={{ color: zsColors.neutral.gray }}>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>KPI Calculator with brand objective alignment</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Trend Analysis Engine (Time Series Analysis)</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Competitive Intelligence benchmarking</span>
+                                        </li>
+                                      </ul>
+                                    </div>
+                                    
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        Outputs
+                                      </h5>
+                                      <div className="grid grid-cols-2 gap-3">
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>KPIs Selected</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>12</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Data Processed</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>24mo</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Quintiles</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>5</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Trends Found</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>8</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
+                              )}
                             </div>
-                            
-                            {/* Module 2 Results */}
-                            <div className="rounded-lg p-3" style={{ 
-                              backgroundColor: zsColors.neutral.offWhite,
+
+                            {/* Module 3: Potential Prediction */}
+                            <div className="rounded-lg overflow-hidden" style={{ 
+                              backgroundColor: zsColors.neutral.white,
                               border: `1px solid ${zsColors.neutral.lightGray}`
                             }}>
-                              <div className="flex items-center justify-between mb-2">
-                                <h5 className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>
-                                  Module 2: Performance Metrics ✓
-                                </h5>
-                                <span className="text-xs" style={{ color: zsColors.semantic.success }}>Completed</span>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2 text-xs">
-                                <div>
-                                  <span style={{ color: zsColors.neutral.gray }}>KPIs Selected:</span>
-                                  <span className="ml-1 font-medium" style={{ color: zsColors.neutral.charcoal }}>12</span>
+                              <button
+                                onClick={() => setExpandedModule(expandedModule === 3 ? null : 3)}
+                                className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+                                    style={{ 
+                                      backgroundColor: agentTheme.primary + '20',
+                                      color: agentTheme.primary
+                                    }}>
+                                    <Target size={20} />
+                                  </div>
+                                  <div className="text-left">
+                                    <h4 className="font-semibold" style={{ color: zsColors.neutral.charcoal }}>
+                                      Module 3: Potential Prediction
+                                    </h4>
+                                    <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
+                                      ML-based opportunity forecasting
+                                    </p>
+                                  </div>
                                 </div>
-                                <div>
-                                  <span style={{ color: zsColors.neutral.gray }}>Data Processed:</span>
-                                  <span className="ml-1 font-medium" style={{ color: zsColors.neutral.charcoal }}>24 months</span>
+                                <ChevronDown 
+                                  size={20} 
+                                  className={`transition-transform ${expandedModule === 3 ? 'rotate-180' : ''}`}
+                                  style={{ color: zsColors.neutral.gray }}
+                                />
+                              </button>
+                              
+                              {expandedModule === 3 && (
+                                <div className="px-4 pb-4 border-t" style={{ borderColor: zsColors.neutral.lightGray }}>
+                                  <div className="mt-3 space-y-3">
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        AI Models & Analytics
+                                      </h5>
+                                      <ul className="space-y-2 text-xs" style={{ color: zsColors.neutral.gray }}>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Predictive Analytics Suite (Ensemble Models)</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Random Forest + XGBoost for depth/breadth prediction</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Opportunity Calculator with validation (87% accuracy)</span>
+                                        </li>
+                                      </ul>
+                                    </div>
+                                    
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        Outputs
+                                      </h5>
+                                      <div className="grid grid-cols-2 gap-3">
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Depth Opp.</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>$28M</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Breadth Opp.</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>$17M</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>High Priority</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>423</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Model Acc.</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>87%</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
+                              )}
+                            </div>
+
+                            {/* Module 4: Preference Mapping */}
+                            <div className="rounded-lg overflow-hidden" style={{ 
+                              backgroundColor: zsColors.neutral.white,
+                              border: `1px solid ${zsColors.neutral.lightGray}`
+                            }}>
+                              <button
+                                onClick={() => setExpandedModule(expandedModule === 4 ? null : 4)}
+                                className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+                                    style={{ 
+                                      backgroundColor: agentTheme.primary + '20',
+                                      color: agentTheme.primary
+                                    }}>
+                                    <Heart size={20} />
+                                  </div>
+                                  <div className="text-left">
+                                    <h4 className="font-semibold" style={{ color: zsColors.neutral.charcoal }}>
+                                      Module 4: Preference Mapping
+                                    </h4>
+                                    <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
+                                      Channel and content affinity analysis
+                                    </p>
+                                  </div>
+                                </div>
+                                <ChevronDown 
+                                  size={20} 
+                                  className={`transition-transform ${expandedModule === 4 ? 'rotate-180' : ''}`}
+                                  style={{ color: zsColors.neutral.gray }}
+                                />
+                              </button>
+                              
+                              {expandedModule === 4 && (
+                                <div className="px-4 pb-4 border-t" style={{ borderColor: zsColors.neutral.lightGray }}>
+                                  <div className="mt-3 space-y-3">
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        AI Models & Analytics
+                                      </h5>
+                                      <ul className="space-y-2 text-xs" style={{ color: zsColors.neutral.gray }}>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Collaborative Filtering Engine</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Engagement Analytics with historical patterns</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Channel Optimizer with response modeling</span>
+                                        </li>
+                                      </ul>
+                                    </div>
+                                    
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        Outputs
+                                      </h5>
+                                      <div className="grid grid-cols-2 gap-3">
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Field Pref.</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>62%</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Digital Pref.</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>38%</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Opt. Frequency</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>2.3/mo</p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Content Types</p>
+                                          <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>7</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Module 5: Microsegmentation */}
+                            <div className="rounded-lg overflow-hidden" style={{ 
+                              backgroundColor: zsColors.neutral.white,
+                              border: `1px solid ${zsColors.neutral.lightGray}`
+                            }}>
+                              <button
+                                onClick={() => setExpandedModule(expandedModule === 5 ? null : 5)}
+                                className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+                                    style={{ 
+                                      backgroundColor: agentTheme.primary + '20',
+                                      color: agentTheme.primary
+                                    }}>
+                                    <Layers size={20} />
+                                  </div>
+                                  <div className="text-left">
+                                    <h4 className="font-semibold" style={{ color: zsColors.neutral.charcoal }}>
+                                      Module 5: Microsegmentation
+                                    </h4>
+                                    <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
+                                      Strategic prioritization using 4P framework
+                                    </p>
+                                  </div>
+                                </div>
+                                <ChevronDown 
+                                  size={20} 
+                                  className={`transition-transform ${expandedModule === 5 ? 'rotate-180' : ''}`}
+                                  style={{ color: zsColors.neutral.gray }}
+                                />
+                              </button>
+                              
+                              {expandedModule === 5 && (
+                                <div className="px-4 pb-4 border-t" style={{ borderColor: zsColors.neutral.lightGray }}>
+                                  <div className="mt-3 space-y-3">
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        AI Models & Analytics
+                                      </h5>
+                                      <ul className="space-y-2 text-xs" style={{ color: zsColors.neutral.gray }}>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Segmentation Engine with 4P integration</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>Priority Matrix Builder (K-means Clustering)</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                          <span className="text-green-500">✓</span>
+                                          <span>ROI Calculator for strategy comparison</span>
+                                        </li>
+                                      </ul>
+                                    </div>
+                                    
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        Outputs - Strategic Options
+                                      </h5>
+                                      <div className="space-y-2">
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <div className="flex justify-between items-center">
+                                            <span className="text-xs font-medium" style={{ color: zsColors.neutral.darkGray }}>Growth Focus</span>
+                                            <span className="text-xs" style={{ color: zsColors.semantic.success }}>+45% growth</span>
+                                          </div>
+                                          <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>
+                                            Champions, Growers, Converters
+                                          </p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <div className="flex justify-between items-center">
+                                            <span className="text-xs font-medium" style={{ color: zsColors.neutral.darkGray }}>Efficiency Focus</span>
+                                            <span className="text-xs" style={{ color: zsColors.secondary.teal }}>+32% ROI</span>
+                                          </div>
+                                          <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>
+                                            Champions, Maintainers, Defenders
+                                          </p>
+                                        </div>
+                                        <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                          <div className="flex justify-between items-center">
+                                            <span className="text-xs font-medium" style={{ color: zsColors.neutral.darkGray }}>Balanced</span>
+                                            <span className="text-xs" style={{ color: agentTheme.primary }}>+28% overall</span>
+                                          </div>
+                                          <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>
+                                            All segments weighted
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
