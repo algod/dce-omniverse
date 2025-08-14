@@ -95,7 +95,14 @@ export default function OmniAgent() {
       return { agentId: 'customer', isWorkflow: true };
     }
     
-    if (lowerQuery.includes('who should') && lowerQuery.includes('customer')) {
+    // More variations for customer prioritization
+    if (lowerQuery.includes('who should be my priority customers') ||
+        lowerQuery.includes('prioritize customer') ||
+        lowerQuery.includes('prioritize my customer') ||
+        lowerQuery.includes('identify priority customer') ||
+        lowerQuery.includes('high opportunity customer') ||
+        lowerQuery.includes('high-opportunity customer') ||
+        (lowerQuery.includes('who should') && lowerQuery.includes('customer'))) {
       return { agentId: 'customer', isWorkflow: true };
     }
     

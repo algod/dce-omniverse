@@ -24,6 +24,7 @@ interface ModuleChatInterfaceProps {
   onApprove: () => void;
   onAdjust: (data: any) => void;
   initialMessage?: string;
+  moduleResults?: any;
 }
 
 export function ModuleChatInterface({
@@ -32,7 +33,8 @@ export function ModuleChatInterface({
   moduleColor,
   onApprove,
   onAdjust,
-  initialMessage
+  initialMessage,
+  moduleResults
 }: ModuleChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -45,6 +47,103 @@ export function ModuleChatInterface({
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+
+  const generateContextualResponse = (query: string) => {
+    const lowerQuery = query.toLowerCase();
+    
+    // Persona Analysis responses
+    if (moduleId === 'persona') {
+      if (lowerQuery.includes('barrier') && (lowerQuery.includes('top') || lowerQuery.includes('main'))) {
+        const barriers = moduleResults?.barriers_identified || {};
+        const topBarriers = Object.entries(barriers)
+          .sort((a: any, b: any) => b[1].percentage - a[1].percentage)
+          .slice(0, 3);
+        
+        return {
+          content: `Based on my analysis of 2,847 HCPs in your territory, the top 3 barriers are:\n\n1. **${topBarriers[0]?.[0]}** - Affecting ${topBarriers[0]?.[1]?.percentage || 0}% of HCPs\n2. **${topBarriers[1]?.[0]}** - Affecting ${topBarriers[1]?.[1]?.percentage || 0}% of HCPs\n3. **${topBarriers[2]?.[0]}** - Affecting ${topBarriers[2]?.[1]?.percentage || 0}% of HCPs\n\nThese barriers represent the primary obstacles preventing HCP adoption. Would you like me to adjust the barrier weights or dive deeper into any specific barrier?`,
+          actions: [
+            { type: 'adjust', label: 'Adjust Barrier Weights', data: { adjustment: 'barrier_weights' } },
+            { type: 'explain', label: 'Explain Impact', data: { context: 'barrier_impact' } }
+          ]
+        };
+      }
+      if (lowerQuery.includes('adjust') || lowerQuery.includes('weight')) {
+        return {
+          content: `I can adjust the relative importance of each barrier based on your field insights. Current weights are:\n\n• Referral Pathways: 25%\n• Side Effects: 20%\n• Insurance: 20%\n• Formulary: 20%\n• Diagnostic: 15%\n\nWhich barrier weight would you like to modify? Increasing weight for barriers with higher field-observed impact will improve targeting accuracy.`,
+          actions: [
+            { type: 'adjust', label: 'Increase Formulary Weight', data: { barrier: 'formulary', change: '+5%' } },
+            { type: 'adjust', label: 'Decrease Diagnostic Weight', data: { barrier: 'diagnostic', change: '-5%' } }
+          ]
+        };
+      }
+    }
+    
+    // Performance Metrics responses
+    if (moduleId === 'performance') {
+      if (lowerQuery.includes('kpi') || lowerQuery.includes('metric')) {
+        return {
+          content: `I've selected the following KPIs based on your brand objectives:\n\n• **Market Share** - Currently at 68%\n• **Growth Rate** - 12% over last 6 months\n• **Prescription Volume** - D4 decile performance\n• **Patient Retention** - Tracking longitudinal adherence\n\nThese metrics align with your goal to increase market share and improve HCP engagement. Should I adjust the KPI selection or add custom metrics?`,
+          actions: [
+            { type: 'adjust', label: 'Add Custom KPI', data: { action: 'add_kpi' } },
+            { type: 'explain', label: 'Why These KPIs', data: { context: 'kpi_selection' } }
+          ]
+        };
+      }
+    }
+    
+    // Potential Prediction responses
+    if (moduleId === 'potential') {
+      if (lowerQuery.includes('opportunity') || lowerQuery.includes('revenue')) {
+        const depth = moduleResults?.depth_opportunity || '$285K';
+        const breadth = moduleResults?.breadth_opportunity || '$142K';
+        const total = moduleResults?.total_opportunity || '$427K';
+        
+        return {
+          content: `The ML model has identified significant opportunities:\n\n**Depth Opportunity**: ${depth}\n• Increase prescription frequency among current prescribers\n• Focus on Champions and Growers segments\n\n**Breadth Opportunity**: ${breadth}\n• Expand prescriber base to new HCPs\n• Target Converters with barrier-specific messaging\n\n**Total Opportunity**: ${total}\n• Model confidence: 94%\n• High-opportunity HCPs: 423\n\nWould you like to adjust the model parameters or see the breakdown by microsegment?`,
+          actions: [
+            { type: 'adjust', label: 'Adjust Model Sensitivity', data: { parameter: 'sensitivity' } },
+            { type: 'explain', label: 'View by Segment', data: { view: 'segment_breakdown' } }
+          ]
+        };
+      }
+    }
+    
+    // Preference Mapping responses
+    if (moduleId === 'preference') {
+      if (lowerQuery.includes('channel') || lowerQuery.includes('frequency')) {
+        return {
+          content: `Based on engagement analysis, here's the optimal channel mix:\n\n**Channel Preferences**:\n• Field: 85% affinity - High-value face-to-face interactions\n• Email: 65% affinity - Clinical updates and case studies\n• Virtual: 55% affinity - Webinars and online programs\n• Web: 40% affinity - Self-service resources\n\n**Optimal Frequency**: 2.3 touches/month\n• Champions: 3.5 touches/month\n• Growers: 2.8 touches/month\n• Converters: 2.1 touches/month\n\nShould I adjust these preferences based on your field feedback?`,
+          actions: [
+            { type: 'adjust', label: 'Modify Channel Mix', data: { action: 'channel_mix' } },
+            { type: 'explain', label: 'Frequency Rationale', data: { context: 'frequency_logic' } }
+          ]
+        };
+      }
+    }
+    
+    // Microsegmentation responses
+    if (moduleId === 'microsegmentation') {
+      if (lowerQuery.includes('segment') || lowerQuery.includes('priorit')) {
+        return {
+          content: `I've created 5 distinct microsegments with 3 strategic options:\n\n**Option 1: Growth Focus** (+45% expected impact)\n• Prioritize Champions, Growers, Converters\n• 423 high-opportunity HCPs\n• Aggressive growth strategy\n\n**Option 2: Efficiency Focus** (+32% ROI)\n• Focus on Champions, Maintainers, Defenders\n• 500 HCPs with lower cost-to-serve\n• Maximize ROI with existing resources\n\n**Option 3: Balanced Approach** (+28% overall)\n• Distribute across all segments\n• 650 HCPs with mixed strategies\n• Risk-mitigated approach\n\n**Recommendation**: Based on your objectives, I recommend the Growth Focus strategy.`,
+          actions: [
+            { type: 'adjust', label: 'Select Growth Focus', data: { strategy: 'growth' } },
+            { type: 'adjust', label: 'Select Efficiency Focus', data: { strategy: 'efficiency' } },
+            { type: 'adjust', label: 'Select Balanced', data: { strategy: 'balanced' } }
+          ]
+        };
+      }
+    }
+    
+    // Default contextual response
+    return {
+      content: `I understand your question about ${query.toLowerCase()}. Based on the ${moduleName} analysis, I can help you explore the data, adjust parameters, or explain the methodology.\n\nWhat specific aspect would you like to focus on?`,
+      actions: [
+        { type: 'adjust', label: 'Modify Parameters', data: { query: input } },
+        { type: 'explain', label: 'Explain Analysis', data: { context: moduleId } }
+      ]
+    };
+  };
 
   const handleSend = () => {
     if (!input.trim() || isProcessing) return;
@@ -60,17 +159,15 @@ export function ModuleChatInterface({
     setInput('');
     setIsProcessing(true);
 
-    // Simulate AI response
+    // Generate contextual AI response
     setTimeout(() => {
+      const response = generateContextualResponse(input);
       const responseMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `I understand your question about ${input.toLowerCase()}. Let me adjust the analysis accordingly.`,
+        content: response.content,
         timestamp: new Date(),
-        actions: [
-          { type: 'adjust', label: 'Apply Changes', data: { query: input } },
-          { type: 'explain', label: 'Why this matters', data: { context: input } }
-        ]
+        actions: response.actions
       };
       setMessages(prev => [...prev, responseMessage]);
       setIsProcessing(false);
@@ -161,7 +258,7 @@ export function ModuleChatInterface({
                     color: message.role === 'user' ? 'white' : zsColors.neutral.charcoal,
                     border: message.role === 'assistant' ? `1px solid ${zsColors.neutral.lightGray}` : 'none'
                   }}>
-                  <p className="text-sm">{message.content}</p>
+                  <div className="text-sm whitespace-pre-wrap">{message.content}</div>
                   
                   {message.actions && (
                     <div className="flex gap-2 mt-3">

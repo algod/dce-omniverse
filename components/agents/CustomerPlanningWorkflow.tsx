@@ -407,9 +407,9 @@ export function CustomerPlanningWorkflow({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Module Progress and Reasoning */}
-        <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: Module Progress and Reasoning - 5 columns for more width */}
+        <div className="lg:col-span-5 space-y-6">
           {/* Module Progress */}
           <div className="rounded-xl p-6" style={{ backgroundColor: zsColors.neutral.white }}>
             <h3 className="text-lg font-bold mb-4" style={{ color: zsColors.neutral.charcoal }}>
@@ -516,8 +516,8 @@ export function CustomerPlanningWorkflow({
           )}
         </div>
 
-        {/* Right: Module Visualization and Chat */}
-        <div className="space-y-6">
+        {/* Right: Module Visualization and Chat - 7 columns for more chat space */}
+        <div className="lg:col-span-7 space-y-6">
           {/* Module Visualization */}
           {activeModule && (
             <motion.div
@@ -548,6 +548,7 @@ export function CustomerPlanningWorkflow({
                 moduleId={currentModuleConfig.id}
                 moduleName={currentModuleConfig.name}
                 moduleColor={currentModuleConfig.color}
+                moduleResults={moduleResults[currentModuleConfig.id]}
                 onApprove={handleApproveModule}
                 onAdjust={(adjustments) => handleApproveModule(adjustments)}
                 initialMessage={`The ${currentModuleConfig.name} analysis is complete. You can review the results, ask questions, or request adjustments before approving.`}
