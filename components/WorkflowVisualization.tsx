@@ -17,9 +17,13 @@ const agentIcons: Record<string, any> = {
   omni: Sparkles,
   customer: Users,
   engagement: TrendingUp,
-  content: FileCheck,
+  'content-planning': FileCheck,
+  'content-generation': Sparkles,
+  'content-approval': FileCheck,
+  content: FileCheck, // Legacy support
   orchestration: Brain,
   activation: Zap,
+  suggestions: Brain,
   copilot: HeadphonesIcon
 };
 
@@ -27,9 +31,13 @@ const agentColors: Record<string, any> = {
   omni: { primary: '#6B46C1', light: '#9F7AEA' },
   customer: { primary: '#002B5C', light: '#0075BE' },
   engagement: { primary: '#0075BE', light: '#00A3E0' },
-  content: { primary: '#00A3E0', light: '#4FC3F7' },
+  'content-planning': { primary: '#8B5CF6', light: '#A78BFA' },
+  'content-generation': { primary: '#6366F1', light: '#818CF8' },
+  'content-approval': { primary: '#10B981', light: '#34D399' },
+  content: { primary: '#00A3E0', light: '#4FC3F7' }, // Legacy support
   orchestration: { primary: '#FF6B35', light: '#FF8F65' },
-  activation: { primary: '#10B981', light: '#34D399' },
+  activation: { primary: '#14B8A6', light: '#5EEAD4' },
+  suggestions: { primary: '#F59E0B', light: '#FBBf24' },
   copilot: { primary: '#4CAF50', light: '#66BB6A' }
 };
 

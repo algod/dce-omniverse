@@ -21,32 +21,47 @@ interface Message {
 const agentRoutes = {
   customer: {
     name: 'Customer Planning',
-    keywords: ['customer', 'hcp', 'barrier', 'priorit', 'segment', 'persona', 'performance', 'potential'],
+    keywords: ['customer', 'hcp', 'barrier', 'priorit', 'segment', 'persona', 'performance', 'potential', 'microsegment'],
     color: zsColors.agents.customer
   },
   engagement: {
     name: 'Engagement Planning',
-    keywords: ['budget', 'resource', 'allocation', 'roi', 'marketing', 'mix', 'channel', 'spend'],
+    keywords: ['budget', 'resource', 'allocation', 'roi', 'marketing', 'mix', 'channel', 'spend', 'engagement'],
     color: zsColors.agents.budget
   },
-  content: {
-    name: 'Content Supply Chain',
-    keywords: ['content', 'mlr', 'approval', 'generation', 'creative', 'asset', 'veeva', 'adobe'],
-    color: zsColors.agents.content
+  'content-planning': {
+    name: 'Content Planning',
+    keywords: ['content', 'planning', 'gap', 'inventory', 'assessment', 'analysis', 'theme', 'mapping'],
+    color: { primary: '#8B5CF6', light: '#A78BFA' }
+  },
+  'content-generation': {
+    name: 'Content Generation',
+    keywords: ['generate', 'create', 'asset', 'variant', 'blueprint', 'derivative', 'develop'],
+    color: { primary: '#6366F1', light: '#818CF8' }
+  },
+  'content-approval': {
+    name: 'Content Approval',
+    keywords: ['mlr', 'approval', 'review', 'veeva', 'compliance', 'approve', 'reject'],
+    color: { primary: '#10B981', light: '#34D399' }
   },
   orchestration: {
     name: 'Orchestration',
-    keywords: ['journey', 'sequence', 'nba', 'next best', 'path', 'optimize'],
+    keywords: ['journey', 'sequence', 'nba', 'next best', 'path', 'optimize', 'orchestrate'],
     color: zsColors.agents.orchestration
   },
   activation: {
     name: 'Digital Activation',
-    keywords: ['activate', 'execute', 'campaign', 'vendor', 'launch', 'deploy'],
-    color: { primary: '#10B981', light: '#34D399' }
+    keywords: ['activate', 'execute', 'campaign', 'vendor', 'launch', 'deploy', 'digital'],
+    color: { primary: '#14B8A6', light: '#5EEAD4' }
+  },
+  suggestions: {
+    name: 'Field Suggestions',
+    keywords: ['field', 'suggestion', 'trigger', 'hq', 'recommendation', 'action', 'priority'],
+    color: { primary: '#F59E0B', light: '#FBBf24' }
   },
   copilot: {
     name: 'Field Copilot',
-    keywords: ['field', 'rep', 'call', 'pre-call', 'coaching', 'schedule', 'email'],
+    keywords: ['field', 'rep', 'call', 'pre-call', 'coaching', 'schedule', 'email', 'copilot'],
     color: zsColors.agents.copilot
   }
 };

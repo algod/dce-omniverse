@@ -8,7 +8,7 @@ export const contentApprovalWorkflow: Workflow = {
   steps: [
     {
       agent: 'omni',
-      action: 'Parse request and activate Content Supply Chain',
+      action: 'Parse request and activate Content Approval Agent',
       status: 'pending'
     },
     {
