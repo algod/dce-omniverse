@@ -32,23 +32,134 @@ export default function ContentPlanningAgent() {
         ]
       }}
       businessInputs={{
-        fromUpstream: [
-          "Customer microsegments from Customer Planning",
-          "Budget allocation by channel from Engagement Planning",
-          "Engagement frequency plans by segment"
+        upstream: {
+          source: "Engagement Planning Agent",
+          data: [
+            { label: "Champions Budget", value: "$3.2M allocated" },
+            { label: "Growers Budget", value: "$2.8M allocated" },
+            { label: "Converters Budget", value: "$2.1M allocated" },
+            { label: "Channel Mix", value: "Field 40%, Digital 35%, Email 25%" }
+          ]
+        },
+        parameters: [
+          {
+            name: "Content Quality Threshold (%)",
+            type: "slider",
+            value: 85,
+            min: 70,
+            max: 100
+          },
+          {
+            name: "Gap Tolerance (%)",
+            type: "slider",
+            value: 15,
+            min: 5,
+            max: 30
+          },
+          {
+            name: "Message Themes per Segment",
+            type: "slider",
+            value: 4,
+            min: 3,
+            max: 7
+          },
+          {
+            name: "Content Refresh Cycle (months)",
+            type: "select",
+            value: "9",
+            options: ["6", "9", "12", "18"]
+          },
+          {
+            name: "MLR Timeline (weeks)",
+            type: "select",
+            value: "5",
+            options: ["3", "4", "5", "6", "8"]
+          },
+          {
+            name: "Priority Mode",
+            type: "select",
+            value: "Barrier-Focused",
+            options: ["Barrier-Focused", "Channel-Optimized", "Segment-Priority", "Balanced"]
+          },
+          {
+            name: "Include Competitive Analysis",
+            type: "toggle",
+            value: true
+          },
+          {
+            name: "Auto-Retire Outdated Content",
+            type: "toggle",
+            value: true
+          },
+          {
+            name: "Fast-Track Critical Assets",
+            type: "toggle",
+            value: false
+          }
         ],
-        userInputs: [
-          "Message theme priorities",
-          "Content quality standards",
-          "MLR approval timelines",
-          "Content retirement criteria"
-        ],
-        businessRules: [
-          "Each microsegment requires 3-5 distinct message themes",
-          "Content must align with barrier-specific messaging",
-          "MLR approval typically requires 4-6 weeks",
-          "Content refresh cycle every 6-12 months"
+        constraints: [
+          "Minimum 3 message themes per microsegment",
+          "Content quality must exceed 80% threshold",
+          "MLR approval timeline cannot exceed 8 weeks",
+          "Budget must align with channel allocations",
+          "Maximum 200 active assets per quarter"
         ]
+      }}
+      analytics={{
+        models: [
+          {
+            name: "Content Gap Analysis Model",
+            description: "ML model that identifies content gaps by analyzing microsegment needs vs. available assets",
+            accuracy: 87
+          },
+          {
+            name: "Message Theme Mapper",
+            description: "NLP-based model that maps communication objectives to optimal message themes",
+            accuracy: 91
+          },
+          {
+            name: "Quality Assessment Engine",
+            description: "Deep learning model that evaluates content quality across multiple dimensions",
+            accuracy: 89
+          }
+        ],
+        algorithms: [
+          "Natural Language Processing",
+          "Gap Analysis Algorithm",
+          "Content Clustering",
+          "Quality Scoring Framework",
+          "Timeline Optimization",
+          "Priority Matrix Builder"
+        ],
+        reasoning: {
+          steps: [
+            {
+              step: "Inventory Analysis",
+              description: "Scan existing content library and categorize by segment, channel, and message theme"
+            },
+            {
+              step: "Gap Detection",
+              description: "Compare microsegment needs with available content to identify critical gaps"
+            },
+            {
+              step: "Quality Evaluation",
+              description: "Score existing content quality and identify assets requiring updates"
+            },
+            {
+              step: "Priority Scoring",
+              description: "Rank content development needs based on impact and urgency"
+            },
+            {
+              step: "Timeline Generation",
+              description: "Create optimal content development schedule considering MLR timelines"
+            },
+            {
+              step: "Action Planning",
+              description: "Generate specific recommendations for content creation and retirement"
+            }
+          ]
+        },
+        visualizations: <ContentPlanningVisualization />
       }}
       outputs={{
         toDownstream: [

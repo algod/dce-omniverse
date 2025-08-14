@@ -32,23 +32,84 @@ export default function DigitalActivationAgent() {
         ]
       }}
       businessInputs={{
-        fromUpstream: [
-          "Optimized customer journeys from Orchestration",
-          "NBA recommendations for each HCP",
-          "Content assignments by channel",
-          "Timing and sequencing rules"
+        upstream: {
+          source: "AI Orchestration Agent",
+          data: [
+            { label: "Optimized Journeys", value: "250 active paths" },
+            { label: "NBA Actions", value: "423 recommendations" },
+            { label: "Content Mapped", value: "147 assets assigned" },
+            { label: "Confidence Score", value: "87% average" }
+          ]
+        },
+        parameters: [
+          {
+            name: "Batch Size per Vendor",
+            type: "slider",
+            value: 1000,
+            min: 100,
+            max: 5000
+          },
+          {
+            name: "Retry Limit",
+            type: "slider",
+            value: 3,
+            min: 1,
+            max: 5
+          },
+          {
+            name: "API Timeout (seconds)",
+            type: "slider",
+            value: 30,
+            min: 10,
+            max: 60
+          },
+          {
+            name: "Error Threshold (%)",
+            type: "slider",
+            value: 5,
+            min: 1,
+            max: 10
+          },
+          {
+            name: "Execution Mode",
+            type: "select",
+            value: "Parallel",
+            options: ["Sequential", "Parallel", "Priority-Based", "Load-Balanced"]
+          },
+          {
+            name: "Vendor Priority",
+            type: "select",
+            value: "Performance-Based",
+            options: ["Performance-Based", "Cost-Optimized", "Round-Robin", "Manual"]
+          },
+          {
+            name: "Notification Level",
+            type: "select",
+            value: "Critical Only",
+            options: ["All", "Critical Only", "Errors and Critical", "None"]
+          },
+          {
+            name: "Enable Auto-Failover",
+            type: "toggle",
+            value: true
+          },
+          {
+            name: "Real-time Monitoring",
+            type: "toggle",
+            value: true
+          },
+          {
+            name: "Validate Before Send",
+            type: "toggle",
+            value: true
+          }
         ],
-        userInputs: [
-          "Vendor API credentials",
-          "Execution priority rules",
-          "Budget caps per vendor",
-          "Error handling preferences"
-        ],
-        businessRules: [
+        constraints: [
           "Maximum 10,000 activations per hour per vendor",
-          "Automatic failover to backup vendors",
-          "Real-time performance monitoring",
-          "Email notifications for critical issues"
+          "API rate limits must be respected",
+          "Budget caps enforced per vendor",
+          "Minimum 95% success rate required",
+          "Critical issues trigger immediate alerts"
         ]
       }}
       outputs={{
@@ -71,6 +132,62 @@ export default function DigitalActivationAgent() {
           "Send completion notifications",
           "Handle 3 critical issues with failover"
         ]
+      }}
+      analytics={{
+        models: [
+          {
+            name: "Format Translation Engine",
+            description: "Converts orchestration outputs into vendor-specific formats for seamless integration",
+            accuracy: 98
+          },
+          {
+            name: "Error Detection Model",
+            description: "ML model that predicts and prevents integration failures before they occur",
+            accuracy: 91
+          },
+          {
+            name: "Performance Optimization Algorithm",
+            description: "Dynamically optimizes vendor selection and load balancing based on real-time performance",
+            accuracy: 89
+          }
+        ],
+        algorithms: [
+          "Format Translation",
+          "API Orchestration",
+          "Error Pattern Recognition",
+          "Load Balancing",
+          "Retry Logic",
+          "Performance Monitoring"
+        ],
+        reasoning: {
+          steps: [
+            {
+              step: "Data Reception",
+              description: "Receive journey plans and NBA recommendations from orchestration engine"
+            },
+            {
+              step: "Format Translation",
+              description: "Convert recommendations into vendor-specific file formats and API payloads"
+            },
+            {
+              step: "Validation",
+              description: "Validate data integrity and check against vendor requirements"
+            },
+            {
+              step: "Vendor Routing",
+              description: "Route activations to appropriate vendors based on performance and priority"
+            },
+            {
+              step: "Execution Monitoring",
+              description: "Monitor real-time execution status and handle errors with retry logic"
+            },
+            {
+              step: "Notification & Reporting",
+              description: "Send completion notifications and compile performance reports for stakeholders"
+            }
+          ]
+        },
+        visualizations: <DigitalActivationVisualization />
       }}
       visualizationComponent={DigitalActivationVisualization}
     />

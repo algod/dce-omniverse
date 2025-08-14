@@ -32,24 +32,141 @@ export default function ContentGenerationAgent() {
         ]
       }}
       businessInputs={{
-        fromUpstream: [
-          "Content gap analysis from Content Planning",
-          "Message theme priorities by segment",
-          "Channel-specific requirements",
-          "Timeline constraints for development"
+        upstream: {
+          source: "Content Planning Agent",
+          data: [
+            { label: "Identified Gaps", value: "47 critical assets" },
+            { label: "Priority Themes", value: "Efficacy, Safety, Access" },
+            { label: "Segment Focus", value: "Champions, Growers priority" },
+            { label: "Timeline", value: "5 weeks for development" }
+          ]
+        },
+        parameters: [
+          {
+            name: "Content Creativity Level",
+            type: "slider",
+            value: 70,
+            min: 50,
+            max: 100
+          },
+          {
+            name: "Compliance Strictness (%)",
+            type: "slider",
+            value: 95,
+            min: 80,
+            max: 100
+          },
+          {
+            name: "Variants per Blueprint",
+            type: "slider",
+            value: 4,
+            min: 2,
+            max: 7
+          },
+          {
+            name: "Quality Target Score",
+            type: "slider",
+            value: 85,
+            min: 70,
+            max: 100
+          },
+          {
+            name: "Generation Mode",
+            type: "select",
+            value: "Balanced",
+            options: ["Speed-Optimized", "Quality-Focused", "Balanced", "Compliance-First"]
+          },
+          {
+            name: "Content Tone",
+            type: "select",
+            value: "Professional-Engaging",
+            options: ["Clinical-Formal", "Professional-Engaging", "Educational", "Empathetic"]
+          },
+          {
+            name: "Template Source",
+            type: "select",
+            value: "Brand Guidelines",
+            options: ["Brand Guidelines", "Best Performers", "Competitive Benchmark", "Custom"]
+          },
+          {
+            name: "Include Clinical Data",
+            type: "toggle",
+            value: true
+          },
+          {
+            name: "Auto-Generate Variants",
+            type: "toggle",
+            value: true
+          },
+          {
+            name: "Pre-Check Compliance",
+            type: "toggle",
+            value: true
+          }
         ],
-        userInputs: [
-          "Content templates and guidelines",
-          "Brand voice and tone specifications",
-          "Clinical data and references",
-          "Visual asset requirements"
-        ],
-        businessRules: [
-          "Each blueprint generates 3-5 content variants",
+        constraints: [
           "All content must include ISI and safety information",
-          "Digital assets require responsive design",
-          "Content must be tagged for Veeva PromoMats"
+          "Compliance score must exceed 90% for submission",
+          "Maximum 5 variants per blueprint",
+          "Development time cannot exceed 6 weeks",
+          "Must maintain brand consistency across all assets"
         ]
+      }}
+      analytics={{
+        models: [
+          {
+            name: "GPT-4 Content Generation Model",
+            description: "Advanced language model fine-tuned on pharmaceutical marketing content for compliant generation",
+            accuracy: 92
+          },
+          {
+            name: "Compliance Pre-Check Engine",
+            description: "ML model that validates content against regulatory guidelines before submission",
+            accuracy: 94
+          },
+          {
+            name: "Variant Generation Algorithm",
+            description: "Creates segment-specific content variants while maintaining core messaging integrity",
+            accuracy: 88
+          }
+        ],
+        algorithms: [
+          "GPT-4 Fine-tuning",
+          "Compliance Pattern Recognition",
+          "Variant Generation",
+          "Quality Scoring",
+          "Channel Optimization",
+          "Template Matching"
+        ],
+        reasoning: {
+          steps: [
+            {
+              step: "Blueprint Creation",
+              description: "Transform content gaps into detailed development blueprints with specifications"
+            },
+            {
+              step: "Content Drafting",
+              description: "Generate initial content using GPT-4 model with pharmaceutical fine-tuning"
+            },
+            {
+              step: "Compliance Validation",
+              description: "Run pre-check against regulatory guidelines and brand standards"
+            },
+            {
+              step: "Variant Generation",
+              description: "Create segment and channel-specific variants from master content"
+            },
+            {
+              step: "Quality Assessment",
+              description: "Score content quality across multiple dimensions including accuracy and engagement"
+            },
+            {
+              step: "Asset Preparation",
+              description: "Tag and prepare assets for downstream approval and Veeva integration"
+            }
+          ]
+        },
+        visualizations: <ContentGenerationVisualization />
       }}
       outputs={{
         toDownstream: [
