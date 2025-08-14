@@ -113,24 +113,28 @@ export default function DigitalActivationAgent() {
         ]
       }}
       outputs={{
-        toDownstream: [
-          "Execution status for all campaigns",
-          "Performance metrics by vendor",
-          "Issue logs and resolution status",
-          "Field action schedules"
-        ],
-        metrics: [
-          "Campaigns activated: 42",
-          "Success rate: 94%",
-          "Average latency: 1.2s",
-          "Vendors integrated: 5",
-          "Email notifications sent: 127"
-        ],
-        actions: [
+        downstream: {
+          destination: "Field Suggestions Agent",
+          data: [
+            { label: "Campaigns Activated", value: "42 live campaigns" },
+            { label: "Success Rate", value: "94% execution" },
+            { label: "Vendor Performance", value: "5 integrated" },
+            { label: "Average Latency", value: "1.2s response" },
+            { label: "Notifications Sent", value: "127 emails" }
+          ]
+        },
+        recommendations: [
           "Execute 42 campaigns across 5 vendors",
-          "Monitor real-time performance",
-          "Send completion notifications",
-          "Handle 3 critical issues with failover"
+          "Monitor real-time performance metrics",
+          "Send completion notifications to stakeholders",
+          "Handle 3 critical issues with automatic failover",
+          "Optimize vendor allocation based on performance"
+        ],
+        impact: [
+          { metric: "Campaign Reach", change: "+42%" },
+          { metric: "Execution Speed", change: "+35%" },
+          { metric: "Error Rate", change: "-6%" },
+          { metric: "Vendor Efficiency", change: "+28%" }
         ]
       }}
       analytics={{

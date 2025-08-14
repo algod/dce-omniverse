@@ -84,16 +84,29 @@ export default function OmniAgent() {
   const [showCustomerPlanning, setShowCustomerPlanning] = useState(false);
   const [brandContext, setBrandContext] = useState<any>(null);
 
-  const detectAgentRoute = (query: string): string | null => {
+  const detectAgentRoute = (query: string): { agentId: string | null; isWorkflow: boolean } => {
     const lowerQuery = query.toLowerCase();
     
+    // Check for workflow-specific queries first
+    if (
+      (lowerQuery.includes('priority') || lowerQuery.includes('priorit')) && 
+      (lowerQuery.includes('customer') || lowerQuery.includes('hcp'))
+    ) {
+      return { agentId: 'customer', isWorkflow: true };
+    }
+    
+    if (lowerQuery.includes('who should') && lowerQuery.includes('customer')) {
+      return { agentId: 'customer', isWorkflow: true };
+    }
+    
+    // Regular agent detection
     for (const [agentId, agent] of Object.entries(agentRoutes)) {
       if (agent.keywords.some(keyword => lowerQuery.includes(keyword))) {
-        return agentId;
+        return { agentId, isWorkflow: false };
       }
     }
     
-    return null;
+    return { agentId: null, isWorkflow: false };
   };
 
   const handleSend = async () => {
@@ -158,31 +171,50 @@ export default function OmniAgent() {
       }
     } else {
       // Detect which agent to route to
-      const route = detectAgentRoute(input);
+      const routeInfo = detectAgentRoute(input);
+      const route = routeInfo.agentId;
       setActiveRoute(route);
 
-      // Simulate processing
-      setTimeout(() => {
+      // If it's a workflow query, navigate directly to the workflow page
+      if (routeInfo.isWorkflow && route) {
         const responseMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: route 
-            ? `I understand you need help with ${agentRoutes[route as keyof typeof agentRoutes].name}. I\'m activating that agent now to assist you with your request.`
-            : 'I\'m analyzing your request to determine the best agent to help you. Could you provide more details about what you\'re trying to accomplish?',
+          content: `Perfect! I understand you want to identify priority customers. I'll activate the Customer Planning Agent workflow to guide you through the comprehensive analysis.`,
           timestamp: new Date(),
-          agentRoute: route || undefined
+          agentRoute: route
         };
-
         setMessages(prev => [...prev, responseMessage]);
         setIsProcessing(false);
+        
+        // Navigate to workflow page
+        setTimeout(() => {
+          router.push(`/agents/${route}?workflow=active`);
+        }, 1500);
+      } else {
+        // Simulate processing for regular agent routing
+        setTimeout(() => {
+          const responseMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: route 
+              ? `I understand you need help with ${agentRoutes[route as keyof typeof agentRoutes].name}. I\'m activating that agent now to assist you with your request.`
+              : 'I\'m analyzing your request to determine the best agent to help you. Could you provide more details about what you\'re trying to accomplish?',
+            timestamp: new Date(),
+            agentRoute: route || undefined
+          };
 
-        // Show routing animation
-        if (route) {
-          setTimeout(() => {
-            setActiveRoute(null);
-          }, 3000);
-        }
-      }, 1500);
+          setMessages(prev => [...prev, responseMessage]);
+          setIsProcessing(false);
+
+          // Navigate to the agent page
+          if (route) {
+            setTimeout(() => {
+              router.push(`/agents/${route}`);
+            }, 1500);
+          }
+        }, 1500);
+      }
     }
   };
 
@@ -387,7 +419,7 @@ export default function OmniAgent() {
                         : zsColors.neutral.white
                     }}
                   >
-                    <Link href={`/agents/${agentId === 'engagement' ? 'budget' : agentId}${agentId === 'customer' ? '?workflow=active' : ''}`}>
+                    <Link href={`/agents/${agentId === 'engagement' ? 'engagement' : agentId}`}>
                       <div className="flex items-center gap-3 cursor-pointer">
                         <div className="w-10 h-10 rounded-lg flex items-center justify-center"
                           style={{ 

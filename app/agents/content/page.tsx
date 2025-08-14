@@ -115,24 +115,28 @@ export default function ContentApprovalAgent() {
         ]
       }}
       outputs={{
-        toDownstream: [
-          "MLR-approved content assets (106 approved)",
-          "Declined assets with improvement recommendations (15)",
-          "Assets pending human review (26)",
-          "Veeva PromoMats integration status"
-        ],
-        metrics: [
-          "Auto-approval rate: 72%",
-          "Manual review required: 18%", 
-          "Decline rate: 10%",
-          "Average review time: 4.2 hours",
-          "Veeva sync success: 100%"
-        ],
-        actions: [
+        downstream: {
+          destination: "AI Orchestration Agent",
+          data: [
+            { label: "Approved Assets", value: "106 MLR-approved" },
+            { label: "Pending Review", value: "26 in queue" },
+            { label: "Declined Assets", value: "15 with feedback" },
+            { label: "Review Time", value: "4.2 hours avg" },
+            { label: "Veeva Sync", value: "100% success" }
+          ]
+        },
+        recommendations: [
           "Auto-approve 106 high-scoring assets",
           "Queue 26 assets for human review",
           "Provide recommendations for 15 declined assets",
-          "Sync all approved content to Veeva PromoMats"
+          "Sync all approved content to Veeva PromoMats",
+          "Expedite critical barrier content reviews"
+        ],
+        impact: [
+          { metric: "Approval Rate", change: "+72%" },
+          { metric: "Review Time", change: "-6 hours" },
+          { metric: "Compliance Score", change: "+96%" },
+          { metric: "Content Velocity", change: "+45%" }
         ]
       }}
       analytics={{

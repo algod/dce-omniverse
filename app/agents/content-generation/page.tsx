@@ -169,23 +169,28 @@ export default function ContentGenerationAgent() {
         visualizations: <ContentGenerationVisualization />
       }}
       outputs={{
-        toDownstream: [
-          "Generated content assets (47 new pieces)",
-          "Content variants by segment (142 total)",
-          "Asset metadata and tagging",
-          "Quality scores for each asset"
-        ],
-        metrics: [
-          "Assets generated: 47 primary, 142 variants",
-          "Average quality score: 8.2/10",
-          "Compliance pre-check pass rate: 94%",
-          "Channel optimization score: 87%"
-        ],
-        actions: [
+        downstream: {
+          destination: "Content Approval Agent",
+          data: [
+            { label: "Generated Assets", value: "47 primary pieces" },
+            { label: "Content Variants", value: "142 total variations" },
+            { label: "Quality Score", value: "8.2/10 average" },
+            { label: "Pre-check Pass Rate", value: "94% compliant" },
+            { label: "Channel Optimization", value: "87% score" }
+          ]
+        },
+        recommendations: [
           "Generate 23 email templates for Growers segment",
           "Create 15 field materials for Converters",
           "Develop 9 virtual engagement assets",
-          "Produce 47 web content pieces for all segments"
+          "Produce 47 web content pieces for all segments",
+          "Prioritize high-barrier content development"
+        ],
+        impact: [
+          { metric: "Content Volume", change: "+189 assets" },
+          { metric: "Quality Score", change: "+0.4 pts" },
+          { metric: "Compliance Rate", change: "+94%" },
+          { metric: "Time to Market", change: "-3 weeks" }
         ]
       }}
       visualizationComponent={ContentGenerationVisualization}

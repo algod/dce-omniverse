@@ -162,23 +162,28 @@ export default function ContentPlanningAgent() {
         visualizations: <ContentPlanningVisualization />
       }}
       outputs={{
-        toDownstream: [
-          "Content gap analysis report",
-          "Content development priorities",
-          "Message theme mapping matrix",
-          "Timeline for content creation"
-        ],
-        metrics: [
-          "Content coverage by segment: 73%",
-          "Identified content gaps: 47 assets",
-          "Average content quality score: 7.8/10",
-          "Estimated MLR approval time: 5.2 weeks"
-        ],
-        actions: [
+        downstream: {
+          destination: "Content Generation Agent",
+          data: [
+            { label: "Content Gaps", value: "47 critical assets" },
+            { label: "Priority Themes", value: "23 high-priority" },
+            { label: "Quality Score", value: "7.8/10 average" },
+            { label: "MLR Timeline", value: "5.2 weeks estimated" },
+            { label: "Coverage Rate", value: "73% by segment" }
+          ]
+        },
+        recommendations: [
           "Develop 23 new content assets for high-priority gaps",
           "Retire 15 outdated assets",
           "Update 31 existing assets with new clinical data",
-          "Fast-track MLR for 8 critical assets"
+          "Fast-track MLR for 8 critical assets",
+          "Focus on formulary barrier content first"
+        ],
+        impact: [
+          { metric: "Content Coverage", change: "+27%" },
+          { metric: "Quality Score", change: "+1.2 pts" },
+          { metric: "MLR Approval Time", change: "-2 weeks" },
+          { metric: "Asset Efficiency", change: "+35%" }
         ]
       }}
       visualizationComponent={ContentPlanningVisualization}

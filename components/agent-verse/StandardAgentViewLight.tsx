@@ -1583,10 +1583,14 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                               backgroundColor: zsColors.neutral.offWhite,
                               border: `1px solid ${zsColors.neutral.lightGray}`
                             }}>
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-medium" style={{ color: zsColors.neutral.charcoal }}>{model.name}</h4>
+                            <div className="flex items-center justify-between mb-2 gap-3">
+                              <h4 className="font-medium flex-1 truncate" style={{ color: zsColors.neutral.charcoal }} title={model.name}>
+                                {model.name}
+                              </h4>
                               {model.accuracy && (
-                                <span className="text-sm font-semibold" style={{ color: zsColors.semantic.success }}>{model.accuracy}% Accuracy</span>
+                                <span className="text-sm font-semibold flex-shrink-0 whitespace-nowrap" style={{ color: zsColors.semantic.success }}>
+                                  {model.accuracy}% Accuracy
+                                </span>
                               )}
                             </div>
                             <p className="text-sm" style={{ color: zsColors.neutral.gray }}>{model.description}</p>
@@ -1796,19 +1800,31 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                           backgroundColor: zsColors.neutral.offWhite,
                           border: `1px solid ${zsColors.neutral.lightGray}`
                         }}>
-                        {props.outputs?.downstream?.data?.map((item, idx) => (
-                          <div key={idx} className="flex justify-between">
-                            <span className="text-sm" style={{ color: zsColors.neutral.gray }}>{item.label}:</span>
-                            <span className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>{item.value}</span>
-                          </div>
-                        ))}
+                        {props.outputs?.downstream?.data ? (
+                          props.outputs.downstream.data.map((item, idx) => (
+                            <div key={idx} className="flex justify-between">
+                              <span className="text-sm" style={{ color: zsColors.neutral.gray }}>{item.label}:</span>
+                              <span className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>{item.value}</span>
+                            </div>
+                          ))
+                        ) : props.outputs?.toDownstream ? (
+                          // Fallback for old format
+                          props.outputs.toDownstream.map((item: string, idx: number) => (
+                            <div key={idx} className="flex items-start gap-2">
+                              <span className="text-sm" style={{ color: zsColors.neutral.gray }}>•</span>
+                              <span className="text-sm" style={{ color: zsColors.neutral.charcoal }}>{item}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-center" style={{ color: zsColors.neutral.gray }}>No downstream data available</p>
+                        )}
                       </div>
                     </div>
 
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Recommendations</h3>
                       <ul className="space-y-2">
-                        {props.outputs?.recommendations?.map((rec, idx) => (
+                        {(props.outputs?.recommendations || props.outputs?.actions)?.map((rec, idx) => (
                           <li key={idx} className="flex items-start gap-2">
                             <ArrowRight size={16} style={{ color: zsColors.semantic.success }} className="mt-1" />
                             <span className="text-sm" style={{ color: zsColors.neutral.darkGray }}>{rec}</span>
@@ -1820,16 +1836,33 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Expected Impact</h3>
                       <div className="grid grid-cols-2 gap-4">
-                        {props.outputs?.impact?.map((impact, idx) => (
-                          <div key={idx} className="rounded-lg p-3"
-                            style={{ 
-                              backgroundColor: zsColors.neutral.white,
-                              border: `1px solid ${zsColors.neutral.lightGray}`
-                            }}>
-                            <p className="text-xs mb-1" style={{ color: zsColors.neutral.gray }}>{impact.metric}</p>
-                            <p className="text-lg font-semibold" style={{ color: zsColors.semantic.success }}>{impact.change}</p>
-                          </div>
-                        ))}
+                        {props.outputs?.impact ? (
+                          props.outputs.impact.map((impact, idx) => (
+                            <div key={idx} className="rounded-lg p-3"
+                              style={{ 
+                                backgroundColor: zsColors.neutral.white,
+                                border: `1px solid ${zsColors.neutral.lightGray}`
+                              }}>
+                              <p className="text-xs mb-1" style={{ color: zsColors.neutral.gray }}>{impact.metric}</p>
+                              <p className="text-lg font-semibold" style={{ color: zsColors.semantic.success }}>{impact.change}</p>
+                            </div>
+                          ))
+                        ) : props.outputs?.metrics ? (
+                          // Fallback for metrics format
+                          props.outputs.metrics.map((metric: string, idx: number) => {
+                            const [label, value] = metric.split(':').map(s => s.trim());
+                            return (
+                              <div key={idx} className="rounded-lg p-3"
+                                style={{ 
+                                  backgroundColor: zsColors.neutral.white,
+                                  border: `1px solid ${zsColors.neutral.lightGray}`
+                                }}>
+                                <p className="text-xs mb-1" style={{ color: zsColors.neutral.gray }}>{label}</p>
+                                <p className="text-sm font-semibold" style={{ color: zsColors.semantic.success }}>{value}</p>
+                              </div>
+                            );
+                          })
+                        ) : null}
                       </div>
                     </div>
 
