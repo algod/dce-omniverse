@@ -883,6 +883,87 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                                         </div>
                                       </div>
                                     </div>
+                                    
+                                    {/* Visualizations */}
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        Visualizations
+                                      </h5>
+                                      
+                                      {/* Barrier Distribution Chart */}
+                                      <div className="mb-3 p-3 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                        <p className="text-xs font-medium mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                          Barrier Distribution by HCP Segment
+                                        </p>
+                                        <div className="space-y-2">
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs w-24" style={{ color: zsColors.neutral.gray }}>Formulary</span>
+                                            <div className="flex-1 bg-gray-200 rounded-full h-4 relative">
+                                              <div className="absolute inset-y-0 left-0 rounded-full" 
+                                                style={{ width: '38%', backgroundColor: agentTheme.primary }} />
+                                            </div>
+                                            <span className="text-xs font-medium" style={{ color: zsColors.neutral.charcoal }}>38%</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs w-24" style={{ color: zsColors.neutral.gray }}>Referral Path</span>
+                                            <div className="flex-1 bg-gray-200 rounded-full h-4 relative">
+                                              <div className="absolute inset-y-0 left-0 rounded-full" 
+                                                style={{ width: '27%', backgroundColor: zsColors.secondary.teal }} />
+                                            </div>
+                                            <span className="text-xs font-medium" style={{ color: zsColors.neutral.charcoal }}>27%</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs w-24" style={{ color: zsColors.neutral.gray }}>Side Effects</span>
+                                            <div className="flex-1 bg-gray-200 rounded-full h-4 relative">
+                                              <div className="absolute inset-y-0 left-0 rounded-full" 
+                                                style={{ width: '20%', backgroundColor: zsColors.secondary.orange }} />
+                                            </div>
+                                            <span className="text-xs font-medium" style={{ color: zsColors.neutral.charcoal }}>20%</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs w-24" style={{ color: zsColors.neutral.gray }}>Insurance</span>
+                                            <div className="flex-1 bg-gray-200 rounded-full h-4 relative">
+                                              <div className="absolute inset-y-0 left-0 rounded-full" 
+                                                style={{ width: '10%', backgroundColor: zsColors.semantic.warning }} />
+                                            </div>
+                                            <span className="text-xs font-medium" style={{ color: zsColors.neutral.charcoal }}>10%</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs w-24" style={{ color: zsColors.neutral.gray }}>Diagnostic</span>
+                                            <div className="flex-1 bg-gray-200 rounded-full h-4 relative">
+                                              <div className="absolute inset-y-0 left-0 rounded-full" 
+                                                style={{ width: '5%', backgroundColor: zsColors.semantic.error }} />
+                                            </div>
+                                            <span className="text-xs font-medium" style={{ color: zsColors.neutral.charcoal }}>5%</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Barrier Severity Heatmap */}
+                                      <div className="p-3 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                        <p className="text-xs font-medium mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                          Barrier Severity Heatmap
+                                        </p>
+                                        <div className="grid grid-cols-5 gap-1">
+                                          {['B001', 'B002', 'B003', 'B004', 'B005'].map((barrier, idx) => (
+                                            <div key={barrier} className="text-center">
+                                              <div className="h-8 rounded flex items-center justify-center text-white text-xs font-medium"
+                                                style={{ 
+                                                  backgroundColor: idx === 0 ? '#dc2626' : 
+                                                                 idx === 1 ? '#ea580c' : 
+                                                                 idx === 2 ? '#ca8a04' : 
+                                                                 idx === 3 ? '#65a30d' : '#16a34a'
+                                                }}>
+                                                {barrier}
+                                              </div>
+                                              <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>
+                                                {idx === 0 ? 'High' : idx < 3 ? 'Med' : 'Low'}
+                                              </p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               )}
@@ -964,6 +1045,56 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                                         <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
                                           <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Trends Found</p>
                                           <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>8</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Visualizations */}
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        Visualizations
+                                      </h5>
+                                      
+                                      {/* Performance Quintiles Chart */}
+                                      <div className="mb-3 p-3 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                        <p className="text-xs font-medium mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                          HCP Performance Quintiles
+                                        </p>
+                                        <div className="flex items-end gap-2 h-24">
+                                          {[85, 65, 50, 35, 20].map((height, idx) => (
+                                            <div key={idx} className="flex-1 flex flex-col items-center">
+                                              <div className="w-full rounded-t" 
+                                                style={{ 
+                                                  height: `${height}%`,
+                                                  backgroundColor: idx === 0 ? zsColors.semantic.success : 
+                                                                 idx === 1 ? zsColors.secondary.teal :
+                                                                 idx === 2 ? agentTheme.primary :
+                                                                 idx === 3 ? zsColors.secondary.orange :
+                                                                 zsColors.semantic.error
+                                                }} />
+                                              <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>Q{idx + 1}</p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Trend Analysis */}
+                                      <div className="p-3 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                        <p className="text-xs font-medium mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                          24-Month Prescription Trend
+                                        </p>
+                                        <div className="h-16 flex items-end gap-1">
+                                          {[40, 45, 43, 48, 52, 55, 53, 58, 60, 62, 65, 68].map((height, idx) => (
+                                            <div key={idx} className="flex-1 rounded-t"
+                                              style={{ 
+                                                height: `${height}%`,
+                                                backgroundColor: idx >= 9 ? zsColors.semantic.success : agentTheme.primary + '60'
+                                              }} />
+                                          ))}
+                                        </div>
+                                        <div className="flex justify-between mt-1">
+                                          <span className="text-xs" style={{ color: zsColors.neutral.gray }}>-24m</span>
+                                          <span className="text-xs" style={{ color: zsColors.neutral.gray }}>Now</span>
                                         </div>
                                       </div>
                                     </div>
@@ -1051,6 +1182,72 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                                         </div>
                                       </div>
                                     </div>
+                                    
+                                    {/* Visualizations */}
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        Visualizations
+                                      </h5>
+                                      
+                                      {/* Opportunity Scatter Plot */}
+                                      <div className="mb-3 p-3 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                        <p className="text-xs font-medium mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                          HCP Opportunity Matrix (Depth vs Breadth)
+                                        </p>
+                                        <div className="relative h-32 border-l-2 border-b-2" style={{ borderColor: zsColors.neutral.lightGray }}>
+                                          <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
+                                            <div className="border-r border-b" style={{ borderColor: zsColors.neutral.lightGray + '50' }}>
+                                              <p className="text-xs p-1" style={{ color: zsColors.neutral.gray }}>Low-Low</p>
+                                            </div>
+                                            <div className="border-b" style={{ borderColor: zsColors.neutral.lightGray + '50' }}>
+                                              <p className="text-xs p-1" style={{ color: zsColors.secondary.teal }}>High Breadth</p>
+                                            </div>
+                                            <div className="border-r" style={{ borderColor: zsColors.neutral.lightGray + '50' }}>
+                                              <p className="text-xs p-1" style={{ color: zsColors.secondary.orange }}>High Depth</p>
+                                            </div>
+                                            <div>
+                                              <p className="text-xs p-1 font-medium" style={{ color: zsColors.semantic.success }}>Champions</p>
+                                            </div>
+                                          </div>
+                                          {/* Sample dots */}
+                                          <div className="absolute top-2 right-4 w-2 h-2 rounded-full" style={{ backgroundColor: zsColors.semantic.success }} />
+                                          <div className="absolute top-8 right-8 w-2 h-2 rounded-full" style={{ backgroundColor: zsColors.semantic.success }} />
+                                          <div className="absolute bottom-8 left-8 w-2 h-2 rounded-full" style={{ backgroundColor: zsColors.neutral.gray }} />
+                                          <div className="absolute top-4 left-4 w-2 h-2 rounded-full" style={{ backgroundColor: zsColors.secondary.orange }} />
+                                        </div>
+                                        <div className="flex justify-between mt-1">
+                                          <span className="text-xs" style={{ color: zsColors.neutral.gray }}>← Depth →</span>
+                                          <span className="text-xs" style={{ color: zsColors.neutral.gray }}>↑ Breadth</span>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Model Performance */}
+                                      <div className="p-3 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                        <p className="text-xs font-medium mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                          Model Accuracy by Prediction Type
+                                        </p>
+                                        <div className="space-y-2">
+                                          <div>
+                                            <div className="flex justify-between mb-1">
+                                              <span className="text-xs" style={{ color: zsColors.neutral.gray }}>Depth Prediction</span>
+                                              <span className="text-xs font-medium" style={{ color: zsColors.semantic.success }}>89%</span>
+                                            </div>
+                                            <div className="h-2 bg-gray-200 rounded-full">
+                                              <div className="h-full rounded-full" style={{ width: '89%', backgroundColor: zsColors.semantic.success }} />
+                                            </div>
+                                          </div>
+                                          <div>
+                                            <div className="flex justify-between mb-1">
+                                              <span className="text-xs" style={{ color: zsColors.neutral.gray }}>Breadth Prediction</span>
+                                              <span className="text-xs font-medium" style={{ color: zsColors.secondary.teal }}>85%</span>
+                                            </div>
+                                            <div className="h-2 bg-gray-200 rounded-full">
+                                              <div className="h-full rounded-full" style={{ width: '85%', backgroundColor: zsColors.secondary.teal }} />
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               )}
@@ -1132,6 +1329,75 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                                         <div className="p-2 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
                                           <p className="text-xs" style={{ color: zsColors.neutral.gray }}>Content Types</p>
                                           <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>7</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Visualizations */}
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        Visualizations
+                                      </h5>
+                                      
+                                      {/* Channel Preference Distribution */}
+                                      <div className="mb-3 p-3 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                        <p className="text-xs font-medium mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                          Channel Preference by HCP Segment
+                                        </p>
+                                        <div className="grid grid-cols-4 gap-2 mb-2">
+                                          <div className="text-center">
+                                            <div className="h-16 flex flex-col justify-end">
+                                              <div className="rounded-t" style={{ height: '62%', backgroundColor: agentTheme.primary }} />
+                                            </div>
+                                            <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>Field</p>
+                                            <p className="text-xs font-medium" style={{ color: zsColors.neutral.charcoal }}>62%</p>
+                                          </div>
+                                          <div className="text-center">
+                                            <div className="h-16 flex flex-col justify-end">
+                                              <div className="rounded-t" style={{ height: '38%', backgroundColor: zsColors.secondary.teal }} />
+                                            </div>
+                                            <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>Email</p>
+                                            <p className="text-xs font-medium" style={{ color: zsColors.neutral.charcoal }}>38%</p>
+                                          </div>
+                                          <div className="text-center">
+                                            <div className="h-16 flex flex-col justify-end">
+                                              <div className="rounded-t" style={{ height: '28%', backgroundColor: zsColors.secondary.orange }} />
+                                            </div>
+                                            <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>Virtual</p>
+                                            <p className="text-xs font-medium" style={{ color: zsColors.neutral.charcoal }}>28%</p>
+                                          </div>
+                                          <div className="text-center">
+                                            <div className="h-16 flex flex-col justify-end">
+                                              <div className="rounded-t" style={{ height: '45%', backgroundColor: zsColors.semantic.success }} />
+                                            </div>
+                                            <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>Web</p>
+                                            <p className="text-xs font-medium" style={{ color: zsColors.neutral.charcoal }}>45%</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Engagement Frequency Heatmap */}
+                                      <div className="p-3 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                        <p className="text-xs font-medium mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                          Optimal Engagement Frequency (touches/month)
+                                        </p>
+                                        <div className="grid grid-cols-5 gap-1">
+                                          {['Champions', 'Growers', 'Converters', 'Maintainers', 'Defenders'].map((segment, idx) => (
+                                            <div key={segment} className="text-center">
+                                              <div className="h-12 rounded flex items-center justify-center text-white text-xs font-medium"
+                                                style={{ 
+                                                  backgroundColor: idx === 0 ? '#059669' : 
+                                                                 idx === 1 ? '#10b981' : 
+                                                                 idx === 2 ? '#84cc16' : 
+                                                                 idx === 3 ? '#eab308' : '#f59e0b'
+                                                }}>
+                                                {idx === 0 ? '3.5' : idx === 1 ? '2.8' : idx === 2 ? '2.3' : idx === 3 ? '1.8' : '1.2'}
+                                              </div>
+                                              <p className="text-xs mt-1 truncate" style={{ color: zsColors.neutral.gray }}>
+                                                {segment}
+                                              </p>
+                                            </div>
+                                          ))}
                                         </div>
                                       </div>
                                     </div>
@@ -1227,6 +1493,74 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                                           <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>
                                             All segments weighted
                                           </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Visualizations */}
+                                    <div>
+                                      <h5 className="text-sm font-semibold mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                        Visualizations
+                                      </h5>
+                                      
+                                      {/* 4P Framework Integration */}
+                                      <div className="mb-3 p-3 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                        <p className="text-xs font-medium mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                          4P Framework Integration
+                                        </p>
+                                        <div className="grid grid-cols-2 gap-2">
+                                          <div className="p-2 rounded text-center" style={{ backgroundColor: agentTheme.primary + '20' }}>
+                                            <p className="text-xs font-medium" style={{ color: agentTheme.primary }}>Persona</p>
+                                            <p className="text-lg font-bold" style={{ color: agentTheme.primary }}>25%</p>
+                                          </div>
+                                          <div className="p-2 rounded text-center" style={{ backgroundColor: zsColors.secondary.teal + '20' }}>
+                                            <p className="text-xs font-medium" style={{ color: zsColors.secondary.teal }}>Performance</p>
+                                            <p className="text-lg font-bold" style={{ color: zsColors.secondary.teal }}>30%</p>
+                                          </div>
+                                          <div className="p-2 rounded text-center" style={{ backgroundColor: zsColors.secondary.orange + '20' }}>
+                                            <p className="text-xs font-medium" style={{ color: zsColors.secondary.orange }}>Potential</p>
+                                            <p className="text-lg font-bold" style={{ color: zsColors.secondary.orange }}>25%</p>
+                                          </div>
+                                          <div className="p-2 rounded text-center" style={{ backgroundColor: zsColors.semantic.success + '20' }}>
+                                            <p className="text-xs font-medium" style={{ color: zsColors.semantic.success }}>Preference</p>
+                                            <p className="text-lg font-bold" style={{ color: zsColors.semantic.success }}>20%</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Microsegment Distribution */}
+                                      <div className="p-3 rounded" style={{ backgroundColor: zsColors.neutral.offWhite }}>
+                                        <p className="text-xs font-medium mb-2" style={{ color: zsColors.neutral.darkGray }}>
+                                          HCP Distribution by Microsegment
+                                        </p>
+                                        <div className="space-y-2">
+                                          {[
+                                            { name: 'Champions', count: 423, color: zsColors.semantic.success },
+                                            { name: 'Growers', count: 567, color: zsColors.secondary.teal },
+                                            { name: 'Converters', count: 892, color: agentTheme.primary },
+                                            { name: 'Maintainers', count: 634, color: zsColors.secondary.orange },
+                                            { name: 'Defenders', count: 331, color: zsColors.semantic.warning }
+                                          ].map((segment) => (
+                                            <div key={segment.name} className="flex items-center gap-2">
+                                              <span className="text-xs w-20" style={{ color: zsColors.neutral.gray }}>{segment.name}</span>
+                                              <div className="flex-1 bg-gray-200 rounded-full h-3 relative">
+                                                <div className="absolute inset-y-0 left-0 rounded-full" 
+                                                  style={{ 
+                                                    width: `${(segment.count / 2847) * 100}%`,
+                                                    backgroundColor: segment.color
+                                                  }} />
+                                              </div>
+                                              <span className="text-xs font-medium w-10 text-right" style={{ color: zsColors.neutral.charcoal }}>
+                                                {segment.count}
+                                              </span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                        <div className="mt-2 pt-2 border-t" style={{ borderColor: zsColors.neutral.lightGray }}>
+                                          <div className="flex justify-between">
+                                            <span className="text-xs" style={{ color: zsColors.neutral.gray }}>Total HCPs</span>
+                                            <span className="text-xs font-bold" style={{ color: zsColors.neutral.charcoal }}>2,847</span>
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
