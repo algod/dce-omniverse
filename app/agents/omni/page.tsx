@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Sparkles, Send, Bot, ArrowRight, Brain, Loader2, Workflow as WorkflowIcon } from 'lucide-react';
 import { zsColors } from '@/lib/design-system/zs-colors';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { WorkflowVisualization } from '@/components/WorkflowVisualization';
 import { CustomerPlanningWorkflow } from '@/components/agents/CustomerPlanningWorkflow';
 import { detectWorkflow, executeWorkflowStep, Workflow } from '@/lib/workflows/customer-priority-workflow';
@@ -67,6 +68,7 @@ const agentRoutes = {
 };
 
 export default function OmniAgent() {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -128,17 +130,15 @@ export default function OmniAgent() {
         const responseMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: `Perfect! I understand you want to identify priority customers. I'll activate the Customer Planning Agent which will guide you through 5 comprehensive modules:\n\n1. **Persona Analysis** - Barrier inferencing\n2. **Performance Metrics** - Historical KPI analysis\n3. **Potential Prediction** - ML-based opportunity forecasting\n4. **Preference Mapping** - Channel and content affinity\n5. **Microsegmentation** - Strategic prioritization\n\nLet me start the workflow now...`,
+          content: `Perfect! I understand you want to identify priority customers. I'll activate the Customer Planning Agent which will guide you through 5 comprehensive modules:\n\n1. **Persona Analysis** - Barrier inferencing\n2. **Performance Metrics** - Historical KPI analysis\n3. **Potential Prediction** - ML-based opportunity forecasting\n4. **Preference Mapping** - Channel and content affinity\n5. **Microsegmentation** - Strategic prioritization\n\nTransitioning to Customer Planning Workflow...`,
           timestamp: new Date()
         };
         setMessages(prev => [...prev, responseMessage]);
         setIsProcessing(false);
-        setShowCustomerPlanning(true);
         
-        // Start workflow execution
+        // Navigate directly to customer planning page with workflow
         setTimeout(() => {
-          const updatedWorkflow = executeWorkflowStep(workflow, 0);
-          setActiveWorkflow(updatedWorkflow);
+          router.push('/agents/customer?workflow=active');
         }, 1500);
       } else {
         const responseMessage: Message = {
@@ -228,20 +228,6 @@ export default function OmniAgent() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Customer Planning Workflow Display */}
-        {showCustomerPlanning && activeWorkflow && activeWorkflow.id === 'customer-priority' && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <CustomerPlanningWorkflow
-              workflow={activeWorkflow}
-              onWorkflowUpdate={setActiveWorkflow}
-              brandContext={brandContext}
-            />
-          </motion.div>
-        )}
         
         {/* Active Workflow Display for other workflows */}
         {activeWorkflow && activeWorkflow.id !== 'customer-priority' && (
@@ -401,7 +387,7 @@ export default function OmniAgent() {
                         : zsColors.neutral.white
                     }}
                   >
-                    <Link href={`/agents/${agentId === 'engagement' ? 'budget' : agentId}`}>
+                    <Link href={`/agents/${agentId === 'engagement' ? 'budget' : agentId}${agentId === 'customer' ? '?workflow=active' : ''}`}>
                       <div className="flex items-center gap-3 cursor-pointer">
                         <div className="w-10 h-10 rounded-lg flex items-center justify-center"
                           style={{ 

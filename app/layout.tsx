@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { CommandPalette } from "@/components/ui/CommandPalette";
 import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
 import { UserModeProvider } from "@/lib/contexts/UserModeContext";
 import { AgentDataProvider } from "@/lib/contexts/AgentDataContext";
@@ -34,7 +33,6 @@ export default function RootLayout({
         <UserModeProvider>
           <AgentDataProvider>
             {children}
-            <CommandPalette />
             <DarkModeToggle />
           </AgentDataProvider>
         </UserModeProvider>

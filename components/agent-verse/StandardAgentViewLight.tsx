@@ -264,47 +264,8 @@ export function StandardAgentViewLight(props: AgentViewProps) {
       {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
         <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-140px)]">
-          {/* Left Panel - Q&A Chat (45% desktop, full width mobile) */}
-          <div className="w-full lg:w-[45%] rounded-xl overflow-hidden flex flex-col" 
-            style={{ 
-              backgroundColor: zsColors.neutral.white,
-              border: `1px solid ${zsColors.neutral.lightGray}`,
-              boxShadow: zsColors.shadows.md,
-              minHeight: '500px'
-            }}>
-            <div className="p-4" style={{ 
-              borderBottom: `1px solid ${zsColors.neutral.lightGray}`,
-              backgroundColor: zsColors.neutral.white
-            }}>
-              <div className="flex items-center gap-2">
-                <MessageSquare size={20} style={{ color: agentTheme.primary }} />
-                <h2 className="text-lg font-semibold" style={{ color: zsColors.neutral.charcoal }}>Interactive Q&A</h2>
-              </div>
-              <p className="text-xs mt-1" style={{ color: zsColors.neutral.gray }}>Ask questions and adjust parameters</p>
-            </div>
-            <AgentChat 
-              agentId={props.agentId} 
-              agentName={props.agentName}
-              agentColor={agentTheme.primary}
-              contextData={{
-                currentTab: selectedTab,
-                parameters: parameters,
-                agentOverview: props.overview,
-                businessInputs: props.businessInputs,
-                analytics: props.analytics,
-                workflowState: workflowState,
-                validationErrors: validationErrors
-              }}
-              suggestedQueries={getAgentSuggestedQueries(props.agentId)}
-              onRerun={(params) => {
-                setParameters(params);
-                console.log('Re-running analysis with params:', params);
-              }}
-            />
-          </div>
-
-          {/* Right Panel - Visualizations (55% desktop, full width mobile) */}
-          <div className="w-full lg:w-[55%] rounded-xl overflow-hidden flex flex-col"
+          {/* Left Panel - Sequential Workflow (55% desktop, full width mobile) */}
+          <div className="w-full lg:w-[55%] rounded-xl overflow-hidden flex flex-col" 
             style={{ 
               backgroundColor: zsColors.neutral.white,
               border: `1px solid ${zsColors.neutral.lightGray}`,
@@ -958,6 +919,61 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
+          </div>
+          
+          {/* Right Panel - Interactive Q&A (45% desktop, full width mobile) */}
+          <div className="w-full lg:w-[45%] rounded-xl overflow-hidden"
+            style={{ 
+              backgroundColor: zsColors.neutral.white,
+              border: `1px solid ${zsColors.neutral.lightGray}`,
+              boxShadow: zsColors.shadows.md,
+              minHeight: '500px',
+              maxHeight: '700px'
+            }}>
+            <div className="p-4" style={{ borderBottom: `1px solid ${zsColors.neutral.lightGray}` }}>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold flex items-center gap-2" style={{ color: zsColors.neutral.charcoal }}>
+                  <MessageSquare size={20} />
+                  Interactive Q&A
+                </h2>
+                <span className="text-xs px-2 py-1 rounded-full" style={{ 
+                  backgroundColor: zsColors.semantic.success + '20',
+                  color: zsColors.semantic.success 
+                }}>
+                  AI Assistant Ready
+                </span>
+              </div>
+            </div>
+            
+            {/* Chat Interface */}
+            <div className="h-full">
+              <AgentChat 
+                agentId={props.agentId}
+                agentName={props.agentName}
+                agentColor={props.agentColor}
+                suggestedQueries={getAgentSuggestedQueries(props.agentId)}
+                contextData={parameters}
+                parameters={parameters.map((param, idx) => ({
+                  label: param.name,
+                  key: `param_${idx}`,
+                  type: param.type === 'slider' ? 'slider' : param.type === 'select' ? 'select' : param.type === 'toggle' ? 'select' : 'text',
+                  value: param.value,
+                  options: param.options,
+                  min: param.min,
+                  max: param.max
+                }))}
+                onRerun={(params) => {
+                  console.log('Rerun with params:', params);
+                  // Handle parameter updates
+                  Object.keys(params).forEach((key) => {
+                    const idx = parseInt(key.replace('param_', ''));
+                    if (!isNaN(idx) && idx < parameters.length) {
+                      handleParameterChange(idx, params[key]);
+                    }
+                  });
+                }}
+              />
             </div>
           </div>
         </div>

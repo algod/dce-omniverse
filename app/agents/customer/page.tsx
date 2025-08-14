@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Users } from 'lucide-react';
 import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
 import { CustomerPlanningInteractive } from '@/components/agents/CustomerPlanningInteractive';
@@ -10,7 +11,8 @@ import { useAgentDataFlow } from '@/lib/contexts/AgentDataContext';
 import { DownstreamImpactPreview } from '@/components/agent-verse/DownstreamImpactPreview';
 import { motion } from 'framer-motion';
 
-export default function CustomerPlanningAgent() {
+function CustomerPlanningAgentContent() {
+  const searchParams = useSearchParams();
   const [workflowMode, setWorkflowMode] = useState(false);
   const [activeWorkflow, setActiveWorkflow] = useState(customerPriorityWorkflow);
   const [brandContext] = useState({
@@ -22,6 +24,16 @@ export default function CustomerPlanningAgent() {
   // Data flow integration
   const { currentData, upstreamData, updateData, dataAvailable, previewDownstreamImpact } = useAgentDataFlow('customer');
   const [pendingChanges, setPendingChanges] = useState<any>(null);
+  
+  // Check if workflow should be started automatically from Omni Agent
+  useEffect(() => {
+    if (searchParams.get('workflow') === 'active') {
+      setWorkflowMode(true);
+      // Start the workflow from the first customer planning module
+      const updated = executeWorkflowStep(activeWorkflow, 1);
+      setActiveWorkflow(updated);
+    }
+  }, [searchParams]);
 
   const handleStartWorkflow = () => {
     setWorkflowMode(true);
@@ -255,5 +267,13 @@ export default function CustomerPlanningAgent() {
         ]
       }}
     />
+  );
+}
+
+export default function CustomerPlanningAgent() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CustomerPlanningAgentContent />
+    </Suspense>
   );
 }
