@@ -23,83 +23,115 @@ const omniAgent = {
   sequence: 0
 };
 
-// Specialized agents
+// Specialized agents - 9 total as per CLAUDE.md
 const agents = [
   {
     id: 'customer',
     name: 'Customer Planning',
     icon: Users,
-    description: 'Microsegmentation & prioritization',
+    description: '5-module microsegmentation',
     color: zsColors.agents.customer,
-    story: 'Classifies customers by persona, performance, potential, preference',
-    outputs: 'Priority target list with microsegments',
+    story: '4P framework: Persona, Performance, Potential, Preference',
+    outputs: 'Priority HCP list with microsegments',
     sequence: 1
   },
   {
     id: 'engagement',
     name: 'Engagement Planning',
     icon: TrendingUp,
-    description: 'Resource allocation & marketing mix',
+    description: 'Budget optimization by segment',
     color: zsColors.agents.budget,
-    story: 'Optimizes budget by microsegment × channel',
-    outputs: 'Optimal resource allocation strategy',
+    story: 'ROI maximization across channels × segments',
+    outputs: 'Optimal resource allocation',
     sequence: 2
   },
   {
-    id: 'content',
-    name: 'Content Supply Chain',
+    id: 'content-planning',
+    name: 'Content Planning',
     icon: FileCheck,
-    description: 'Planning, generation & approval',
-    color: zsColors.agents.content,
-    story: 'End-to-end content lifecycle management',
-    outputs: 'Approved content with MLR compliance',
+    description: 'Gap analysis & inventory',
+    color: { primary: '#8B5CF6', light: '#A78BFA' },
+    story: 'Identifies content needs by segment',
+    outputs: 'Content gap analysis & timeline',
     sequence: 3
+  },
+  {
+    id: 'content-generation',
+    name: 'Content Generation',
+    icon: Sparkles,
+    description: 'Asset creation & variants',
+    color: { primary: '#6366F1', light: '#818CF8' },
+    story: 'Develops compliant content assets',
+    outputs: 'Generated content with quality scores',
+    sequence: 4
+  },
+  {
+    id: 'content',
+    name: 'Content Approval',
+    icon: FileCheck,
+    description: 'MLR review & Veeva sync',
+    color: { primary: '#10B981', light: '#34D399' },
+    story: 'Automated approval with human-in-loop',
+    outputs: 'MLR-approved content library',
+    sequence: 5
   },
   {
     id: 'orchestration',
     name: 'Orchestration',
     icon: Brain,
-    description: 'Customer journey optimization',
+    description: 'Journey optimization',
     color: zsColors.agents.orchestration,
-    story: 'Determines optimal engagement sequences',
+    story: 'AI-powered engagement sequences',
     outputs: 'Personalized customer journeys',
-    sequence: 4
+    sequence: 6
   },
   {
     id: 'activation',
     name: 'Digital Activation',
     icon: Zap,
-    description: 'Execution vendor integration',
-    color: { primary: '#10B981', light: '#34D399' },
-    story: 'Activates recommendations through AgentVerse',
-    outputs: 'Executed campaigns across channels',
-    sequence: 5
+    description: 'Vendor integration',
+    color: { primary: '#14B8A6', light: '#5EEAD4' },
+    story: 'Executes campaigns via partners',
+    outputs: 'Activated campaigns',
+    sequence: 7
+  },
+  {
+    id: 'suggestions',
+    name: 'Field Suggestions',
+    icon: Lightbulb,
+    description: 'HQ-designed triggers',
+    color: { primary: '#F59E0B', light: '#FBBf24' },
+    story: '7 trigger types with prioritization',
+    outputs: 'Prioritized field actions',
+    sequence: 8
   },
   {
     id: 'copilot',
     name: 'Field Copilot',
     icon: HeadphonesIcon,
-    description: 'AI-powered field assistance',
+    description: 'Rep AI assistant',
     color: zsColors.agents.copilot,
-    story: 'Empowers reps with real-time insights',
-    outputs: 'Pre-call plans, coaching & insights',
-    sequence: 6
+    story: 'Pre-call planning & coaching',
+    outputs: 'Field insights & feedback',
+    sequence: 9
   }
 ];
 
 
-// Agent flow connections
+// Agent flow connections - 9 agent sequential flow
 const flowConnections = [
-  // Sequential flow
+  // Main sequential flow
   { from: 'omni', to: 'customer', label: 'Customer Query', type: 'main' },
   { from: 'customer', to: 'engagement', label: 'Microsegments', type: 'main' },
-  { from: 'engagement', to: 'content', label: 'Resource Plan', type: 'main' },
-  { from: 'content', to: 'orchestration', label: 'Content Assets', type: 'main' },
+  { from: 'engagement', to: 'content-planning', label: 'Budget Allocation', type: 'main' },
+  { from: 'content-planning', to: 'content-generation', label: 'Content Gaps', type: 'main' },
+  { from: 'content-generation', to: 'content', label: 'Generated Assets', type: 'main' },
+  { from: 'content', to: 'orchestration', label: 'Approved Content', type: 'main' },
   { from: 'orchestration', to: 'activation', label: 'Journey Plans', type: 'main' },
-  { from: 'activation', to: 'copilot', label: 'Field Actions', type: 'main' },
-  // Feedback loops
-  { from: 'copilot', to: 'customer', label: 'Field Insights', type: 'feedback' },
-  { from: 'activation', to: 'orchestration', label: 'Performance', type: 'feedback' }
+  { from: 'activation', to: 'suggestions', label: 'Campaign Data', type: 'main' },
+  { from: 'suggestions', to: 'copilot', label: 'Field Actions', type: 'main' },
+  // Feedback loop
+  { from: 'copilot', to: 'customer', label: 'Field Insights', type: 'feedback' }
 ];
 
 export function FlowVisualizationClean() {
@@ -291,8 +323,8 @@ export function FlowVisualizationClean() {
             </p>
           </div>
           
-          {/* Agent Grid - responsive */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 px-4 max-w-6xl mx-auto">
+          {/* Agent Grid - responsive for 9 agents */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 px-4 max-w-7xl mx-auto">
             {agents.map((agent, index) => (
               <motion.div
                 key={agent.id}

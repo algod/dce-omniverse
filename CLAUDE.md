@@ -4,20 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-**DCE OmniVerse** is a next-generation omnichannel agentic AI solution for pharmaceutical companies in the US, featuring 6 intelligent AI agents in an interconnected agent-verse. This demonstration application showcases advanced AI capabilities for omnichannel planning and execution through a connected flow of agents, designed for presentation to senior pharmaceutical commercial leaders.
+**DCE OmniVerse** is a next-generation omnichannel agentic AI solution for pharmaceutical companies in the US, featuring 6 intelligent AI agents in an interconnected agent-verse. This demonstration application showcases advanced AI capabilities for omnichannel planning and execution through a connected flow of agents, designed for presentation to senior pharmaceutical commercial leaders. Note that this is an agentic ecosystem which I want to make real through this working demo application.
+
 
 **Live Application**: https://dce-omniverse.vercel.app  
 **GitHub Repository**: https://github.com/algod/dce-omniverse
 
 ## Agent-Verse Architecture
 
-The DCE OmniVerse follows a logical flow where each agent's outputs feed into the next, creating a comprehensive omnichannel strategy:
+The DCE OmniVerse follows a logical business process flow where each agent's outputs feed into the next, creating a comprehensive omnichannel strategy:
 
 ```
 Omni Agent (Master Orchestrator)
     ↓
-Customer Planning (5-Module Workflow) → Budget Planning → Content Review → 
-Omnichannel Orchestration → Field Suggestions → Field Copilot
+Customer Planning (5-Module Workflow) → Engagement Planning → Content Planning → Content Generation → Content Approval → Omnichannel Orchestration → Digital Activation → Field Suggestions → Field Copilot
 ```
 
 ### Omni Agent - Master Orchestrator
@@ -28,6 +28,7 @@ Omnichannel Orchestration → Field Suggestions → Field Copilot
 - Activates appropriate agent workflows
 - Manages inter-agent communication
 - Visualizes workflow progression
+- Based on the invoked agent, it navigates the user automatically into agent specific screens/UX
 
 **Workflow Detection**:
 - "Who should be my priority customers?" → Activates Customer Planning Workflow
@@ -50,12 +51,10 @@ Omnichannel Orchestration → Field Suggestions → Field Copilot
 - **Agent Framework**: Custom agent architecture with inter-agent communication
 - **Design System**: ZS-inspired professional interface
 
-## Core Modules (6 Agentic AI Agents)
+## Core Modules (9 Agentic AI Agents)
 
 ### 1. Customer Planning Agent
-**Position**: Start of flow - Intelligence Gathering
-**Purpose**: Prioritization of high opportunity customers using barrier analysis through 5-module workflow
-**Agent Reasoning**: Analyzes secondary data and field feedback to identify HCP barriers and predict sales opportunities
+**Purpose**: Classifies and prioritizes the high opportunity customers based on microsegments. The process follows 5-module workflow
 
 #### 5-Module Workflow Structure:
 
@@ -87,7 +86,7 @@ Omnichannel Orchestration → Field Suggestions → Field Copilot
   - Trains ensemble models (Random Forest + XGBoost)
   - Generates opportunity predictions per HCP
   - Validates against holdout dataset
-- **Output**: Depth ($285K avg) and Breadth ($142K avg) opportunities
+- **Output**: Depth and Breadth opportunities
 
 ##### Module 4: Preference Mapping
 - **Purpose**: Channel and content affinity analysis
@@ -111,12 +110,6 @@ Omnichannel Orchestration → Field Suggestions → Field Copilot
     - Balanced Approach: All segments weighted (+28% overall performance)
 - **User Interaction**: Select strategy, confirm segments, finalize
 
-**Key Actions**:
-- Identifies and analyzes 5 primary barriers affecting HCP prescribing
-- Runs predictive models for sales depth/breadth opportunities
-- Prioritizes customers for field and/or digital promotion
-- Generates "The Play" framework for barrier-specific engagement
-
 **Interactive Q&A Examples**:
 - "Which barriers are most prevalent in my territory?"
 - "Show me high-opportunity HCPs with referral pathway barriers"
@@ -137,15 +130,14 @@ Omnichannel Orchestration → Field Suggestions → Field Copilot
 - HCP opportunity scatter plot (depth vs breadth)
 - Barrier distribution by segment
 
-### 2. Budget Planning Agent
-**Position**: Second in flow - Resource Allocation
-**Purpose**: Optimal budget allocation across promotional channels with ROI maximization
+### 2. Engagement Planning Agent
+**Purpose**: Optimal budget allocation across promotional channels and customer microsegment (microsegment definitions come from customer planning agent) with ROI maximization
 **Agent Reasoning**: Uses impact attribution analysis and response curves to optimize channel mix
 **Key Actions**:
-- Analyzes historical response curves for each channel
+- Analyzes historical response curves for each channel and customer microsegment (microsegment definitions come from customer planning agent)
 - Optimizes budget allocation with constraints
 - Calculates ROI and mROI for each scenario
-- Breaks down to quarterly HCP-level engagement plans
+- Breaks down to quarterly HCP microsegment-level engagement plans
 
 **Interactive Q&A Examples**:
 - "What's the optimal allocation for $15M budget?"
@@ -158,49 +150,88 @@ Omnichannel Orchestration → Field Suggestions → Field Copilot
 - Forward-looking assumptions
 
 **Outputs** → Content Review:
-- Optimal channel budgets
+- Optimal budgets by channels
+- Optimal budgets by HCP microsegments
 - Expected ROI by channel
-- HCP engagement frequency plans
+- HCP microsegment level engagement frequency plans
 
 **Visualizations**:
-- Response curves by channel
+- Response curves by channel and customer microsegment
 - ROI waterfall chart
 - Budget allocation pie chart
 - Saturation analysis gauges
 
-### 3. Content Review Agent
-**Position**: Third in flow - Message Preparation
-**Purpose**: Content management and accelerated MLR approval process
-**Agent Reasoning**: Maps content to barriers and ensures compliance while identifying gaps
+### 3. Content Planning Agent
+**Purpose**: Determines the current state of content asset inventory, determines where there is the need to develop new content assets or retire old assets
+**Agent Reasoning**: Maps customer microsegments to communication objectives, message themes and actual creatives, identifyies gaps
 **Key Actions**:
-- Maps message themes to customer barriers
-- Conducts MLR compliance assessment
-- Identifies content gaps by barrier and channel
-- Coordinates new content production
+- Maps communication objectives and message themes to customer microsegments 
+- Identifies content gaps by message theme and channel
+- Performs review of the quality of available content assets 
+- Recommends actions and develops the plan for future content creation and MLR approval
 
 **Interactive Q&A Examples**:
 - "Which content addresses referral pathway barriers?"
-- "Show MLR approval status for pending assets"
 - "What content gaps exist for email channel?"
 
-**Business Inputs**:
-- Message theme priorities
-- Content approval criteria
-- Asset retirement decisions
-
-**Outputs** → Orchestration:
-- Approved content library
-- Content-barrier mapping
-- Gap analysis recommendations
+**Outputs** → Content Generation:
+- Visual mapping from microsegment to message objectives to content themes, volume of creatives, quality of creatives
+- Recommended actions to address content gaps and timeline plan which includes steps of content development and tagging, MLR review and approval and integration with Veeva Promomats 
 
 **Visualizations**:
 - Content coverage heatmap
-- MLR compliance dashboard
 - Content calendar timeline
-- Gap analysis by barrier
+- Gap analysis by microsegment, message theme and channel
 
-### 4. AI-based Orchestration Agent
-**Position**: Fourth in flow - Journey Optimization
+### 4. Content Generation Agent
+**Purpose**: Develops new content assets starting from blueprint to content variants or derivaties in accordance with outputs from content planning agent
+**Agent Reasoning**: Translates recommendations from content planning agent into a clear content development plan and accordingly develops high quality content which is likely to pass MLR approval and compliance
+**Key Actions**:
+- Develops the actual content assets as per the recommendations from content plannign agent
+- Passes the developed assets to content approval agent
+
+**Interactive Q&A Examples**:
+- "How do you determine a high quality content?"
+- "What checks are in place to ensure the content will pass MLR and compliance approval?"
+
+**Outputs** → Content Approval:
+- Summary of how the developed content addresses the recommendations from content planning agent
+- List of generated content asset 
+- Direct integration of generated content assets with content approval agent
+
+**Visualizations**:
+- Distribution of content vs. customer microsegments, message themes and channel before vs. after content generation module is run (connect with outputs from content planning agent)
+- Distribution of content by original blueprint vs. content variants/derivatives
+
+
+### 5. Content Approval Agent
+**Purpose**: Defines the standards for content approval, runs the MLR review engine, recommends which content should be approved and among those not approved what are the changes to be made and gets the content approved with human in the loop
+**Agent Reasoning**: Thinks through and determines the standards for content approval and evaluates whether generated content should be approved 
+**Key Actions**:
+- Inputs the data from content generation agent
+- Run the MLR review engine which assigns approval score to each of the pipeline content asset  
+- Explains why an asset should be approved vs. declined
+- Buckets assets into those which should be auto-approved vs. those that need human review vs. those that should be declined 
+- Provides suggestions with data points to help with quick decision making
+- Human in the loop reviews the output of MLR review where human review was required and signs off
+- Through a chat interface, human in the loop should be able to ask follow up questions on MLR review scoring methodology, suggest changes to standards of content or scoring approach
+- End to end workflow seamlessly integrates with veeva promomats. This integration should show up in the UX
+
+**Interactive Q&A Examples**:
+- "What is your standard for MLR approval?"
+- "What are the improvements needed with a [specific content asset] so that it passes MLR approval"
+
+**Outputs**:
+- Summary of MLR approval standards
+- Content asset level MLR approval score, whether it should be auto approved, requires manual review or should be declined, rationale behind the scores and recommendations
+- Auto approved assets are directly integrated with content library (using integration with Veeva PromoMats)
+- Assets requiring human approval are integrated downstream only after human reviews and confirms
+  
+**Visualizations**:
+- Distribution of developed content by MLR approval buckets
+- Based on the approved assets, double click into which microsegments and channels will have their content gaps fulfilled vs. where the content was developed but got declined (connect with outputs from content planning agent and content generation agent)
+
+### 6. AI-based Orchestration Agent
 **Purpose**: Customer journey optimization and Next Best Action recommendations
 **Agent Reasoning**: Uses BERT model for behavior prediction and genetic algorithms for sequence optimization
 **Key Actions**:
@@ -219,7 +250,7 @@ Omnichannel Orchestration → Field Suggestions → Field Copilot
 - Journey constraints
 - Success metrics definition
 
-**Outputs** → Field Suggestions:
+**Outputs** → Digital Activation Agent and Field Suggestions Agent:
 - Optimized customer journeys
 - NBA recommendations
 - Model explainability insights
@@ -230,7 +261,29 @@ Omnichannel Orchestration → Field Suggestions → Field Copilot
 - Feature importance charts
 - Conversion funnel analysis
 
-### 5. Field Suggestion Design Agent for HQ
+### 7. Digital Activation Agent
+**Purpose**: Activates the recommendations from orchestration agent by integrating with execution parterns such as SalesForce and third-party vendors
+**Agent Reasoning**: Translates orchestration outputs into format which can be passed to respective execution vendors
+**Key Actions**:
+- Integrates the recommendations from orchestration engine
+- Translates into files for activation with execution partners
+- Raises any issues that requires user input
+- Communicates that the execution is complete via email to the user and execution partners
+- Addresses any tickets or queries from the execution partner 
+
+**Interactive Q&A Examples**:
+
+
+**Business Inputs**:
+
+
+**Outputs** 
+
+
+**Visualizations**:
+
+
+### 8. Field Suggestion Design Agent for HQ
 **Position**: Fifth in flow - Field Enablement
 **Purpose**: Design and monitor field suggestions aligned with brand objectives
 **Agent Reasoning**: Balances trigger volume, quality, and field capacity while incorporating feedback
@@ -261,7 +314,7 @@ Omnichannel Orchestration → Field Suggestions → Field Copilot
 - Volume trend charts
 - Adoption heatmap by territory
 
-### 6. Field Copilot Agent
+### 9. Field Copilot Agent
 **Position**: End of flow - Execution Support
 **Purpose**: AI assistant for sales reps supporting field activities
 **Agent Reasoning**: Synthesizes all upstream intelligence for actionable field guidance
@@ -467,7 +520,7 @@ Seven prioritized triggers configured for the field suggestion system:
 
 ## Important Notes
 
-- **Target Audience**: Senior pharmaceutical commercial leaders
+- **Target Audience**: Pharmaceutical commercial leaders
 - **Demo Focus**: Interactive exploration of connected AI agents
 - **Key Differentiator**: Barrier-led approach with explainable AI reasoning
 - **Presentation Ready**: Optimized for live demonstrations with Q&A

@@ -23,15 +23,18 @@ interface AgentViewProps {
     purpose: string;
     reasoning: string[];
     tools: string[];
-    actions: string[];
-    keyMetrics: Array<{ label: string; value: string | number }>;
+    actions?: string[];
+    keyMetrics?: Array<{ label: string; value: string | number }>;
   };
-  businessInputs: {
+  businessInputs?: {
     upstream?: {
       source: string;
       data: Array<{ label: string; value: string }>;
     };
-    parameters: Array<{
+    fromUpstream?: string[];
+    userInputs?: string[];
+    businessRules?: string[];
+    parameters?: Array<{
       name: string;
       type: 'slider' | 'select' | 'toggle' | 'number';
       value: any;
@@ -39,30 +42,34 @@ interface AgentViewProps {
       min?: number;
       max?: number;
     }>;
-    constraints: string[];
+    constraints?: string[];
   };
-  analytics: {
-    models: Array<{ name: string; description: string; accuracy?: number }>;
-    algorithms: string[];
-    reasoning: {
+  analytics?: {
+    models?: Array<{ name: string; description: string; accuracy?: number }>;
+    algorithms?: string[];
+    reasoning?: {
       steps: Array<{ step: string; description: string }>;
     };
-    visualizations: React.ReactNode;
+    visualizations?: React.ReactNode;
   };
-  outputs: {
-    downstream: {
+  outputs?: {
+    downstream?: {
       destination: string;
       data: Array<{ label: string; value: string }>;
     };
-    recommendations: string[];
-    impact: Array<{ metric: string; change: string }>;
+    toDownstream?: string[];
+    metrics?: string[];
+    actions?: string[];
+    recommendations?: string[];
+    impact?: Array<{ metric: string; change: string }>;
   };
+  visualizationComponent?: React.ComponentType;
 }
 
 export function StandardAgentViewLight(props: AgentViewProps) {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState<'overview' | 'inputs' | 'analytics' | 'outputs'>('overview');
-  const [parameters, setParameters] = useState(props.businessInputs.parameters);
+  const [parameters, setParameters] = useState(props.businessInputs?.parameters || []);
   const [isNavigating, setIsNavigating] = useState(false);
   const [workflowState, setWorkflowState] = useState({
     overviewCompleted: false,
@@ -475,7 +482,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold mb-4" style={{ color: zsColors.neutral.charcoal }}>Current Actions</h3>
                       <div className="space-y-3">
-                        {props.overview.actions.map((action, idx) => (
+                        {props.overview.actions?.map((action, idx) => (
                           <div key={idx} className="flex items-start gap-3">
                             <Activity size={16} style={{ color: zsColors.secondary.orange }} className="mt-0.5 flex-shrink-0" />
                             <span className="text-sm leading-relaxed" style={{ color: zsColors.neutral.darkGray }}>{action}</span>
@@ -487,7 +494,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     <div>
                       <h3 className="text-lg font-semibold mb-4" style={{ color: zsColors.neutral.charcoal }}>Key Metrics</h3>
                       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                        {props.overview.keyMetrics.map((metric, idx) => (
+                        {props.overview.keyMetrics?.map((metric, idx) => (
                           <div key={idx} className="rounded-lg p-4 text-center"
                             style={{ 
                               backgroundColor: zsColors.neutral.white,
@@ -534,17 +541,17 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     exit={{ opacity: 0, y: -10 }}
                     className="space-y-6"
                   >
-                    {props.businessInputs.upstream && (
+                    {props.businessInputs?.upstream && (
                       <div>
                         <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
-                          Data from {props.businessInputs.upstream.source}
+                          Data from {props.businessInputs?.upstream?.source}
                         </h3>
                         <div className="rounded-lg p-4 space-y-2"
                           style={{ 
                             backgroundColor: zsColors.neutral.offWhite,
                             border: `1px solid ${zsColors.neutral.lightGray}`
                           }}>
-                          {props.businessInputs.upstream.data.map((item, idx) => (
+                          {props.businessInputs?.upstream?.data?.map((item, idx) => (
                             <div key={idx} className="flex justify-between">
                               <span className="text-sm" style={{ color: zsColors.neutral.gray }}>{item.label}:</span>
                               <span className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>{item.value}</span>
@@ -630,7 +637,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Business Constraints</h3>
                       <ul className="space-y-2">
-                        {props.businessInputs.constraints.map((constraint, idx) => (
+                        {props.businessInputs?.constraints?.map((constraint, idx) => (
                           <li key={idx} className="flex items-start gap-2">
                             <Zap size={16} style={{ color: zsColors.semantic.warning }} className="mt-1" />
                             <span className="text-sm" style={{ color: zsColors.neutral.darkGray }}>{constraint}</span>
@@ -676,7 +683,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>AI Models</h3>
                       <div className="space-y-3">
-                        {props.analytics.models.map((model, idx) => (
+                        {props.analytics?.models?.map((model, idx) => (
                           <div key={idx} className="rounded-lg p-4"
                             style={{ 
                               backgroundColor: zsColors.neutral.offWhite,
@@ -697,7 +704,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Algorithms</h3>
                       <div className="flex flex-wrap gap-2">
-                        {props.analytics.algorithms.map((algo, idx) => (
+                        {props.analytics?.algorithms?.map((algo, idx) => (
                           <span key={idx} className="px-3 py-1 rounded-full text-sm text-white"
                             style={{ backgroundColor: agentTheme.primary }}>
                             {algo}
@@ -709,7 +716,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Reasoning Process</h3>
                       <div className="space-y-3">
-                        {props.analytics.reasoning.steps.map((step, idx) => (
+                        {props.analytics?.reasoning?.steps?.map((step, idx) => (
                           <div key={idx} className="flex gap-3">
                             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
                               style={{ 
@@ -736,7 +743,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                             <p className="text-sm" style={{ color: zsColors.neutral.gray }}>AI models are processing your inputs...</p>
                           </div>
                         ) : (
-                          <>{props.analytics.visualizations}</>
+                          <>{props.analytics?.visualizations || (props.visualizationComponent && <props.visualizationComponent />)}</>
                         )}
                       </div>
                     )}
@@ -794,14 +801,14 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                   >
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>
-                        Data Package to {props.outputs.downstream.destination}
+                        Data Package to {props.outputs?.downstream?.destination || 'Next Agent'}
                       </h3>
                       <div className="rounded-lg p-4 space-y-2"
                         style={{ 
                           backgroundColor: zsColors.neutral.offWhite,
                           border: `1px solid ${zsColors.neutral.lightGray}`
                         }}>
-                        {props.outputs.downstream.data.map((item, idx) => (
+                        {props.outputs?.downstream?.data?.map((item, idx) => (
                           <div key={idx} className="flex justify-between">
                             <span className="text-sm" style={{ color: zsColors.neutral.gray }}>{item.label}:</span>
                             <span className="text-sm font-medium" style={{ color: zsColors.neutral.charcoal }}>{item.value}</span>
@@ -813,7 +820,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Recommendations</h3>
                       <ul className="space-y-2">
-                        {props.outputs.recommendations.map((rec, idx) => (
+                        {props.outputs?.recommendations?.map((rec, idx) => (
                           <li key={idx} className="flex items-start gap-2">
                             <ArrowRight size={16} style={{ color: zsColors.semantic.success }} className="mt-1" />
                             <span className="text-sm" style={{ color: zsColors.neutral.darkGray }}>{rec}</span>
@@ -825,7 +832,7 @@ export function StandardAgentViewLight(props: AgentViewProps) {
                     <div>
                       <h3 className="text-lg font-semibold mb-3" style={{ color: zsColors.neutral.charcoal }}>Expected Impact</h3>
                       <div className="grid grid-cols-2 gap-4">
-                        {props.outputs.impact.map((impact, idx) => (
+                        {props.outputs?.impact?.map((impact, idx) => (
                           <div key={idx} className="rounded-lg p-3"
                             style={{ 
                               backgroundColor: zsColors.neutral.white,
