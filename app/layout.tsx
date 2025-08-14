@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
+import { UserModeProvider } from "@/lib/contexts/UserModeContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,9 +30,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <CommandPalette />
-        <DarkModeToggle />
+        <UserModeProvider>
+          {children}
+          <CommandPalette />
+          <DarkModeToggle />
+        </UserModeProvider>
       </body>
     </html>
   );

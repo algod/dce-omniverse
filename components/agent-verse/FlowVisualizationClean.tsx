@@ -8,122 +8,117 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { zsColors } from '@/lib/design-system/zs-colors';
+import { useUserMode } from '@/lib/contexts/UserModeContext';
+import { UserModeToggle } from '@/components/ui/UserModeToggle';
 
-// Agents arranged in horizontal workflow sequence
-const planningAgents = [
+// Master Orchestrator
+const omniAgent = {
+  id: 'omni',
+  name: 'Omni Agent',
+  icon: Sparkles,
+  description: 'Master Orchestrator - Intelligent routing & coordination',
+  color: { primary: '#6B46C1', light: '#9F7AEA' },
+  story: 'Controls and coordinates all specialized agents',
+  outputs: 'Orchestrated multi-agent workflows',
+  sequence: 0
+};
+
+// Specialized agents
+const agents = [
   {
     id: 'customer',
     name: 'Customer Planning',
     icon: Users,
-    description: 'Barrier analysis & HCP prioritization',
+    description: 'Microsegmentation & prioritization',
     color: zsColors.agents.customer,
-    story: 'Identifies barriers preventing prescribing',
-    outputs: 'Prioritized HCPs with barrier profiles',
-    phase: 'Planning',
+    story: 'Classifies customers by persona, performance, potential, preference',
+    outputs: 'Priority target list with microsegments',
     sequence: 1
   },
   {
-    id: 'budget',
-    name: 'Budget Planning', 
+    id: 'engagement',
+    name: 'Engagement Planning',
     icon: TrendingUp,
-    description: 'Multi-channel ROI optimization',
+    description: 'Resource allocation & marketing mix',
     color: zsColors.agents.budget,
-    story: 'Allocates resources for maximum impact',
-    outputs: 'Optimal channel budget allocation',
-    phase: 'Planning',
+    story: 'Optimizes budget by microsegment × channel',
+    outputs: 'Optimal resource allocation strategy',
     sequence: 2
   },
   {
     id: 'content',
-    name: 'Content Review',
+    name: 'Content Supply Chain',
     icon: FileCheck,
-    description: 'MLR compliance & content strategy',
+    description: 'Planning, generation & approval',
     color: zsColors.agents.content,
-    story: 'Ensures compliant barrier-specific messaging',
-    outputs: 'Approved content mapped to barriers',
-    phase: 'Planning',
+    story: 'End-to-end content lifecycle management',
+    outputs: 'Approved content with MLR compliance',
     sequence: 3
-  }
-];
-
-const orchestrationAgent = {
-  id: 'orchestration',
-  name: 'AI Orchestration',
-  icon: Brain,
-  description: 'Customer journey optimization & NBA',
-  color: zsColors.agents.orchestration,
-  story: 'Synthesizes intelligence for personalized journeys',
-  outputs: 'Optimized customer journeys & NBA recommendations',
-  phase: 'Orchestration',
-  sequence: 4
-};
-
-const executionAgents = [
+  },
   {
-    id: 'suggestions',
-    name: 'Field Suggestions',
-    icon: Lightbulb,
-    description: 'Intelligent trigger-based recommendations',
-    color: zsColors.agents.suggestions,
-    story: 'Generates actionable field guidance',
-    outputs: 'Prioritized suggestions with context',
-    phase: 'Execution',
+    id: 'orchestration',
+    name: 'Orchestration',
+    icon: Brain,
+    description: 'Customer journey optimization',
+    color: zsColors.agents.orchestration,
+    story: 'Determines optimal engagement sequences',
+    outputs: 'Personalized customer journeys',
+    sequence: 4
+  },
+  {
+    id: 'activation',
+    name: 'Digital Activation',
+    icon: Zap,
+    description: 'Execution vendor integration',
+    color: { primary: '#10B981', light: '#34D399' },
+    story: 'Activates recommendations through AgentVerse',
+    outputs: 'Executed campaigns across channels',
     sequence: 5
   },
   {
     id: 'copilot',
     name: 'Field Copilot',
     icon: HeadphonesIcon,
-    description: 'AI-powered rep assistance & coaching',
+    description: 'AI-powered field assistance',
     color: zsColors.agents.copilot,
-    story: 'Empowers every HCP interaction',
-    outputs: 'Call plans, insights & feedback',
-    phase: 'Execution',
+    story: 'Empowers reps with real-time insights',
+    outputs: 'Pre-call plans, coaching & insights',
     sequence: 6
   }
 ];
 
-// Horizontal flow connections
+
+// Agent flow connections
 const flowConnections = [
   // Sequential flow
-  { from: 'customer', to: 'budget', label: 'HCP Priorities', type: 'main' },
-  { from: 'budget', to: 'content', label: 'Budget Strategy', type: 'main' },
+  { from: 'omni', to: 'customer', label: 'Customer Query', type: 'main' },
+  { from: 'customer', to: 'engagement', label: 'Microsegments', type: 'main' },
+  { from: 'engagement', to: 'content', label: 'Resource Plan', type: 'main' },
   { from: 'content', to: 'orchestration', label: 'Content Assets', type: 'main' },
-  { from: 'orchestration', to: 'suggestions', label: 'Journey Plans', type: 'main' },
-  { from: 'suggestions', to: 'copilot', label: 'Field Guidance', type: 'main' },
+  { from: 'orchestration', to: 'activation', label: 'Journey Plans', type: 'main' },
+  { from: 'activation', to: 'copilot', label: 'Field Actions', type: 'main' },
   // Feedback loops
-  { from: 'copilot', to: 'orchestration', label: 'Performance Data', type: 'feedback' },
-  { from: 'orchestration', to: 'customer', label: 'Insights', type: 'feedback' }
+  { from: 'copilot', to: 'customer', label: 'Field Insights', type: 'feedback' },
+  { from: 'activation', to: 'orchestration', label: 'Performance', type: 'feedback' }
 ];
 
 export function FlowVisualizationClean() {
   const [activeAgent, setActiveAgent] = useState<string | null>(null);
   const [flowStep, setFlowStep] = useState(0);
-  
-  // All agents in sequence order
-  const allAgents = [
-    ...planningAgents, 
-    orchestrationAgent, 
-    ...executionAgents
-  ];
+  const [showOmniConnections, setShowOmniConnections] = useState(true);
+  const { isAgentEnabled } = useUserMode();
 
-  // Sequential flow animation - horizontal progression
+  // Sequential flow animation
   useEffect(() => {
     const flowInterval = setInterval(() => {
-      setFlowStep(prev => (prev + 1) % allAgents.length);
-      setActiveAgent(allAgents[flowStep]?.id || null);
+      setFlowStep(prev => (prev + 1) % agents.length);
+      setActiveAgent(agents[flowStep]?.id || null);
     }, 3000);
 
     return () => {
       clearInterval(flowInterval);
     };
   }, [flowStep]);
-
-  const getCurrentPhaseDescription = () => {
-    if (flowStep < 3) return "Planning Phase: Strategic Intelligence & Foundation";
-    if (flowStep === 3) return "Orchestration Phase: AI-Powered Journey Optimization";
-    return "Execution Phase: Field Support & Continuous Learning";
-  };
 
   return (
     <div className="relative min-h-screen p-8" style={{ backgroundColor: zsColors.neutral.offWhite }}>
@@ -135,8 +130,129 @@ export function FlowVisualizationClean() {
       </div>
 
       <div className="relative z-10 max-w-[1600px] mx-auto">
+        {/* User Mode Toggle */}
+        <div className="flex justify-center mb-8">
+          <UserModeToggle />
+        </div>
+
+        {/* Omni Agent - Master Orchestrator */}
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mb-12"
+        >
+          <div className="flex justify-center mb-8">
+            <Link href="/agents/omni">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="relative"
+                onHoverStart={() => setShowOmniConnections(true)}
+                onHoverEnd={() => setShowOmniConnections(false)}
+              >
+                {/* Glow effect */}
+                <motion.div
+                  className="absolute inset-0 rounded-3xl blur-2xl"
+                  style={{ background: `radial-gradient(circle, ${omniAgent.color.primary}40, transparent)` }}
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 0.8, 0.5]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+                
+                {/* Main card */}
+                <motion.div
+                  className="relative bg-white rounded-3xl p-8 shadow-2xl border-2"
+                  style={{ 
+                    borderColor: omniAgent.color.primary,
+                    background: `linear-gradient(135deg, white, ${omniAgent.color.primary}05)`
+                  }}
+                >
+                  <div className="flex items-center gap-6">
+                    <motion.div
+                      className="w-20 h-20 rounded-2xl flex items-center justify-center"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${omniAgent.color.primary}, ${omniAgent.color.light})`
+                      }}
+                      animate={{ rotate: [0, 5, -5, 0] }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                    >
+                      <Sparkles className="w-10 h-10 text-white" />
+                    </motion.div>
+                    
+                    <div>
+                      <h2 className="text-3xl font-bold mb-2" style={{ color: omniAgent.color.primary }}>
+                        {omniAgent.name}
+                      </h2>
+                      <p className="text-lg font-medium mb-1" style={{ color: zsColors.neutral.charcoal }}>
+                        Master Orchestrator
+                      </p>
+                      <p className="text-sm" style={{ color: zsColors.neutral.gray }}>
+                        {omniAgent.description}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Status indicator */}
+                  <div className="absolute top-4 right-4">
+                    <motion.div
+                      className="flex items-center gap-2 px-3 py-1 rounded-full"
+                      style={{ backgroundColor: `${zsColors.secondary.green}20` }}
+                    >
+                      <motion.div
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: zsColors.secondary.green }}
+                        animate={{ opacity: [1, 0.5, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                      <span className="text-xs font-medium" style={{ color: zsColors.secondary.green }}>
+                        Active
+                      </span>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </Link>
+          </div>
+          
+          {/* Connection lines to agents */}
+          <AnimatePresence>
+            {showOmniConnections && (
+              <motion.svg
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 pointer-events-none"
+                style={{ zIndex: -1 }}
+              >
+                {agents.map((agent, index) => {
+                  const angle = (index * 360) / agents.length;
+                  const x = 50 + 30 * Math.cos((angle * Math.PI) / 180);
+                  const y = 20 + 15 * Math.sin((angle * Math.PI) / 180);
+                  return (
+                    <motion.line
+                      key={agent.id}
+                      x1="50%"
+                      y1="20%"
+                      x2={`${x}%`}
+                      y2={`${y}%`}
+                      stroke={omniAgent.color.primary}
+                      strokeWidth="1"
+                      strokeDasharray="4 4"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                    />
+                  );
+                })}
+              </motion.svg>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -169,162 +285,39 @@ export function FlowVisualizationClean() {
             className="text-base"
             style={{ color: zsColors.neutral.gray }}
           >
-            Strategic Planning → AI Orchestration → Field Execution
+            Intelligent Agent Flow for Omnichannel Excellence
           </motion.p>
         </div>
 
-        {/* Current Phase Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="text-center mb-12"
-        >
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full"
-            style={{ 
-              backgroundColor: zsColors.neutral.white,
-              border: `2px solid ${zsColors.primary.blue}20`,
-              boxShadow: zsColors.shadows.md
-            }}
-          >
-            <Activity size={20} style={{ color: zsColors.primary.blue }} />
-            <span className="text-base font-semibold" style={{ color: zsColors.neutral.charcoal }}>
-              {getCurrentPhaseDescription()}
-            </span>
-          </div>
-        </motion.div>
 
-        {/* Horizontal Flow Layout */}
+        {/* Specialized Agents Grid */}
         <div className="relative">
-          {/* Main horizontal container - responsive */}
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 px-4">
-            
-            {/* Planning Phase Section - Left */}
-            <motion.div 
-              className="w-full lg:flex-1 lg:max-w-[400px]"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.9 }}
-            >
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold mb-2" style={{ color: zsColors.agents.customer.primary }}>
-                  Planning Phase
-                </h2>
-                <p className="text-sm" style={{ color: zsColors.neutral.gray }}>
-                  Intelligence & Strategy
-                </p>
-              </div>
-              
-              <div className="space-y-4">
-                {planningAgents.map((agent, index) => (
-                  <motion.div
-                    key={agent.id}
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1 + index * 0.1 }}
-                  >
-                    <HorizontalAgentCard 
-                      agent={agent}
-                      isActive={activeAgent === agent.id}
-                      sequence={index + 1}
-                      onHover={setActiveAgent}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Flow Arrow - responsive */}
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="flex flex-col lg:flex-row items-center gap-2 px-4 lg:px-2"
-            >
-              <ArrowRight size={40} className="lg:block hidden" style={{ color: zsColors.primary.blue }} />
-              <div className="w-10 h-10 lg:hidden rounded-full border-2 border-dashed flex items-center justify-center" 
-                style={{ borderColor: zsColors.primary.blue }}>
-                <div style={{ transform: 'rotate(90deg)' }}>
-                  <ArrowRight size={24} style={{ color: zsColors.primary.blue }} />
-                </div>
-              </div>
-              <span className="text-xs font-medium text-center" 
-                style={{ color: zsColors.neutral.darkGray }}>
-                <span className="lg:hidden block">Flows Down</span>
-                <span className="hidden lg:block">Feeds Into</span>
-              </span>
-            </motion.div>
-
-            {/* Orchestration Phase - Center */}
-            <motion.div 
-              className="w-full lg:flex-shrink-0 lg:w-[350px] max-w-md"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.3 }}
-            >
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold mb-2" style={{ color: zsColors.agents.orchestration.primary }}>
-                  AI Orchestration
-                </h2>
-                <p className="text-sm" style={{ color: zsColors.neutral.gray }}>
-                  Journey Optimization
-                </p>
-              </div>
-              
-              <CenterAgentCard 
-                agent={orchestrationAgent}
-                isActive={activeAgent === orchestrationAgent.id}
-                onHover={setActiveAgent}
-              />
-            </motion.div>
-
-            {/* Flow Arrow */}
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-              className="flex flex-col items-center gap-2 px-4"
-            >
-              <ArrowRight size={40} style={{ color: zsColors.primary.blue }} />
-              <span className="text-xs font-medium text-center whitespace-nowrap" 
-                style={{ color: zsColors.neutral.darkGray }}>
-                Enables
-              </span>
-            </motion.div>
-
-            {/* Execution Phase Section - Right */}
-            <motion.div 
-              className="w-full lg:flex-1 lg:max-w-[400px]"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.5 }}
-            >
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold mb-2" style={{ color: zsColors.agents.copilot.primary }}>
-                  Execution Phase
-                </h2>
-                <p className="text-sm" style={{ color: zsColors.neutral.gray }}>
-                  Field Support
-                </p>
-              </div>
-              
-              <div className="space-y-4">
-                {executionAgents.map((agent, index) => (
-                  <motion.div
-                    key={agent.id}
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.7 + index * 0.1 }}
-                  >
-                    <HorizontalAgentCard 
-                      agent={agent}
-                      isActive={activeAgent === agent.id}
-                      sequence={index + 5}
-                      onHover={setActiveAgent}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
+          <div className="text-center mb-6">
+            <h3 className="text-lg font-medium" style={{ color: zsColors.neutral.darkGray }}>
+              Specialized Agents
+            </h3>
+            <p className="text-sm" style={{ color: zsColors.neutral.gray }}>
+              Orchestrated and coordinated by the Omni Agent
+            </p>
+          </div>
+          
+          {/* Agent Grid - responsive */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 px-4 max-w-6xl mx-auto">
+            {agents.map((agent, index) => (
+              <motion.div
+                key={agent.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2 + index * 0.1 }}
+              >
+                <AgentCard
+                  agent={agent}
+                  isActive={activeAgent === agent.id}
+                  sequence={agent.sequence}
+                  onHover={setActiveAgent}
+                />
+              </motion.div>
+            ))}
           </div>
 
           {/* Feedback Loop Visualization */}
@@ -380,43 +373,49 @@ export function FlowVisualizationClean() {
   );
 }
 
-// Horizontal Agent Card Component
-interface HorizontalAgentCardProps {
+// Agent Card Component
+interface AgentCardProps {
   agent: any;
   isActive: boolean;
   sequence: number;
   onHover: (agentId: string | null) => void;
 }
 
-function HorizontalAgentCard({ agent, isActive, sequence, onHover }: HorizontalAgentCardProps) {
-  return (
-    <Link href={`/agents/${agent.id}`}>
+function AgentCard({ agent, isActive, sequence, onHover }: AgentCardProps) {
+  const { isAgentEnabled } = useUserMode();
+  const isEnabled = isAgentEnabled(agent.id);
+  
+  const CardContent = (
+    
       <motion.div
-        whileHover={{ 
+        whileHover={isEnabled ? { 
           scale: 1.02,
           transition: { duration: 0.2 }
-        }}
-        onHoverStart={() => onHover(agent.id)}
-        onHoverEnd={() => onHover(null)}
-        className="group relative rounded-xl p-5 transition-all cursor-pointer border"
+        } : {}}
+        onHoverStart={() => isEnabled && onHover(agent.id)}
+        onHoverEnd={() => isEnabled && onHover(null)}
+        className={`group relative rounded-xl p-6 h-full transition-all border ${
+          isEnabled ? 'cursor-pointer' : 'cursor-not-allowed'
+        }`}
         style={{
           backgroundColor: zsColors.neutral.white,
-          borderColor: isActive ? agent.color.primary : zsColors.neutral.lightGray + '80',
-          boxShadow: isActive ? zsColors.shadows.lg : zsColors.shadows.sm,
-          ...(isActive && {
+          borderColor: isActive && isEnabled ? agent.color.primary : zsColors.neutral.lightGray + '80',
+          boxShadow: isActive && isEnabled ? zsColors.shadows.lg : zsColors.shadows.sm,
+          opacity: isEnabled ? 1 : 0.4,
+          ...(isActive && isEnabled && {
             background: `linear-gradient(135deg, ${zsColors.neutral.white}, ${agent.color.primary}06)`
           })
         }}
       >
         {/* Sequence number */}
-        <div className="absolute -left-2 -top-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white"
+        <div className="absolute -right-2 -top-2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
           style={{ backgroundColor: agent.color.primary }}>
           {sequence}
         </div>
 
         {/* Active pulse */}
-        {isActive && (
-          <div className="absolute top-3 right-3">
+        {isActive && isEnabled && (
+          <div className="absolute top-3 left-3">
             <motion.div
               className="w-2 h-2 rounded-full"
               style={{ backgroundColor: agent.color.primary }}
@@ -426,138 +425,59 @@ function HorizontalAgentCard({ agent, isActive, sequence, onHover }: HorizontalA
           </div>
         )}
 
-        <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-lg p-2.5 flex-shrink-0 transition-all group-hover:scale-105"
+        <div className="flex flex-col h-full">
+          <div className={`w-14 h-14 rounded-lg p-3 mb-4 transition-all ${
+            isEnabled ? 'group-hover:scale-105' : ''
+          }`}
             style={{
-              background: `linear-gradient(135deg, ${agent.color.primary}, ${agent.color.light})`,
-              boxShadow: isActive ? `0 6px 20px ${agent.color.primary}30` : '0 3px 10px rgba(0,0,0,0.1)'
+              background: isEnabled 
+                ? `linear-gradient(135deg, ${agent.color.primary}, ${agent.color.light})`
+                : `linear-gradient(135deg, ${zsColors.neutral.gray}, ${zsColors.neutral.lightGray})`,
+              boxShadow: isActive && isEnabled ? `0 6px 20px ${agent.color.primary}30` : '0 3px 10px rgba(0,0,0,0.1)'
             }}
           >
             <agent.icon className="w-full h-full text-white" />
           </div>
           
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-base mb-1 truncate" 
+          <div className="flex-1">
+            <h3 className="font-bold text-lg mb-2" 
                 style={{ color: zsColors.neutral.charcoal }}>
               {agent.name}
             </h3>
-            <p className="text-xs mb-2 line-clamp-2" 
+            <p className="text-sm mb-3 line-clamp-2" 
                style={{ color: zsColors.neutral.gray }}>
               {agent.description}
             </p>
-            <p className="text-xs font-medium line-clamp-1" 
+            <p className="text-xs font-medium line-clamp-2 mb-3" 
                style={{ color: agent.color.primary }}>
               {agent.story}
             </p>
+            
+            <div className="p-2 rounded-lg bg-gray-50">
+              <p className="text-xs" style={{ color: zsColors.neutral.darkGray }}>
+                <strong>Output:</strong> {agent.outputs}
+              </p>
+            </div>
           </div>
 
-          <motion.div
-            className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-            style={{ color: agent.color.primary }}
-          >
-            <ArrowUpRight size={16} />
-          </motion.div>
-        </div>
-      </motion.div>
-    </Link>
-  );
-}
-
-// Center Agent Card Component  
-interface CenterAgentCardProps {
-  agent: any;
-  isActive: boolean;
-  onHover: (agentId: string | null) => void;
-}
-
-function CenterAgentCard({ agent, isActive, onHover }: CenterAgentCardProps) {
-  return (
-    <Link href={`/agents/${agent.id}`}>
-      <motion.div
-        whileHover={{ 
-          scale: 1.03,
-          transition: { duration: 0.2 }
-        }}
-        onHoverStart={() => onHover(agent.id)}
-        onHoverEnd={() => onHover(null)}
-        className="group relative rounded-2xl p-8 transition-all cursor-pointer border-2"
-        style={{
-          backgroundColor: zsColors.neutral.white,
-          borderColor: isActive ? agent.color.primary : zsColors.neutral.lightGray + '60',
-          boxShadow: isActive ? zsColors.shadows.xl : zsColors.shadows.md,
-          background: `linear-gradient(135deg, ${zsColors.neutral.white}, ${agent.color.primary}08)`
-        }}
-      >
-        {/* Central position indicator */}
-        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-          <div className="px-3 py-1 rounded-full text-xs font-bold text-white"
-            style={{ backgroundColor: agent.color.primary }}>
-            AI Core
-          </div>
-        </div>
-
-        {/* Active glow effect */}
-        {isActive && (
-          <motion.div
-            className="absolute inset-0 rounded-2xl pointer-events-none"
-            style={{ 
-              background: `radial-gradient(circle at center, ${agent.color.primary}15, transparent)`
-            }}
-            animate={{ opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          />
-        )}
-
-        <div className="relative z-10 text-center">
-          <div className="w-20 h-20 rounded-2xl p-4 mx-auto mb-4 transition-all group-hover:scale-110"
-            style={{
-              background: `linear-gradient(135deg, ${agent.color.primary}, ${agent.color.light})`,
-              boxShadow: isActive ? `0 12px 32px ${agent.color.primary}40` : '0 6px 16px rgba(0,0,0,0.1)'
-            }}
-          >
-            <agent.icon className="w-full h-full text-white" />
-          </div>
-          
-          <h3 className="text-xl font-bold mb-3" 
-              style={{ color: zsColors.neutral.charcoal }}>
-            {agent.name}
-          </h3>
-          <p className="text-sm mb-3" style={{ color: zsColors.neutral.gray }}>
-            {agent.description}
-          </p>
-          <p className="text-sm font-medium mb-4" style={{ color: agent.color.primary }}>
-            {agent.story}
-          </p>
-          
-          <div className="p-3 rounded-lg" style={{ backgroundColor: zsColors.neutral.offWhite }}>
-            <p className="text-xs font-medium mb-1" style={{ color: zsColors.neutral.darkGray }}>
-              Key Outputs:
-            </p>
-            <p className="text-xs" style={{ color: zsColors.neutral.gray }}>
-              {agent.outputs}
-            </p>
-          </div>
-
-          <motion.div
-            className="opacity-0 group-hover:opacity-100 transition-opacity mt-3"
-            style={{ color: agent.color.primary }}
-          >
-            <ArrowUpRight size={20} />
-          </motion.div>
-        </div>
-
-        {/* Active pulse indicator */}
-        {isActive && (
-          <div className="absolute top-4 right-4">
+          {isEnabled && (
             <motion.div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: agent.color.primary }}
-              animate={{ opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </div>
-        )}
+              className="opacity-0 group-hover:opacity-100 transition-opacity mt-3 flex justify-end"
+              style={{ color: agent.color.primary }}
+            >
+              <ArrowUpRight size={18} />
+            </motion.div>
+          )}
+        </div>
       </motion.div>
+  );
+  
+  return isEnabled ? (
+    <Link href={`/agents/${agent.id}`}>
+      {CardContent}
     </Link>
+  ) : (
+    CardContent
   );
 }
+

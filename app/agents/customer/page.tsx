@@ -1,10 +1,40 @@
 'use client';
 
+import { useState } from 'react';
 import { Users } from 'lucide-react';
 import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
-import { CustomerPlanningVisualization } from '@/components/agents/CustomerPlanningVisualization';
+import { CustomerPlanningInteractive } from '@/components/agents/CustomerPlanningInteractive';
+import { CustomerPlanningWorkflow } from '@/components/agents/CustomerPlanningWorkflow';
+import { customerPriorityWorkflow, executeWorkflowStep } from '@/lib/workflows/customer-priority-workflow';
 
 export default function CustomerPlanningAgent() {
+  const [workflowMode, setWorkflowMode] = useState(false);
+  const [activeWorkflow, setActiveWorkflow] = useState(customerPriorityWorkflow);
+  const [brandContext] = useState({
+    therapeutic_area: 'Oncology',
+    brand_name: 'BrandX',
+    objectives: ['Increase market share', 'Improve HCP engagement', 'Optimize resource allocation']
+  });
+
+  const handleStartWorkflow = () => {
+    setWorkflowMode(true);
+    // Start the workflow from the first customer planning module
+    const updated = executeWorkflowStep(activeWorkflow, 1);
+    setActiveWorkflow(updated);
+  };
+
+  if (workflowMode) {
+    return (
+      <div className="min-h-screen p-6" style={{ backgroundColor: '#F5F5F5' }}>
+        <CustomerPlanningWorkflow
+          workflow={activeWorkflow}
+          onWorkflowUpdate={setActiveWorkflow}
+          brandContext={brandContext}
+        />
+      </div>
+    );
+  }
+
   return (
     <StandardAgentViewLight
       agentId="customer"
@@ -155,7 +185,7 @@ export default function CustomerPlanningAgent() {
             }
           ]
         },
-        visualizations: <CustomerPlanningVisualization />
+        visualizations: <CustomerPlanningInteractive onStartWorkflow={handleStartWorkflow} />
       }}
       outputs={{
         downstream: {

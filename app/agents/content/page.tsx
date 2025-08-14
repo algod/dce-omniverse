@@ -2,24 +2,24 @@
 
 import { FileCheck } from 'lucide-react';
 import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
-import { ContentReviewVisualization } from '@/components/agents/ContentReviewVisualization';
+import { ContentSupplyChain } from '@/components/agents/ContentSupplyChain';
 
-export default function ContentReviewAgent() {
+export default function ContentSupplyChainAgent() {
   return (
     <StandardAgentViewLight
       agentId="content"
-      agentName="Content Review Agent"
+      agentName="Content Supply Chain"
       agentIcon={FileCheck}
       agentColor="from-sky-500 to-blue-500"
       overview={{
-        position: "Third in flow - Message Preparation. Receives channel budgets from Budget Planning Agent and ensures adequate content exists for each funded channel.",
-        purpose: "Content management and accelerated MLR approval process. Maps message themes to customer barriers, ensures MLR compliance, identifies content gaps, and coordinates new content production.",
+        position: "Fourth in flow - Content Lifecycle Management. Parent agent with three sub-agents for planning, generation, and approval.",
+        purpose: "End-to-end content lifecycle management with integrated sub-agents for content planning, generation (Adobe integration), and approval (Veeva PromoMats integration).",
         reasoning: [
-          "Maps content themes to the 5 primary barriers",
-          "Performs automated MLR compliance checking",
-          "Identifies gaps in content coverage by channel",
-          "Predicts approval likelihood based on historical patterns",
-          "Coordinates content production priorities"
+          "Content Planning: Identifies gaps and retirement opportunities",
+          "Content Generation: Creates blueprints with Adobe Creative Cloud",
+          "Content Approval: MLR review engine with Veeva PromoMats sync",
+          "Automated compliance checking and scoring",
+          "Human-in-the-loop review for edge cases"
         ],
         tools: [
           "MLR Compliance Checker",
@@ -165,7 +165,7 @@ export default function ContentReviewAgent() {
             }
           ]
         },
-        visualizations: <ContentReviewVisualization />
+        visualizations: <ContentSupplyChain />
       }}
       outputs={{
         downstream: {

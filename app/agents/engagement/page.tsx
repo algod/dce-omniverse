@@ -4,37 +4,37 @@ import { TrendingUp } from 'lucide-react';
 import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
 import { BudgetPlanningVisualization } from '@/components/agents/BudgetPlanningVisualization';
 
-export default function BudgetPlanningAgent() {
+export default function EngagementPlanningAgent() {
   return (
     <StandardAgentViewLight
-      agentId="budget"
-      agentName="Budget Planning Agent"
+      agentId="engagement"
+      agentName="Engagement Planning Agent"
       agentIcon={TrendingUp}
       agentColor="from-blue-600 to-blue-700"
       overview={{
-        position: "Second in flow - Resource Allocation. Receives prioritized HCP data from Customer Planning and determines optimal budget allocation across channels.",
-        purpose: "Optimize budget allocation across promotional channels with ROI maximization. Uses impact attribution analysis and response curves to find the optimal channel mix for maximum impact.",
+        position: "Third in flow - Resource Optimization. Receives microsegments from Customer Planning and determines optimal resource allocation by microsegment × channel.",
+        purpose: "Determines optimal resource allocation by customer microsegment and channel through impact attribution and marketing mix analytics to maximize ROI.",
         reasoning: [
-          "Analyzes historical response curves for each channel",
-          "Detects channel saturation points and diminishing returns",
-          "Optimizes budget allocation with business constraints",
-          "Calculates ROI and mROI for each scenario",
-          "Breaks down to quarterly HCP-level engagement plans"
+          "Conducts impact attribution by microsegment",
+          "Runs marketing mix analytics for optimal allocation",
+          "Analyzes response curves by segment × channel",
+          "Optimizes future budget with business constraints",
+          "Generates granular engagement plans per microsegment"
         ],
         tools: [
-          "Channel Response Modeler",
-          "ROI Optimization Engine",
-          "Budget Allocation Simulator",
-          "Performance Attribution System",
-          "Saturation Analysis Tool",
-          "What-If Scenario Planner"
+          "Impact Attribution Engine",
+          "Marketing Mix Model",
+          "Microsegment Optimizer",
+          "Resource Allocation Simulator",
+          "ROI Calculator",
+          "Constraint Solver"
         ],
         actions: [
-          "Optimizing $15M budget across 6 channels",
-          "Calculating marginal ROI for each channel",
-          "Finding optimal allocation mix",
-          "Running saturation analysis",
-          "Generating quarterly plans"
+          "Analyzing 5 microsegments across 6 channels",
+          "Running marketing mix optimization",
+          "Calculating segment-specific ROI",
+          "Allocating resources by opportunity",
+          "Creating microsegment engagement plans"
         ],
         keyMetrics: [
           { label: "Total Budget", value: "$15M" },
