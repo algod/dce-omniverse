@@ -11,6 +11,7 @@ export default function FieldCopilotAgent() {
       agentName="Field Copilot Agent"
       agentIcon={HeadphonesIcon}
       agentColor="from-green-500 to-green-600"
+      hideSequentialWorkflow={true}
       overview={{
         position: "End of flow - Execution Support. This is the final agent in the DCE OmniVerse flow, providing AI-powered assistance to field representatives. It synthesizes all upstream intelligence and sends feedback back to Customer Planning to complete the loop.",
         purpose: "AI assistant for sales reps supporting field activities. Provides pre-call planning, virtual coaching, territory insights, and email assistance. Captures field feedback and insights to continuously improve the system.",

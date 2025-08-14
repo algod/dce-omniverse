@@ -35,7 +35,8 @@ const agents = [
     color: zsColors.agents.customer,
     story: '4P framework: Persona, Performance, Potential, Preference',
     outputs: 'Priority HCP list with microsegments',
-    sequence: 1
+    sequence: 1,
+    category: 'Planning'
   },
   {
     id: 'engagement',
@@ -45,8 +46,57 @@ const agents = [
     color: zsColors.agents.budget,
     story: 'ROI maximization across channels × segments',
     outputs: 'Optimal resource allocation',
-    sequence: 2
+    sequence: 2,
+    category: 'Planning'
   },
+  {
+    id: 'orchestration',
+    name: 'Orchestration',
+    icon: Brain,
+    description: 'Journey optimization',
+    color: zsColors.agents.orchestration,
+    story: 'AI-powered engagement sequences',
+    outputs: 'Personalized customer journeys',
+    sequence: 6,
+    category: 'Orchestration'
+  },
+  {
+    id: 'activation',
+    name: 'Digital Activation',
+    icon: Zap,
+    description: 'Vendor integration',
+    color: { primary: '#14B8A6', light: '#5EEAD4' },
+    story: 'Executes campaigns via partners',
+    outputs: 'Activated campaigns',
+    sequence: 7,
+    category: 'Activation'
+  },
+  {
+    id: 'suggestions',
+    name: 'Field Suggestions',
+    icon: Lightbulb,
+    description: 'HQ-designed triggers',
+    color: { primary: '#F59E0B', light: '#FBBf24' },
+    story: '7 trigger types with prioritization',
+    outputs: 'Prioritized field actions',
+    sequence: 8,
+    category: 'Field'
+  },
+  {
+    id: 'copilot',
+    name: 'Field Copilot',
+    icon: HeadphonesIcon,
+    description: 'Rep AI assistant',
+    color: zsColors.agents.copilot,
+    story: 'Pre-call planning & coaching',
+    outputs: 'Field insights & feedback',
+    sequence: 9,
+    category: 'Field'
+  }
+];
+
+// Content Supply Chain - grouped separately
+const contentSupplyChain = [
   {
     id: 'content-planning',
     name: 'Content Planning',
@@ -76,58 +126,20 @@ const agents = [
     story: 'Automated approval with human-in-loop',
     outputs: 'MLR-approved content library',
     sequence: 5
-  },
-  {
-    id: 'orchestration',
-    name: 'Orchestration',
-    icon: Brain,
-    description: 'Journey optimization',
-    color: zsColors.agents.orchestration,
-    story: 'AI-powered engagement sequences',
-    outputs: 'Personalized customer journeys',
-    sequence: 6
-  },
-  {
-    id: 'activation',
-    name: 'Digital Activation',
-    icon: Zap,
-    description: 'Vendor integration',
-    color: { primary: '#14B8A6', light: '#5EEAD4' },
-    story: 'Executes campaigns via partners',
-    outputs: 'Activated campaigns',
-    sequence: 7
-  },
-  {
-    id: 'suggestions',
-    name: 'Field Suggestions',
-    icon: Lightbulb,
-    description: 'HQ-designed triggers',
-    color: { primary: '#F59E0B', light: '#FBBf24' },
-    story: '7 trigger types with prioritization',
-    outputs: 'Prioritized field actions',
-    sequence: 8
-  },
-  {
-    id: 'copilot',
-    name: 'Field Copilot',
-    icon: HeadphonesIcon,
-    description: 'Rep AI assistant',
-    color: zsColors.agents.copilot,
-    story: 'Pre-call planning & coaching',
-    outputs: 'Field insights & feedback',
-    sequence: 9
   }
 ];
 
 
-// Agent flow connections - 9 agent sequential flow
+// Agent flow connections - updated for reorganized structure
 const flowConnections = [
   // Main sequential flow
   { from: 'omni', to: 'customer', label: 'Customer Query', type: 'main' },
   { from: 'customer', to: 'engagement', label: 'Microsegments', type: 'main' },
   { from: 'engagement', to: 'content-planning', label: 'Budget Allocation', type: 'main' },
-  { from: 'content-planning', to: 'content-generation', label: 'Content Gaps', type: 'main' },
-  { from: 'content-generation', to: 'content', label: 'Generated Assets', type: 'main' },
+  // Content Supply Chain internal flow
+  { from: 'content-planning', to: 'content-generation', label: 'Content Gaps', type: 'content-chain' },
+  { from: 'content-generation', to: 'content', label: 'Generated Assets', type: 'content-chain' },
+  // Continue main flow
   { from: 'content', to: 'orchestration', label: 'Approved Content', type: 'main' },
   { from: 'orchestration', to: 'activation', label: 'Journey Plans', type: 'main' },
   { from: 'activation', to: 'suggestions', label: 'Campaign Data', type: 'main' },
@@ -145,16 +157,17 @@ export function FlowVisualizationClean() {
 
   // Sequential flow animation with data flow events
   useEffect(() => {
+    const allAgents = [...agents, ...contentSupplyChain];
     const flowInterval = setInterval(() => {
-      const currentAgent = agents[flowStep];
-      const nextStep = (flowStep + 1) % agents.length;
-      const nextAgent = agents[nextStep];
+      const currentAgent = allAgents[flowStep];
+      const nextStep = (flowStep + 1) % allAgents.length;
+      const nextAgent = allAgents[nextStep];
       
       setFlowStep(nextStep);
       setActiveAgent(nextAgent?.id || null);
       
       // Simulate data flow between agents
-      if (currentAgent && nextAgent && flowStep < agents.length - 1) {
+      if (currentAgent && nextAgent && flowStep < allAgents.length - 1) {
         addDataFlowEvent({
           from: currentAgent.id,
           to: nextAgent.id,
@@ -308,8 +321,9 @@ export function FlowVisualizationClean() {
                 className="absolute inset-0 pointer-events-none"
                 style={{ zIndex: -1 }}
               >
-                {agents.map((agent, index) => {
-                  const angle = (index * 360) / agents.length;
+{[...agents, ...contentSupplyChain].map((agent, index) => {
+                  const totalAgents = agents.length + contentSupplyChain.length;
+                  const angle = (index * 360) / totalAgents;
                   const x = 50 + 30 * Math.cos((angle * Math.PI) / 180);
                   const y = 20 + 15 * Math.sin((angle * Math.PI) / 180);
                   return (
@@ -336,7 +350,7 @@ export function FlowVisualizationClean() {
 
         {/* Specialized Agents Grid */}
         <div className="relative">
-          <div className="text-center mb-6">
+          <div className="text-center mb-8">
             <h3 className="text-lg font-medium" style={{ color: zsColors.neutral.darkGray }}>
               Specialized Agents
             </h3>
@@ -345,8 +359,8 @@ export function FlowVisualizationClean() {
             </p>
           </div>
           
-          {/* Agent Grid - responsive for 9 agents */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 px-4 max-w-7xl mx-auto">
+          {/* Main Agents Grid - responsive for 6 main agents */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 px-4 max-w-7xl mx-auto mb-12">
             {agents.map((agent, index) => (
               <motion.div
                 key={agent.id}
@@ -363,6 +377,74 @@ export function FlowVisualizationClean() {
               </motion.div>
             ))}
           </div>
+          
+          {/* Content Supply Chain Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8 }}
+            className="mb-8"
+          >
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-semibold mb-2" style={{ color: zsColors.neutral.charcoal }}>
+                Content Supply Chain
+              </h3>
+              <p className="text-sm" style={{ color: zsColors.neutral.gray }}>
+                End-to-end content development, generation, and approval workflow
+              </p>
+            </div>
+            
+            {/* Content Supply Chain Flow */}
+            <div className="relative">
+              {/* Background container with subtle gradient */}
+              <div className="bg-gradient-to-r from-purple-50 to-green-50 rounded-2xl p-6 border" 
+                style={{ borderColor: zsColors.neutral.lightGray }}>
+                
+                {/* Content agents in horizontal flow */}
+                <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+                  {contentSupplyChain.map((agent, index) => (
+                    <div key={agent.id} className="flex items-center">
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 2 + index * 0.2 }}
+                      >
+                        <ContentSupplyChainCard
+                          agent={agent}
+                          isActive={activeAgent === agent.id}
+                          sequence={agent.sequence}
+                          onHover={setActiveAgent}
+                        />
+                      </motion.div>
+                      
+                      {/* Arrow connector */}
+                      {index < contentSupplyChain.length - 1 && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 2.2 + index * 0.2 }}
+                          className="mx-4 hidden md:block"
+                        >
+                          <ArrowRight 
+                            size={24} 
+                            style={{ color: zsColors.neutral.gray }}
+                            className="animate-pulse"
+                          />
+                        </motion.div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Supply Chain Description */}
+                <div className="text-center mt-6">
+                  <p className="text-sm font-medium" style={{ color: zsColors.neutral.darkGray }}>
+                    Integrated workflow: Planning → Generation → Approval
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Feedback Loop Visualization */}
           <motion.div 
@@ -419,6 +501,14 @@ export function FlowVisualizationClean() {
 
 // Agent Card Component
 interface AgentCardProps {
+  agent: any;
+  isActive: boolean;
+  sequence: number;
+  onHover: (agentId: string | null) => void;
+}
+
+// Content Supply Chain Card Component
+interface ContentSupplyChainCardProps {
   agent: any;
   isActive: boolean;
   sequence: number;
@@ -514,6 +604,101 @@ function AgentCard({ agent, isActive, sequence, onHover }: AgentCardProps) {
           )}
         </div>
       </motion.div>
+  );
+  
+  return isEnabled ? (
+    <Link href={`/agents/${agent.id}`}>
+      {CardContent}
+    </Link>
+  ) : (
+    CardContent
+  );
+}
+
+function ContentSupplyChainCard({ agent, isActive, sequence, onHover }: ContentSupplyChainCardProps) {
+  const { isAgentEnabled } = useUserMode();
+  const isEnabled = isAgentEnabled(agent.id);
+  
+  const CardContent = (
+    <motion.div
+      whileHover={isEnabled ? { 
+        scale: 1.05,
+        transition: { duration: 0.2 }
+      } : {}}
+      onHoverStart={() => isEnabled && onHover(agent.id)}
+      onHoverEnd={() => isEnabled && onHover(null)}
+      className={`group relative rounded-lg p-4 transition-all border ${
+        isEnabled ? 'cursor-pointer' : 'cursor-not-allowed'
+      }`}
+      style={{
+        backgroundColor: zsColors.neutral.white,
+        borderColor: isActive && isEnabled ? agent.color.primary : zsColors.neutral.lightGray + '80',
+        boxShadow: isActive && isEnabled ? zsColors.shadows.lg : zsColors.shadows.sm,
+        opacity: isEnabled ? 1 : 0.4,
+        minWidth: '200px',
+        maxWidth: '220px',
+        ...(isActive && isEnabled && {
+          background: `linear-gradient(135deg, ${zsColors.neutral.white}, ${agent.color.primary}06)`
+        })
+      }}
+    >
+      {/* Sequence number */}
+      <div className="absolute -right-1 -top-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white"
+        style={{ backgroundColor: agent.color.primary }}>
+        {sequence}
+      </div>
+
+      {/* Active pulse */}
+      {isActive && isEnabled && (
+        <div className="absolute top-2 left-2">
+          <motion.div
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ backgroundColor: agent.color.primary }}
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+        </div>
+      )}
+
+      <div className="flex flex-col items-center text-center">
+        <div className={`w-12 h-12 rounded-lg p-2.5 mb-3 transition-all ${
+          isEnabled ? 'group-hover:scale-105' : ''
+        }`}
+          style={{
+            background: isEnabled 
+              ? `linear-gradient(135deg, ${agent.color.primary}, ${agent.color.light})`
+              : `linear-gradient(135deg, ${zsColors.neutral.gray}, ${zsColors.neutral.lightGray})`,
+            boxShadow: isActive && isEnabled ? `0 4px 16px ${agent.color.primary}30` : '0 2px 8px rgba(0,0,0,0.1)'
+          }}
+        >
+          <agent.icon className="w-full h-full text-white" />
+        </div>
+        
+        <h3 className="font-bold text-sm mb-1" 
+            style={{ color: zsColors.neutral.charcoal }}>
+          {agent.name}
+        </h3>
+        <p className="text-xs mb-2 line-clamp-2" 
+           style={{ color: zsColors.neutral.gray }}>
+          {agent.description}
+        </p>
+        
+        <div className="p-1.5 rounded text-center w-full" style={{ backgroundColor: `${agent.color.primary}08` }}>
+          <p className="text-xs font-medium line-clamp-1" style={{ color: agent.color.primary }}>
+            {agent.story}
+          </p>
+        </div>
+
+        {isEnabled && (
+          <motion.div
+            className="opacity-0 group-hover:opacity-100 transition-opacity mt-2"
+            style={{ color: agent.color.primary }}
+          >
+            <ArrowUpRight size={14} />
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
   );
   
   return isEnabled ? (

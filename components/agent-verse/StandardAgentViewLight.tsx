@@ -65,6 +65,7 @@ interface AgentViewProps {
     impact?: Array<{ metric: string; change: string }>;
   };
   visualizationComponent?: React.ComponentType;
+  hideSequentialWorkflow?: boolean;
 }
 
 export function StandardAgentViewLight(props: AgentViewProps) {
@@ -266,8 +267,10 @@ export function StandardAgentViewLight(props: AgentViewProps) {
       {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
         <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-140px)]">
-          {/* Left Panel - Sequential Workflow (55% desktop, full width mobile) */}
-          <div className="w-full lg:w-[55%] rounded-xl overflow-hidden flex flex-col" 
+          {!props.hideSequentialWorkflow && (
+            <>
+              {/* Left Panel - Sequential Workflow (55% desktop, full width mobile) */}
+              <div className="w-full lg:w-[55%] rounded-xl overflow-hidden flex flex-col" 
             style={{ 
               backgroundColor: zsColors.neutral.white,
               border: `1px solid ${zsColors.neutral.lightGray}`,
@@ -1981,9 +1984,11 @@ export function StandardAgentViewLight(props: AgentViewProps) {
               </AnimatePresence>
             </div>
           </div>
+            </>
+          )}
           
           {/* Right Panel - Interactive Q&A (45% desktop, full width mobile) */}
-          <div className="w-full lg:w-[45%] rounded-xl overflow-hidden"
+          <div className={`w-full ${props.hideSequentialWorkflow ? '' : 'lg:w-[45%]'} rounded-xl overflow-hidden`}
             style={{ 
               backgroundColor: zsColors.neutral.white,
               border: `1px solid ${zsColors.neutral.lightGray}`,

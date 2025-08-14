@@ -11,6 +11,7 @@ export default function FieldSuggestionsAgent() {
       agentName="Field Suggestions Agent"
       agentIcon={Lightbulb}
       agentColor="from-cyan-500 to-teal-500"
+      hideSequentialWorkflow={true}
       overview={{
         position: "Fifth in flow - Field Enablement. Receives NBA recommendations from the AI Orchestration Agent and generates prioritized field suggestions for representatives.",
         purpose: "Design and monitor field suggestions aligned with brand objectives. Balances trigger volume, quality, and field capacity while incorporating feedback through the 40/40/20 prioritization system.",

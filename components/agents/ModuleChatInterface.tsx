@@ -60,7 +60,7 @@ export function ModuleChatInterface({
           .slice(0, 3);
         
         return {
-          content: `Based on my analysis of 2,847 HCPs in your territory, the top 3 barriers are:\n\n1. **${topBarriers[0]?.[0]}** - Affecting ${topBarriers[0]?.[1]?.percentage || 0}% of HCPs\n2. **${topBarriers[1]?.[0]}** - Affecting ${topBarriers[1]?.[1]?.percentage || 0}% of HCPs\n3. **${topBarriers[2]?.[0]}** - Affecting ${topBarriers[2]?.[1]?.percentage || 0}% of HCPs\n\nThese barriers represent the primary obstacles preventing HCP adoption. Would you like me to adjust the barrier weights or dive deeper into any specific barrier?`,
+          content: `Based on my analysis of 2,847 HCPs in your territory, the top 3 barriers are:\n\n1. **${topBarriers[0]?.[0]}** - Affecting ${(topBarriers[0]?.[1] as any)?.percentage || 0}% of HCPs\n2. **${topBarriers[1]?.[0]}** - Affecting ${(topBarriers[1]?.[1] as any)?.percentage || 0}% of HCPs\n3. **${topBarriers[2]?.[0]}** - Affecting ${(topBarriers[2]?.[1] as any)?.percentage || 0}% of HCPs\n\nThese barriers represent the primary obstacles preventing HCP adoption. Would you like me to adjust the barrier weights or dive deeper into any specific barrier?`,
           actions: [
             { type: 'adjust', label: 'Adjust Barrier Weights', data: { adjustment: 'barrier_weights' } },
             { type: 'explain', label: 'Explain Impact', data: { context: 'barrier_impact' } }
@@ -167,7 +167,7 @@ export function ModuleChatInterface({
         role: 'assistant',
         content: response.content,
         timestamp: new Date(),
-        actions: response.actions
+        actions: response.actions as { type: 'approve' | 'adjust' | 'explain'; label: string; data?: any }[] | undefined
       };
       setMessages(prev => [...prev, responseMessage]);
       setIsProcessing(false);
