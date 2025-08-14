@@ -123,13 +123,41 @@ export function FlowVisualizationClean() {
   return (
     <div className="relative min-h-screen p-8" style={{ backgroundColor: zsColors.neutral.offWhite }}>
       {/* Elegant gradient background */}
-      <div className="absolute inset-0 opacity-[0.02]">
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none">
         <div className="absolute inset-0" style={{
           background: `linear-gradient(90deg, ${zsColors.agents.customer.primary}10, ${zsColors.agents.orchestration.primary}08, ${zsColors.agents.copilot.primary}10)`
         }} />
       </div>
 
       <div className="relative z-10 max-w-[1600px] mx-auto">
+        {/* Header - DCE OmniVerse Title */}
+        <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-3 mb-6"
+          >
+            <Sparkles size={28} style={{ color: zsColors.secondary.orange }} />
+            <h1 className="text-6xl font-bold bg-gradient-to-r bg-clip-text text-transparent"
+              style={{
+                backgroundImage: `linear-gradient(90deg, ${zsColors.primary.navy}, ${zsColors.primary.blue})`
+              }}>
+              DCE OmniVerse
+            </h1>
+            <Sparkles size={28} style={{ color: zsColors.secondary.orange }} />
+          </motion.div>
+          
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-2xl mb-4 font-medium"
+            style={{ color: zsColors.neutral.darkGray }}
+          >
+            Intelligent Agent Flow for Pharmaceutical Excellence
+          </motion.p>
+        </div>
+
         {/* User Mode Toggle */}
         <div className="flex justify-center mb-8">
           <UserModeToggle />
@@ -250,44 +278,6 @@ export function FlowVisualizationClean() {
             )}
           </AnimatePresence>
         </motion.div>
-
-        {/* Header */}
-        <div className="text-center mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 mb-6"
-          >
-            <Sparkles size={28} style={{ color: zsColors.secondary.orange }} />
-            <h1 className="text-6xl font-bold bg-gradient-to-r bg-clip-text text-transparent"
-              style={{
-                backgroundImage: `linear-gradient(90deg, ${zsColors.primary.navy}, ${zsColors.primary.blue})`
-              }}>
-              DCE OmniVerse
-            </h1>
-            <Sparkles size={28} style={{ color: zsColors.secondary.orange }} />
-          </motion.div>
-          
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-2xl mb-4 font-medium"
-            style={{ color: zsColors.neutral.darkGray }}
-          >
-            Intelligent Agent Flow for Pharmaceutical Excellence
-          </motion.p>
-          
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-base"
-            style={{ color: zsColors.neutral.gray }}
-          >
-            Intelligent Agent Flow for Omnichannel Excellence
-          </motion.p>
-        </div>
 
 
         {/* Specialized Agents Grid */}

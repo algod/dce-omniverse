@@ -382,15 +382,24 @@ export function CustomerPlanningWorkflow({
           <div className="flex justify-between text-xs">
             <span style={{ color: zsColors.neutral.gray }}>Overall Progress</span>
             <span style={{ color: zsColors.neutral.darkGray }}>
-              {Math.round((workflow.steps.filter(s => s.status === 'approved' || s.status === 'completed').length / workflow.steps.length) * 100)}%
+              {(() => {
+                const moduleSteps = workflow.steps.filter(s => s.module && ['persona', 'performance', 'potential', 'preference', 'microsegmentation'].includes(s.module));
+                const completedSteps = moduleSteps.filter(s => s.status === 'approved' || s.status === 'completed' || s.status === 'review');
+                return Math.round((completedSteps.length / moduleSteps.length) * 100) || 0;
+              })()}%
             </span>
           </div>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ 
-                width: `${(workflow.steps.filter(s => s.status === 'approved' || s.status === 'completed').length / workflow.steps.length) * 100}%` 
+                width: `${(() => {
+                  const moduleSteps = workflow.steps.filter(s => s.module && ['persona', 'performance', 'potential', 'preference', 'microsegmentation'].includes(s.module));
+                  const completedSteps = moduleSteps.filter(s => s.status === 'approved' || s.status === 'completed' || s.status === 'review');
+                  return (completedSteps.length / moduleSteps.length) * 100 || 0;
+                })()}%` 
               }}
+              transition={{ duration: 0.5 }}
               className="h-full rounded-full"
               style={{ backgroundColor: zsColors.secondary.green }}
             />
