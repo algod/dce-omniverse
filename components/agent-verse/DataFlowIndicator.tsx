@@ -167,8 +167,8 @@ export function DataFlowIndicator() {
         )}
       </AnimatePresence>
 
-      {/* Animated Data Packets */}
-      <AnimatePresence>
+      {/* Animated Data Packets - Temporarily disabled to fix floating icon issue */}
+      {/* <AnimatePresence>
         {dataPackets.map(packet => (
           <motion.div
             key={packet.id}
@@ -202,7 +202,6 @@ export function DataFlowIndicator() {
               }}
               className="relative"
             >
-              {/* Glow effect */}
               <div
                 className="absolute inset-0 rounded-full blur-xl"
                 style={{ 
@@ -216,7 +215,6 @@ export function DataFlowIndicator() {
                 }}
               />
               
-              {/* Data packet icon */}
               <div
                 className="relative bg-white rounded-full p-3 shadow-lg"
                 style={{ 
@@ -226,7 +224,6 @@ export function DataFlowIndicator() {
                 <Package size={24} style={{ color: packet.color }} />
               </div>
               
-              {/* Label */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -245,7 +242,7 @@ export function DataFlowIndicator() {
             </motion.div>
           </motion.div>
         ))}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
       {/* Flow Status Details Modal */}
       <AnimatePresence>
