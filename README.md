@@ -232,4 +232,4 @@ For questions or support, please contact the development team.
 
 **Built with 💙 for pharmaceutical commercial excellence**
 
-*Last Updated: 2025-08-10*
+*Last Updated: 2025-08-10* 
