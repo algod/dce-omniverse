@@ -359,9 +359,9 @@ export function FlowVisualizationClean() {
             </p>
           </div>
           
-          {/* Main Agents Grid - responsive for 6 main agents */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 px-4 max-w-7xl mx-auto mb-12">
-            {agents.map((agent, index) => (
+          {/* First row: Customer Planning and Engagement Planning */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 px-4 max-w-5xl mx-auto mb-8">
+            {agents.slice(0, 2).map((agent, index) => (
               <motion.div
                 key={agent.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -378,11 +378,11 @@ export function FlowVisualizationClean() {
             ))}
           </div>
           
-          {/* Content Supply Chain Section */}
+          {/* Content Supply Chain Section - now comes after Engagement Planning */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.8 }}
+            transition={{ delay: 1.4 }}
             className="mb-8"
           >
             <div className="text-center mb-6">
@@ -445,6 +445,25 @@ export function FlowVisualizationClean() {
               </div>
             </div>
           </motion.div>
+          
+          {/* Remaining Agents Grid - Orchestration, Digital Activation, Field Suggestions, Field Copilot */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 max-w-7xl mx-auto mb-12">
+            {agents.slice(2).map((agent, index) => (
+              <motion.div
+                key={agent.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.6 + index * 0.1 }}
+              >
+                <AgentCard
+                  agent={agent}
+                  isActive={activeAgent === agent.id}
+                  sequence={agent.sequence}
+                  onHover={setActiveAgent}
+                />
+              </motion.div>
+            ))}
+          </div>
 
           {/* Feedback Loop Visualization */}
           <motion.div 
