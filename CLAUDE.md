@@ -6,14 +6,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **DCE OmniVerse** is a next-generation omnichannel agentic AI solution for pharmaceutical companies in the US, featuring 6 intelligent AI agents in an interconnected agent-verse. This demonstration application showcases advanced AI capabilities for omnichannel planning and execution through a connected flow of agents, designed for presentation to senior pharmaceutical commercial leaders.
 
+**Live Application**: https://dce-omniverse.vercel.app  
+**GitHub Repository**: https://github.com/algod/dce-omniverse
+
 ## Agent-Verse Architecture
 
 The DCE OmniVerse follows a logical flow where each agent's outputs feed into the next, creating a comprehensive omnichannel strategy:
 
 ```
-Customer Planning → Budget Planning → Content Review → 
+Omni Agent (Master Orchestrator)
+    ↓
+Customer Planning (5-Module Workflow) → Budget Planning → Content Review → 
 Omnichannel Orchestration → Field Suggestions → Field Copilot
 ```
+
+### Omni Agent - Master Orchestrator
+**Purpose**: Intelligent routing and orchestration across all agents
+**Key Capabilities**:
+- Detects user intent from natural language queries
+- Extracts brand context and strategic objectives
+- Activates appropriate agent workflows
+- Manages inter-agent communication
+- Visualizes workflow progression
+
+**Workflow Detection**:
+- "Who should be my priority customers?" → Activates Customer Planning Workflow
+- "How should I allocate my budget?" → Routes to Budget Planning
+- "Review content for approval" → Activates Content Review
 
 ### Design Philosophy
 - **Barrier-Led Engagement**: Focus on identifying and resolving the 5 primary barriers preventing HCP adoption
@@ -35,8 +54,63 @@ Omnichannel Orchestration → Field Suggestions → Field Copilot
 
 ### 1. Customer Planning Agent
 **Position**: Start of flow - Intelligence Gathering
-**Purpose**: Prioritization of high opportunity customers using barrier analysis
+**Purpose**: Prioritization of high opportunity customers using barrier analysis through 5-module workflow
 **Agent Reasoning**: Analyzes secondary data and field feedback to identify HCP barriers and predict sales opportunities
+
+#### 5-Module Workflow Structure:
+
+##### Module 1: Persona Analysis
+- **Purpose**: Barrier inferencing and HCP classification
+- **Tools**: Barrier Detection ML Model, Pattern Recognition Engine, HCP Behavioral Analytics
+- **Process**: 
+  - Analyzes 2,847 HCPs for barrier patterns
+  - Runs probabilistic barrier detection
+  - Maps HCPs to 5 primary barriers
+  - Calculates barrier prevalence and severity
+- **User Interaction**: Review distribution, adjust weights, approve
+
+##### Module 2: Performance Metrics
+- **Purpose**: KPI selection and historical analysis
+- **Tools**: KPI Calculator, Trend Analysis Engine, Competitive Intelligence
+- **Process**:
+  - Selects KPIs based on brand objectives
+  - Processes 24 months of historical data
+  - Segments HCPs into performance quintiles
+  - Identifies trends and patterns
+- **User Interaction**: Review KPIs, validate segments, approve
+
+##### Module 3: Potential Prediction
+- **Purpose**: ML-based opportunity forecasting
+- **Tools**: Predictive Analytics Suite, Model Tuning Framework, Opportunity Calculator
+- **Process**:
+  - Configures breadth and depth prediction models
+  - Trains ensemble models (Random Forest + XGBoost)
+  - Generates opportunity predictions per HCP
+  - Validates against holdout dataset
+- **Output**: Depth ($285K avg) and Breadth ($142K avg) opportunities
+
+##### Module 4: Preference Mapping
+- **Purpose**: Channel and content affinity analysis
+- **Tools**: Collaborative Filtering Engine, Engagement Analytics, Channel Optimizer
+- **Process**:
+  - Analyzes historical engagement data
+  - Runs collaborative filtering algorithms
+  - Scores channel preferences (Field, Email, Virtual, Web)
+  - Maps content type affinity
+- **Output**: Optimal engagement frequency (2.3 touches/month)
+
+##### Module 5: Microsegmentation
+- **Purpose**: Strategic prioritization using 4P framework
+- **Tools**: Segmentation Engine, Priority Matrix Builder, ROI Calculator
+- **Process**:
+  - Combines all 4P factors (Persona, Performance, Potential, Preference)
+  - Creates 5 distinct microsegments
+  - Generates 3 prioritization options:
+    - Growth Focus: Champions, Growers, Converters (+45% expected growth)
+    - Efficiency Focus: Champions, Maintainers, Defenders (+32% ROI improvement)
+    - Balanced Approach: All segments weighted (+28% overall performance)
+- **User Interaction**: Select strategy, confirm segments, finalize
+
 **Key Actions**:
 - Identifies and analyzes 5 primary barriers affecting HCP prescribing
 - Runs predictive models for sales depth/breadth opportunities
@@ -251,10 +325,33 @@ All agents reference and work to address these core barriers:
 
 ## Interactive Features
 
+### Workflow Execution
+**Module Progression**:
+- Status tracking: `pending` → `active` → `review` → `approved`
+- Real-time progress bars with percentage completion
+- Visual indicators for each module state
+- User approval required before progression
+
 ### Agent Q&A Interface
 Each agent page features a split-view layout:
 - **Left Panel (40%)**: Interactive chat for Q&A, parameter adjustments, and scenario exploration
 - **Right Panel (60%)**: Dynamic visualizations that update based on interactions
+
+### Agent Reasoning Panel
+**Real-time Thinking Display**:
+- Shows step-by-step agent reasoning
+- Confidence scores for each decision
+- Tool usage indicators
+- Processing animations
+- Expandable/collapsible interface
+
+### Module Executor
+**Execution Visualization**:
+- Step-by-step processing display
+- Tool activation tracking
+- Execution logging with timestamps
+- Progress bars and metrics
+- Live status updates
 
 ### Re-run Capabilities
 Users can modify parameters and re-run analyses in real-time:
@@ -294,15 +391,32 @@ Seven prioritized triggers configured for the field suggestion system:
 /app
   /page.tsx              # Agent-verse dashboard with flow visualization
   /agents
-    /[agent]/page.tsx    # Dynamic agent pages with Q&A interface
+    /omni                # Omni Agent master orchestrator
+    /customer            # Customer Planning with 5-module workflow
+    /engagement          # Budget Planning (formerly /budget)
+    /content             # Content Review
+    /orchestration       # AI-based Orchestration
+    /activation          # Digital Activation
+    /copilot             # Field Copilot
   /api
     /agents              # Agent-specific endpoints
     /chat                # Q&A processing endpoints
 /components
+  /agents
+    CustomerPlanningWorkflow.tsx  # 5-module workflow orchestrator
+    ModuleExecutor.tsx            # Individual module execution engine
+    AgentReasoningPanel.tsx       # Real-time agent reasoning display
+    ModuleChatInterface.tsx       # Interactive chat for each module
   /agent-verse           # Agent flow and interaction components
+    FlowVisualizationClean.tsx    # Main dashboard visualization
+    WorkflowVisualization.tsx     # Workflow progress display
   /design-system         # ZS-inspired UI components
   /charts                # Interactive visualizations
 /lib
+  /workflows
+    customer-priority-workflow.ts  # Customer planning workflow logic
+    content-approval-workflow.ts   # Content approval workflow
+  /contexts              # React contexts for state management
   /agents                # Agent logic and reasoning
   /types                 # TypeScript definitions
   /data                  # Mock data generators
@@ -315,6 +429,20 @@ Seven prioritized triggers configured for the field suggestion system:
 - Interactive Q&A demonstrations
 - Real-time impact analysis
 - Barrier-led engagement showcase
+
+### Customer Planning Workflow Demo
+1. **Initiation**: User asks "Who should be my priority customers?"
+2. **Brand Context**: System extracts therapeutic area and objectives
+3. **Module Progression**: 
+   - Each module processes with visible reasoning
+   - User sees real-time visualizations
+   - Chat interface for Q&A at each step
+   - Approval before next module
+4. **Final Output**:
+   - 423 prioritized HCPs identified
+   - $45M total opportunity calculated
+   - 3 microsegmentation strategies presented
+   - Results passed to downstream agents
 
 ### Interactive Capabilities
 - Natural language queries
@@ -343,6 +471,16 @@ Seven prioritized triggers configured for the field suggestion system:
 - **Demo Focus**: Interactive exploration of connected AI agents
 - **Key Differentiator**: Barrier-led approach with explainable AI reasoning
 - **Presentation Ready**: Optimized for live demonstrations with Q&A
+- **Workflow Innovation**: 5-module Customer Planning with real-time agent reasoning
+- **User Control**: Approval workflow at each module for transparency
+- **Visual Excellence**: Dynamic visualizations update based on module outputs
+
+## Deployment
+
+- **Production URL**: https://dce-omniverse.vercel.app
+- **Platform**: Vercel (automatic deployments from main branch)
+- **GitHub**: https://github.com/algod/dce-omniverse
+- **Environment**: Next.js 14, TypeScript, Tailwind CSS
 
 ## Success Metrics
 
