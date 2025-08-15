@@ -1,10 +1,41 @@
 'use client';
 
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Brain } from 'lucide-react';
 import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
 import { OrchestrationVisualization } from '@/components/agents/OrchestrationVisualization';
+import { OrchestrationWorkflow } from '@/components/agents/workflows/OrchestrationWorkflow';
+import { aiOrchestrationWorkflow } from '@/lib/workflows/ai-orchestration-workflow';
+import { executeWorkflowStep } from '@/lib/workflows/workflow-utils';
 
-export default function OrchestrationAgent() {
+function OrchestrationAgentContent() {
+  const searchParams = useSearchParams();
+  const [workflowMode, setWorkflowMode] = useState(false);
+  const [activeWorkflow, setActiveWorkflow] = useState(aiOrchestrationWorkflow);
+  const [brandContext] = useState({
+    therapeutic_area: 'Oncology',
+    brand_name: 'BrandX'
+  });
+  
+  useEffect(() => {
+    if (searchParams.get('workflow') === 'active') {
+      setWorkflowMode(true);
+      const updated = executeWorkflowStep(activeWorkflow, 1);
+      setActiveWorkflow(updated);
+    }
+  }, [searchParams]);
+
+  const handleStartWorkflow = () => {
+    setWorkflowMode(true);
+    const updated = executeWorkflowStep(activeWorkflow, 1);
+    setActiveWorkflow(updated);
+  };
+
+  if (workflowMode) {
+    return <OrchestrationWorkflow brandContext={brandContext} />;
+  }
+
   return (
     <StandardAgentViewLight
       agentId="orchestration"
@@ -167,7 +198,7 @@ export default function OrchestrationAgent() {
             }
           ]
         },
-        visualizations: <OrchestrationVisualization />
+        visualizations: <OrchestrationVisualization onStartWorkflow={handleStartWorkflow} />
       }}
       outputs={{
         downstream: {
@@ -195,5 +226,13 @@ export default function OrchestrationAgent() {
         ]
       }}
     />
+  );
+}
+
+export default function OrchestrationAgent() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OrchestrationAgentContent />
+    </Suspense>
   );
 }

@@ -7,13 +7,13 @@ import {
   User, TrendingUp, Target, Heart, Layers, ChevronLeft
 } from 'lucide-react';
 import { zsColors } from '@/lib/design-system/zs-colors';
-import { 
-  Workflow, 
-  WorkflowStep,
+import { Workflow, WorkflowStep } from '@/lib/workflows/engagement-planning-workflow';
+import {
   executeWorkflowStep,
   processModuleStep,
-  approveModuleStep 
-} from '@/lib/workflows/customer-priority-workflow';
+  approveModuleStep,
+  getWorkflowProgress
+} from '@/lib/workflows/workflow-utils';
 import { ModuleChatInterface } from '../ModuleChatInterface';
 import { ModuleExecutor } from '../ModuleExecutor';
 import { AgentReasoningPanel } from '../AgentReasoningPanel';

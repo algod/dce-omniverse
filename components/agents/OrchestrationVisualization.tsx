@@ -52,7 +52,11 @@ const featureImportance = [
   { feature: 'Digital Engagement', importance: 0.10 }
 ];
 
-export function OrchestrationVisualization() {
+interface OrchestrationVisualizationProps {
+  onStartWorkflow?: () => void;
+}
+
+export function OrchestrationVisualization({ onStartWorkflow }: OrchestrationVisualizationProps) {
   const [selectedView, setSelectedView] = useState<'journey' | 'nba' | 'model' | 'sequences'>('journey');
 
   return (
@@ -317,6 +321,23 @@ export function OrchestrationVisualization() {
           </div>
         </div>
       </div>
+      
+      {/* Start Workflow Button */}
+      {onStartWorkflow && (
+        <div className="flex justify-center mt-6">
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onStartWorkflow}
+            className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+          >
+            <Brain size={20} />
+            Start 5-Module Workflow
+          </motion.button>
+        </div>
+      )}
     </div>
   );
 }
