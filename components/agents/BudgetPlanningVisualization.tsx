@@ -48,7 +48,11 @@ const roiWaterfallData = [
   { name: 'Total Sales', value: 19000000, fill: colors.primary.main }
 ];
 
-export function BudgetPlanningVisualization() {
+interface BudgetPlanningVisualizationProps {
+  onStartWorkflow?: () => void;
+}
+
+export function BudgetPlanningVisualization({ onStartWorkflow }: BudgetPlanningVisualizationProps) {
   const [selectedView, setSelectedView] = useState<'allocation' | 'roi' | 'response' | 'quarterly'>('allocation');
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const totalBudget = channelData.reduce((sum, c) => sum + c.budget, 0);
@@ -347,6 +351,23 @@ export function BudgetPlanningVisualization() {
             </div>
           </div>
         </motion.div>
+      )}
+      
+      {/* Start Workflow Button */}
+      {onStartWorkflow && (
+        <div className="flex justify-center mt-6">
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onStartWorkflow}
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+          >
+            <TrendingUp size={20} />
+            Start 5-Module Workflow
+          </motion.button>
+        </div>
       )}
     </div>
   );

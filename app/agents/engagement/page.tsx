@@ -1,10 +1,74 @@
 'use client';
 
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { TrendingUp } from 'lucide-react';
 import { StandardAgentViewLight } from '@/components/agent-verse/StandardAgentViewLight';
 import { BudgetPlanningVisualization } from '@/components/agents/BudgetPlanningVisualization';
+import { EngagementPlanningWorkflow } from '@/components/agents/workflows/EngagementPlanningWorkflow';
+import { engagementPlanningWorkflow, executeWorkflowStep } from '@/lib/workflows/engagement-planning-workflow';
+import { useAgentDataFlow } from '@/lib/contexts/AgentDataContext';
+import { DownstreamImpactPreview } from '@/components/agent-verse/DownstreamImpactPreview';
 
-export default function EngagementPlanningAgent() {
+function EngagementPlanningAgentContent() {
+  const searchParams = useSearchParams();
+  const [workflowMode, setWorkflowMode] = useState(false);
+  const [activeWorkflow, setActiveWorkflow] = useState(engagementPlanningWorkflow);
+  const [brandContext] = useState({
+    therapeutic_area: 'Oncology',
+    brand_name: 'BrandX',
+    budget: 15000000,
+    objectives: ['Maximize ROI', 'Optimize channel mix', 'Improve engagement efficiency']
+  });
+  
+  // Data flow integration
+  const { currentData, upstreamData, updateData, dataAvailable, previewDownstreamImpact } = useAgentDataFlow('engagement');
+  const [pendingChanges, setPendingChanges] = useState<any>(null);
+  
+  // Check if workflow should be started automatically
+  useEffect(() => {
+    if (searchParams.get('workflow') === 'active') {
+      setWorkflowMode(true);
+      // Start the workflow from the first module
+      const updated = executeWorkflowStep(activeWorkflow, 1);
+      setActiveWorkflow(updated);
+    }
+  }, [searchParams]);
+
+  const handleStartWorkflow = () => {
+    setWorkflowMode(true);
+    // Start the workflow from the first module
+    const updated = executeWorkflowStep(activeWorkflow, 1);
+    setActiveWorkflow(updated);
+    
+    // Prepare changes for preview
+    const changes = {
+      optimalBudgets: {
+        'Field': 6000000,
+        'Digital': 3750000,
+        'Email': 2250000,
+        'Conferences': 1500000,
+        'Speaker Programs': 1500000
+      },
+      segmentBudgets: {
+        'Champions': 4500000,
+        'Growers': 3750000,
+        'Converters': 3000000,
+        'Maintainers': 2250000,
+        'Defenders': 1500000
+      },
+      expectedROI: 3.2,
+      engagementFrequency: 2.3
+    };
+    
+    setPendingChanges(changes);
+    updateData(changes);
+  };
+
+  if (workflowMode) {
+    return <EngagementPlanningWorkflow brandContext={brandContext} />;
+  }
+
   return (
     <StandardAgentViewLight
       agentId="engagement"
@@ -171,7 +235,7 @@ export default function EngagementPlanningAgent() {
             }
           ]
         },
-        visualizations: <BudgetPlanningVisualization />
+        visualizations: <BudgetPlanningVisualization onStartWorkflow={handleStartWorkflow} />
       }}
       outputs={{
         downstream: {
@@ -199,5 +263,13 @@ export default function EngagementPlanningAgent() {
         ]
       }}
     />
+  );
+}
+
+export default function EngagementPlanningAgent() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EngagementPlanningAgentContent />
+    </Suspense>
   );
 }
